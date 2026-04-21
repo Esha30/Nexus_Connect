@@ -1,0 +1,14 @@
+# Root .gitignore
+node_modules/
+
+# Environment Variables (CRITICAL)
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dev scripts
+insert_download.ps1

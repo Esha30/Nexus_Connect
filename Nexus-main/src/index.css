@@ -1,0 +1,89 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased overflow-x-hidden break-words selection:bg-brand-100 selection:text-brand-900;
+  }
+
+  .dark body {
+    @apply bg-slate-950 text-slate-100;
+  }
+
+  /* Global Overrides for components with hardcoded light backgrounds */
+  .dark .bg-white,
+  .dark .bg-gray-50,
+  .dark .bg-\[\#FDFDFF\] {
+    background-color: #0f172a !important; /* slate-900 */
+    color: #f1f5f9 !important; /* slate-100 */
+  }
+
+  .dark .bg-gray-50\/20,
+  .dark .bg-gray-50\/30,
+  .dark .bg-gray-50\/50 {
+    background-color: rgba(30, 41, 59, 0.5) !important; /* slate-800 with opacity */
+  }
+
+  .dark .text-gray-900,
+  .dark .text-gray-700,
+  .dark .text-gray-600 {
+    color: #f1f5f9 !important; /* slate-100 */
+  }
+
+  .dark .text-gray-500,
+  .dark .text-gray-400 {
+    color: #94a3b8 !important; /* slate-400 */
+  }
+
+  .dark .border-gray-100,
+  .dark .border-gray-200,
+  .dark .border-white\/40,
+  .dark .border-white\/20 {
+    border-color: #1e293b !important; /* slate-800 */
+  }
+
+  /* Success/Warning badge overrides if needed */
+  .dark .bg-emerald-50,
+  .dark .bg-primary-50 {
+    background-color: rgba(16, 185, 129, 0.1) !important;
+  }
+}
+
+@layer components {
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Natural Glassmorphism Utilities */
+  .glass-surface {
+    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)];
+  }
+
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-lg border border-white/40 shadow-[0_20px_40px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.07)] transition-all duration-500;
+  }
+
+  .glass-dark {
+    @apply bg-slate-900/80 backdrop-blur-xl border border-white/10;
+  }
+
+  .natural-shadow {
+    box-shadow: 
+      0 2px 4px 0 rgba(0,0,0,0.01),
+      0 4px 10px 0 rgba(0,0,0,0.02),
+      0 10px 20px 0 rgba(0,0,0,0.04);
+  }
+}
+
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight;
+  }
+}

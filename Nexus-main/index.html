@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#2563eb" />
+    <link rel="manifest" href="/manifest.json" />
+    <title>Nexus | Connecting Investors & Entrepreneurs</title>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Service Worker & Cache Management
+      if ('serviceWorker' in navigator) {
+        if (window.location.hostname === 'localhost') {
+          // Aggressively unregister all service workers on localhost to stop fetch errors
+          navigator.serviceWorker.getRegistrations().then(registrations => {
+            for(let registration of registrations) {
+              registration.unregister().then(() => {
+                console.log('Nexus: Service Worker unregistered from localhost.');
+              });
+            }
+          });
+          // Also clear caches
+          if ('caches' in window) {
+            caches.keys().then(names => {
+              for (let name of names) caches.delete(name);
+            });
+          }
+        } else {
+          // Register in production
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').then(reg => {
+               console.log('Nexus Service Worker registered!', reg);
+            }).catch(err => {
+               console.log('SW registration failed: ', err);
+            });
+          });
+        }
+      }
+    </script>
+  </body>
+</html>

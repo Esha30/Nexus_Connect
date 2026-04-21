@@ -1,0 +1,22 @@
+{
+  "short_name": "Nexus",
+  "name": "Nexus Platform",
+  "description": "Investor & Entrepreneur Portal",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary"
+}
