@@ -47,4 +47,4 @@ services:
       - key: VITE_API_URL
         value: https://nexus-backend-jurl.onrender.com/api
       - key: VITE_GOOGLE_CLIENT_ID
-        sync: false
+        value: 584779340324-vl3pqpo7kr6dv98jg5fsnimk4a48t5ie.apps.googleusercontent.com
