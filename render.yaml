@@ -18,7 +18,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: FRONTEND_URL
-        sync: false
+        value: https://nexus-frontend-co3l.onrender.com
       - key: GEMINI_API_KEY
         sync: false
       - key: EMAIL_USER
@@ -45,4 +45,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        sync: false
+        value: https://nexus-backend-jurl.onrender.com/api
