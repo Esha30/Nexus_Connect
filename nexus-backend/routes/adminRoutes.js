@@ -4,17 +4,27 @@ import {
   getSupportTickets, 
   resolveTicket,
   getPendingPriority,
-  approvePriority
+  approvePriority,
+  getAdminStats,
+  getAllUsers,
+  getUserById,
+  deleteUser,
+  getAllPosts,
+  deletePost
 } from '../controllers/adminController.js';
 
 const router = express.Router();
 
-// Apply protect middleware to all routes
+// Apply protect and adminAuth middleware to all routes
 router.use(protect);
-
-// Apply adminAuth middleware to all routes (we will create this)
 router.use(adminAuth);
 
+router.get('/stats', getAdminStats);
+router.get('/users', getAllUsers);
+router.get('/users/:id', getUserById);
+router.delete('/users/:id', deleteUser);
+router.get('/posts', getAllPosts);
+router.delete('/posts/:id', deletePost);
 router.get('/tickets', getSupportTickets);
 router.put('/tickets/:id', resolveTicket);
 router.get('/priority', getPendingPriority);

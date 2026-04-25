@@ -11,6 +11,9 @@ interface SocketContextType {
   isConnected: boolean;
   onlineUsers: Record<string, boolean>;
   totalUnreadCount: number;
+  unreadNotificationsCount: number;
+  refreshMessageCount: () => Promise<void>;
+  refreshNotificationCount: () => Promise<void>;
 }
 
 const SocketContext = createContext<SocketContextType>({
@@ -18,6 +21,9 @@ const SocketContext = createContext<SocketContextType>({
   isConnected: false,
   onlineUsers: {},
   totalUnreadCount: 0,
+  unreadNotificationsCount: 0,
+  refreshMessageCount: async () => {},
+  refreshNotificationCount: async () => {},
 });
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -25,11 +31,35 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [isConnected, setIsConnected] = useState(false);
   const [onlineUsers, setOnlineUsers] = useState<Record<string, boolean>>({});
   const [totalUnreadCount, setTotalUnreadCount] = useState(0);
+  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
   const socketRef = useRef<Socket | null>(null);
+
+  const fetchMessageCount = async () => {
+    try {
+      const res = await api.get('/messages/conversations');
+      const data = res.data;
+      if (Array.isArray(data)) {
+        interface Conversation { unreadCount?: number }
+        const count = data.reduce((acc: number, conv: Conversation) => acc + (conv.unreadCount || 0), 0);
+        setTotalUnreadCount(count);
+      }
+    } catch (err) {
+      console.error("Failed to fetch initial unread counts:", err);
+    }
+  };
+
+  const fetchNotificationCount = async () => {
+    try {
+      const res = await api.get('/notifications/');
+      const unread = res.data.filter((n: any) => !n.isRead).length;
+      setUnreadNotificationsCount(unread);
+    } catch (err) {
+      console.error('Failed to fetch unread notifications count:', err);
+    }
+  };
 
   useEffect(() => {
     if (!user) {
-      // Disconnect if user logs out
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
@@ -38,9 +68,8 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       return;
     }
 
-    // Create socket connection with enhanced stability
     const socket = io(SOCKET_URL, {
-      transports: ['polling', 'websocket'], // Prioritize polling for dev stability
+      transports: ['polling', 'websocket'],
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
@@ -52,7 +81,6 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     socket.on('connect', () => {
       setIsConnected(true);
-      // Announce online presence
       socket.emit('user-online', user.id);
       socket.emit('join-chat', user.id);
     });
@@ -61,8 +89,36 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setIsConnected(false);
     });
 
-    // Meeting Notifications
+    // Real-time badge updates from socket
+    socket.on('message-count-update', () => {
+      fetchMessageCount();
+    });
+
+    socket.on('notification-count-update', () => {
+      fetchNotificationCount();
+    });
+
+    // Listen for new notifications to increment count
+    socket.on('new-notification', (data: any) => {
+      setUnreadNotificationsCount(prev => prev + 1);
+      
+      // Keep existing toast logic for meetings/collabs
+      if (data.type === 'meeting') {
+        toast.success(`📅 New Meeting Request: "${data.title}" from ${data.senderName}`, {
+          duration: 6000,
+          icon: '🗓️'
+        });
+      } else if (data.type === 'collab') {
+        toast.success(`🤝 New Collaboration Request from ${data.investorName}`, {
+          duration: 6000,
+          style: { background: '#4F46E5', color: '#fff' }
+        });
+      }
+    });
+
+    // Meeting Notifications (Legacy events if backend still emits them separately)
     socket.on('new-meeting', (data: { title: string, senderName: string }) => {
+      fetchNotificationCount(); // Sync count
       toast.success(`📅 New Meeting Request: "${data.title}" from ${data.senderName}`, {
         duration: 6000,
         icon: '🗓️'
@@ -70,6 +126,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     });
 
     socket.on('meeting-updated', (data: { status: string, title: string, updatedBy: string }) => {
+      fetchNotificationCount(); // Sync count
       const message = data.status === 'accepted' 
         ? `✅ Meeting Accepted: "${data.title}" by ${data.updatedBy}`
         : `❌ Meeting Declined: "${data.title}" by ${data.updatedBy}`;
@@ -80,18 +137,16 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       });
     });
 
-    // Collaboration Notifications
     socket.on('new-collab', (data: { investorName: string }) => {
+      fetchNotificationCount(); // Sync count
       toast.success(`🤝 New Collaboration Request from ${data.investorName}`, {
         duration: 6000,
-        style: {
-          background: '#4F46E5',
-          color: '#fff',
-        }
+        style: { background: '#4F46E5', color: '#fff' }
       });
     });
 
     socket.on('collab-updated', (data: { status: string, entrepreneurName: string }) => {
+      fetchNotificationCount(); // Sync count
       if (data.status === 'accepted') {
         toast.success(`🚀 Collaboration accepted by ${data.entrepreneurName}!`, {
           duration: 8000,
@@ -99,17 +154,14 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
     });
 
-    // Listen for other users' status changes
     socket.on('user-status-change', ({ userId, isOnline }: { userId: string; isOnline: boolean }) => {
       setOnlineUsers(prev => ({ ...prev, [userId]: isOnline }));
     });
 
-    // Listen for global messages
     socket.on('receive-message', (payload) => {
-      setTotalUnreadCount(prev => prev + 1);
-      
-      // Toast notification if not on chat page
+      // If we are not in the chat with the sender, increment unread count
       if (!window.location.pathname.includes(`/chat/${payload.senderId}`)) {
+        setTotalUnreadCount(prev => prev + 1);
         toast.success(`Message: ${payload.content.substring(0, 30)}${payload.content.length > 30 ? '...' : ''}`, {
           icon: '💬',
           duration: 4000
@@ -117,21 +169,9 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
     });
 
-    // Fetch initial unread count
-    const fetchInitialUnread = async () => {
-      try {
-        const res = await api.get('/messages/conversations');
-        const data = res.data;
-        if (Array.isArray(data)) {
-          interface Conversation { unreadCount?: number }
-          const count = data.reduce((acc: number, conv: Conversation) => acc + (conv.unreadCount || 0), 0);
-          setTotalUnreadCount(count);
-        }
-      } catch (err) {
-        console.error("Failed to fetch initial unread counts:", err);
-      }
-    };
-    fetchInitialUnread();
+    // Initial fetch
+    fetchMessageCount();
+    fetchNotificationCount();
 
     return () => {
       socket.disconnect();
@@ -141,7 +181,15 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, [user]);
 
   return (
-    <SocketContext.Provider value={{ socket: socketRef.current, isConnected, onlineUsers, totalUnreadCount }}>
+    <SocketContext.Provider value={{ 
+      socket: socketRef.current, 
+      isConnected, 
+      onlineUsers, 
+      totalUnreadCount, 
+      unreadNotificationsCount,
+      refreshMessageCount: fetchMessageCount,
+      refreshNotificationCount: fetchNotificationCount
+    }}>
       {children}
     </SocketContext.Provider>
   );

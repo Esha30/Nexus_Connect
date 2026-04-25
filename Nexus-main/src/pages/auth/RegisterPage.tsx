@@ -26,8 +26,12 @@ export const RegisterPage: React.FC = () => {
  setIsLoading(true);
  try {
  if (response.credential) {
- await googleLogin(response.credential, role);
- navigate(role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor');
+ const result = await googleLogin(response.credential, role);
+ if (result?.role === 'admin') {
+   navigate('/admin');
+ } else {
+   navigate(role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor');
+ }
  }
  } catch (err) {
   if (err instanceof Error && err.message.includes('403')) {
@@ -56,7 +60,11 @@ export const RegisterPage: React.FC = () => {
  if (result && result.requiresVerification) {
  setRequiresOTP(true);
  } else {
- navigate(role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor');
+ if (result?.role === 'admin') {
+   navigate('/admin');
+ } else {
+   navigate(role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor');
+ }
  }
  } catch (err) {
  setError(err instanceof Error ? err.message : 'Registration failed');
@@ -70,8 +78,12 @@ export const RegisterPage: React.FC = () => {
  setError(null);
  setIsLoading(true);
  try {
- await verifyOTP(email, otp, role);
- navigate(role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor');
+ const result = await verifyOTP(email, otp, role);
+ if (result?.role === 'admin') {
+   navigate('/admin');
+ } else {
+   navigate(role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor');
+ }
  } catch (err) {
  setError(err instanceof Error ? err.message : 'Verification failed');
  } finally {

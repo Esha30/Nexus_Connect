@@ -1,4 +1,4 @@
-export type UserRole = 'entrepreneur' | 'investor';
+export type UserRole = 'entrepreneur' | 'investor' | 'admin';
 
 export interface UserProfile {
   bio?: string;
@@ -182,14 +182,14 @@ export interface AuthResponse {
 
 export interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string, role: UserRole) => Promise<AuthResponse | void>;
+  login: (email: string, password: string, role: UserRole) => Promise<any>;
   register: (name: string, email: string, password: string, role: UserRole) => Promise<void>;
-  googleLogin: (credential: string, role: UserRole) => Promise<AuthResponse | void>;
+  googleLogin: (credential: string, role: UserRole) => Promise<any>;
   logout: () => void;
   forgotPassword: (email: string) => Promise<void>;
   resetPassword: (token: string, newPassword: string) => Promise<void>;
   updateProfile: (userId: string, updates: Partial<User>) => Promise<void>;
-  verifyOTP: (email: string, otp: string, role: UserRole) => Promise<void>;
+  verifyOTP: (email: string, otp: string, role: UserRole) => Promise<any>;
   setup2FA: () => Promise<{ secret: string; qrCode: string }>;
   confirm2FA: (token: string) => Promise<boolean>;
   updatePartialUser: (updates: Partial<User>) => void;

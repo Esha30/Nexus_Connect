@@ -21,6 +21,7 @@ import stripeRoutes from './routes/stripeRoutes.js';
 import supportRoutes from './routes/supportRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import postRoutes from './routes/postRoutes.js';
 import User from './models/User.js';
 
 const app = express();
@@ -126,6 +127,7 @@ app.use('/api/stripe', stripeRoutes);
 app.use('/api/support', supportRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/ai', aiRateLimiter, aiRoutes);
+app.use('/api/posts', postRoutes);
 
 // Make uploads folder accessible
 const __dirname = path.resolve();

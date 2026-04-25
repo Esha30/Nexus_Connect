@@ -39,6 +39,7 @@ const AnalyticsPage = lazy(() => import('./pages/analytics/AnalyticsPage').then(
 const ContactPage = lazy(() => import('./pages/help/ContactPage').then(m => ({ default: m.ContactPage })));
 const DealsPage = lazy(() => import('./pages/deals/DealsPage').then(m => ({ default: m.DealsPage })));
 const MeetingsPage = lazy(() => import('./pages/meetings/MeetingsPage').then(m => ({ default: m.MeetingsPage })));
+const FeedPage = lazy(() => import('./pages/feed/FeedPage').then(m => ({ default: m.FeedPage })));
 
 // Chat Pages
 const ChatPage = lazy(() => import('./pages/chat/ChatPage').then(m => ({ default: m.ChatPage })));
@@ -141,6 +142,10 @@ function App() {
     
                   <Route path="/analytics" element={<DashboardLayout />}>
                     <Route index element={<AnalyticsPage />} />
+                  </Route>
+
+                  <Route path="/feed" element={<DashboardLayout />}>
+                    <Route index element={<FeedPage />} />
                   </Route>
                   
                   <Route path="/admin" element={<DashboardLayout />}>

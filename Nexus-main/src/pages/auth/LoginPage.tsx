@@ -28,7 +28,12 @@ export const LoginPage: React.FC = () => {
           setIsLoading(false);
           return;
         }
-        navigate(role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor');
+
+        if (result?.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate(role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor');
+        }
       }
     } catch (err) {
       if (err instanceof Error && err.message.includes('403')) {
@@ -50,8 +55,12 @@ export const LoginPage: React.FC = () => {
     
     try {
       if (requires2FA) {
-        await verifyOTP(email, otp, role);
-        navigate(role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor');
+        const otpResult = await verifyOTP(email, otp, role);
+        if (otpResult?.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate(role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor');
+        }
         return;
       }
 
@@ -63,7 +72,11 @@ export const LoginPage: React.FC = () => {
         return;
       }
 
-      navigate(role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor');
+      if (result?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate(role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
       setIsLoading(false);

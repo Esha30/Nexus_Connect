@@ -66,6 +66,7 @@ export const ChatPage: React.FC = () => {
  const [isClearModalOpen, setIsClearModalOpen] = useState(false);
  const [chatToClear, setChatToClear] = useState<string | null>(null);
  const [isDrafting, setIsDrafting] = useState(false);
+ const [showProfileInfo, setShowProfileInfo] = useState(false);
  
  // WhatsApp Features State
  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -682,6 +683,13 @@ export const ChatPage: React.FC = () => {
  <button onClick={() => startCall('video')} className="p-2.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition duration-200">
  <VideoIcon size={20} />
  </button>
+ <button 
+   onClick={() => setShowProfileInfo(!showProfileInfo)} 
+   className={`p-2.5 rounded-xl transition duration-200 ${showProfileInfo ? 'bg-primary-100 text-primary-600' : 'text-gray-400 hover:text-primary-600 hover:bg-primary-50'}`}
+   title="Partner Information"
+ >
+   <Info size={20} />
+ </button>
  <div className="relative">
    <button onClick={() => setShowChatOptions(!showChatOptions)} className="p-2.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition duration-200">
      <MoreVertical size={20} />
@@ -891,6 +899,81 @@ export const ChatPage: React.FC = () => {
     </div>
   </div>
  )}
+ 
+    {/* Partner Info Sidebar */}
+    {showProfileInfo && chatPartner && (
+      <div className="hidden lg:flex w-80 border-l border-gray-100 bg-white flex-col animate-in slide-in-from-right duration-300">
+        <div className="p-6 border-b border-gray-50 flex justify-between items-center bg-white sticky top-0">
+          <h3 className="font-bold text-gray-900">Partner Intelligence</h3>
+          <button onClick={() => setShowProfileInfo(false)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition">
+            <X size={18} />
+          </button>
+        </div>
+        
+        <div className="flex-1 overflow-y-auto p-6 space-y-8">
+          <div className="flex flex-col items-center text-center space-y-3">
+            <div className="relative">
+              <Avatar src={chatPartner.profile?.avatarUrl} alt={chatPartner.name} size="2xl" />
+              {chatPartner.isOnline && (
+                <span className="absolute bottom-2 right-2 block h-4 w-4 rounded-full bg-green-500 ring-4 ring-white" />
+              )}
+            </div>
+            <div>
+              <h4 className="text-lg font-bold text-gray-900">{chatPartner.name}</h4>
+              <p className="text-xs font-bold text-primary-600 uppercase tracking-widest">{chatPartner.role}</p>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="p-1.5 bg-primary-100 text-primary-600 rounded-lg">
+                  <Sparkles size={14} />
+                </div>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-tighter">Strategic Pitch</p>
+              </div>
+              <p className="text-sm text-gray-700 font-medium leading-relaxed">
+                {chatPartner.profile?.pitchSummary || 'No strategic pitch summary provided yet.'}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              <div className="space-y-1">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Industry focus</p>
+                <p className="text-sm font-semibold text-gray-900">{chatPartner.profile?.industry || 'Unspecified'}</p>
+              </div>
+              
+              {chatPartner.role === 'entrepreneur' && (
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Funding Goal</p>
+                  <p className="text-sm font-semibold text-emerald-600">{chatPartner.profile?.fundingNeeded || 'TBD'}</p>
+                </div>
+              )}
+              
+              {chatPartner.role === 'investor' && (
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Investment Interests</p>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {chatPartner.profile?.investmentInterests?.map((interest: string, i: number) => (
+                      <span key={i} className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded text-[10px] font-bold">{interest}</span>
+                    )) || <span className="text-sm font-semibold text-gray-900">General</span>}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        <div className="p-6 border-t border-gray-50 bg-gray-50/50">
+          <button 
+            onClick={() => window.location.href = `/${chatPartner.role === 'investor' ? 'investors' : 'entrepreneurs'}`}
+            className="w-full py-3 bg-white border border-gray-200 text-gray-700 rounded-xl text-xs font-bold hover:bg-gray-50 transition shadow-sm"
+          >
+            View Full Profile Protocol
+          </button>
+        </div>
+      </div>
+    )}
     </div>
   );
 };

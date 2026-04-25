@@ -24,6 +24,13 @@ export const markAsRead = async (req, res) => {
       { new: true }
     );
     if (!notification) return res.status(404).json({ message: 'Notification not found' });
+    
+    // Emit event to update unread counts in real-time
+    const io = req.app.get('socketio');
+    if (io) {
+      io.to(req.user._id.toString()).emit('notification-count-update');
+    }
+
     res.json(notification);
   } catch (error) {
     res.status(500).json({ message: 'Error updating notification', error: error.message });
@@ -39,6 +46,13 @@ export const markAllAsRead = async (req, res) => {
       { recipient: req.user._id, isRead: false },
       { isRead: true }
     );
+
+    // Emit event to update unread counts in real-time
+    const io = req.app.get('socketio');
+    if (io) {
+      io.to(req.user._id.toString()).emit('notification-count-update');
+    }
+
     res.json({ message: 'All marked as read' });
   } catch (error) {
     res.status(500).json({ message: 'Error updating notifications', error: error.message });
@@ -54,6 +68,13 @@ export const deleteNotification = async (req, res) => {
       recipient: req.user._id
     });
     if (!notification) return res.status(404).json({ message: 'Notification not found' });
+    
+    // Emit event to update unread counts in real-time
+    const io = req.app.get('socketio');
+    if (io) {
+      io.to(req.user._id.toString()).emit('notification-count-update');
+    }
+
     res.json({ message: 'Notification deleted' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting notification', error: error.message });
@@ -65,6 +86,13 @@ export const deleteNotification = async (req, res) => {
 export const deleteAllNotifications = async (req, res) => {
   try {
     await Notification.deleteMany({ recipient: req.user._id });
+    
+    // Emit event to update unread counts in real-time
+    const io = req.app.get('socketio');
+    if (io) {
+      io.to(req.user._id.toString()).emit('notification-count-update');
+    }
+
     res.json({ message: 'All notifications deleted' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting notifications', error: error.message });

@@ -13,63 +13,12 @@ import { Notification } from '../../types';
 export const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logout } = useAuth();
-  const { socket } = useSocket();
+  const { unreadNotificationsCount: unreadNotifications } = useSocket();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [unreadNotifications, setUnreadNotifications] = useState(0);
   
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
-  useEffect(() => {
-    const fetchUnreadCount = async () => {
-      try {
-        const res = await api.get('/notifications/');
-        const unread = res.data.filter((n: Notification) => !n.isRead).length;
-        setUnreadNotifications(unread);
-      } catch (err) {
-        console.error('Failed to fetch notifications count', err);
-      }
-    };
-    
-    if (user) {
-      fetchUnreadCount();
-      
-      // Listen for manual sync triggers from other components
-      window.addEventListener('notifications-updated', fetchUnreadCount);
-      return () => window.removeEventListener('notifications-updated', fetchUnreadCount);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (socket) {
-      socket.on('new-notification', (notification) => {
-        setUnreadNotifications(prev => prev + 1);
-        toast.custom((t_notif) => (
-          <div className={`${t_notif.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full bg-white shadow-sm rounded-lg pointer-events-auto border border-gray-200`}>
-            <div className="flex-1 p-4">
-              <div className="flex items-start">
-                <img className="h-8 w-8 rounded-full" src={notification.sender?.profile?.avatarUrl || notification.sender?.avatarUrl || 'https://via.placeholder.com/150'} alt="" />
-                <div className="ml-3 flex-1">
-                  <p className="text-sm font-medium text-gray-900">{notification.sender?.name}</p>
-                  <p className="mt-0.5 text-sm text-gray-500">{notification.content}</p>
-                </div>
-              </div>
-            </div>
-            <div className="border-l border-gray-100">
-              <button
-                onClick={() => { toast.dismiss(t_notif.id); navigate('/notifications'); }}
-                className="px-4 py-3 text-sm font-medium text-primary-600 hover:bg-gray-50 rounded-r-lg"
-              >
-                View
-              </button>
-            </div>
-          </div>
-        ));
-      });
-    }
-    return () => { if (socket) socket.off('new-notification'); };
-  }, [socket, navigate]);
-  
   const handleLogout = () => {
     logout();
     navigate('/login');

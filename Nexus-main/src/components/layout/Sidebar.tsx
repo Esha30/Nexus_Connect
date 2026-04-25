@@ -6,7 +6,7 @@ import { useTranslation } from '../../context/LanguageContext';
 import { PlanBadge } from '../ui/PlanBadge';
 import { 
   Home, Building2, CircleDollarSign, Users, MessageCircle, 
-  Bell, FileText, Settings, HelpCircle, Calendar, ChevronRight, Mail as MailIcon 
+  Bell, FileText, Settings, HelpCircle, Calendar, ChevronRight, Mail as MailIcon, LayoutGrid, Shield 
 } from 'lucide-react';
 
 interface SidebarItemProps {
@@ -51,6 +51,7 @@ export const Sidebar: React.FC = () => {
   const entrepreneurItems = [
     { to: '/dashboard/entrepreneur', icon: <Home size={18} />, text: t('nav.dashboard') },
     { to: '/profile/entrepreneur/' + user.id, icon: <Building2 size={18} />, text: t('sidebar.my_startup') },
+    { to: '/feed', icon: <LayoutGrid size={18} />, text: 'Global Feed' },
     { to: '/investors', icon: <CircleDollarSign size={18} />, text: t('sidebar.find_investors') },
     { to: '/messages', icon: <MessageCircle size={18} />, text: t('nav.messages') },
     { to: '/meetings', icon: <Calendar size={18} />, text: t('sidebar.meetings') },
@@ -61,6 +62,7 @@ export const Sidebar: React.FC = () => {
   const investorItems = [
     { to: '/dashboard/investor', icon: <Home size={18} />, text: t('nav.dashboard') },
     { to: '/profile/investor/' + user.id, icon: <CircleDollarSign size={18} />, text: t('sidebar.my_portfolio') },
+    { to: '/feed', icon: <LayoutGrid size={18} />, text: 'Global Feed' },
     { to: '/entrepreneurs', icon: <Users size={18} />, text: t('sidebar.find_startups') },
     { to: '/messages', icon: <MessageCircle size={18} />, text: t('nav.messages') },
     { to: '/meetings', icon: <Calendar size={18} />, text: t('sidebar.meetings') },
@@ -72,6 +74,7 @@ export const Sidebar: React.FC = () => {
   const sidebarItems = user.role === 'entrepreneur' ? entrepreneurItems : investorItems;
   
   const commonItems = [
+    ...(user.role === 'admin' ? [{ to: '/admin', icon: <Shield size={18} />, text: 'Admin Panel' }] : []),
     { to: '/settings', icon: <Settings size={18} />, text: t('sidebar.settings') },
     { to: '/help', icon: <HelpCircle size={18} />, text: t('sidebar.help') },
     { to: '/contact', icon: <MailIcon size={18} />, text: t('sidebar.contact') },

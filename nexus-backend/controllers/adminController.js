@@ -1,5 +1,115 @@
 import SupportTicket from '../models/SupportTicket.js';
 import User from '../models/User.js';
+import Post from '../models/Post.js';
+import Deal from '../models/Deal.js';
+
+// @desc    Get Admin Dashboard Stats
+// @route   GET /api/admin/stats
+// @access  Private (Admin only)
+export const getAdminStats = async (req, res) => {
+  try {
+    const userCount = await User.countDocuments();
+    const entrepreneurCount = await User.countDocuments({ role: 'entrepreneur' });
+    const investorCount = await User.countDocuments({ role: 'investor' });
+    const postCount = await Post.countDocuments();
+    const dealCount = await Deal.countDocuments();
+    const pendingTicketCount = await SupportTicket.countDocuments({ status: { $ne: 'resolved' } });
+
+    res.json({
+      users: {
+        total: userCount,
+        entrepreneurs: entrepreneurCount,
+        investors: investorCount
+      },
+      content: {
+        posts: postCount,
+        deals: dealCount
+      },
+      support: {
+        pendingTickets: pendingTicketCount
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch admin stats', error: error.message });
+  }
+};
+
+// @desc    Get all users (detailed)
+// @route   GET /api/admin/users
+// @access  Private (Admin only)
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().sort({ createdAt: -1 });
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch users', error: error.message });
+  }
+};
+
+// @desc    Get a single user's full details
+// @route   GET /api/admin/users/:id
+// @access  Private (Admin only)
+export const getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // Get post count for this user
+    const postCount = await Post.countDocuments({ author: req.params.id });
+
+    res.json({ ...user.toObject(), postCount });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch user', error: error.message });
+  }
+};
+
+// @desc    Delete a user
+// @route   DELETE /api/admin/users/:id
+// @access  Private (Admin only)
+export const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    if (user.role === 'admin') {
+      return res.status(403).json({ message: 'Cannot delete an administrator' });
+    }
+
+    await User.findByIdAndDelete(req.params.id);
+    // Optionally delete user's posts, deals, etc.
+    await Post.deleteMany({ author: req.params.id });
+    
+    res.json({ message: 'User and associated content removed' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete user', error: error.message });
+  }
+};
+
+// @desc    Get all posts
+// @route   GET /api/admin/posts
+// @access  Private (Admin only)
+export const getAllPosts = async (req, res) => {
+  try {
+    const posts = await Post.find().populate('author', 'name email role').sort({ createdAt: -1 });
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch posts', error: error.message });
+  }
+};
+
+// @desc    Delete a post (moderation)
+// @route   DELETE /api/admin/posts/:id
+// @access  Private (Admin only)
+export const deletePost = async (req, res) => {
+  try {
+    await Post.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Post removed by moderator' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete post', error: error.message });
+  }
+};
 
 // @desc    Get all support tickets
 // @route   GET /api/admin/tickets
@@ -23,9 +133,6 @@ export const resolveTicket = async (req, res) => {
       return res.status(404).json({ message: 'Ticket not found' });
     }
     
-    // SupportTicket might not have a 'status' field originally, 
-    // but Mongoose allows adding if we enable strict=false or update it directly
-    // Let's assume we can set status to 'resolved'
     ticket.status = 'resolved';
     ticket.updatedAt = new Date();
     await ticket.save();

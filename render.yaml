@@ -1,0 +1,44 @@
+services:
+  # Backend Web Service
+  - type: web
+    name: nexus-backend
+    env: node
+    plan: starter
+    region: oregon
+    buildCommand: npm install
+    startCommand: node server.js
+    rootDir: nexus-backend
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5001
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+
+  # Frontend Static Site
+  - type: static
+    name: nexus-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    rootDir: Nexus-main
+    envVars:
+      - key: VITE_API_URL
+        sync: false

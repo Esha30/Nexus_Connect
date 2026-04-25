@@ -86,6 +86,12 @@ export const getMessages = async (req, res) => {
       await conversation.save();
     }
 
+    // Emit event to update unread counts in real-time for the reader
+    const io = req.app.get('socketio');
+    if (io) {
+      io.to(req.user._id.toString()).emit('message-count-update');
+    }
+
     const messages = await Message.find({ conversationId: conversation._id })
       .populate('replyTo', 'senderId content')
       .sort({ createdAt: 1 })

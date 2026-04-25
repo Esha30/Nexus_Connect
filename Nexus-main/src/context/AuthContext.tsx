@@ -52,7 +52,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = async (email: string, password: string, role: UserRole): Promise<void | { requires2FA: boolean; message: string }> => {
+  const login = async (email: string, password: string, role: UserRole): Promise<any> => {
     if (!password) {
       throw new Error("Password is required for local login.");
     }
@@ -64,7 +64,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return res.data;
       }
 
-      if (res.data.role !== role) {
+      if (res.data.role !== role && res.data.role !== 'admin') {
         throw new Error(`Account registered as ${res.data.role}, not ${role}`);
       }
 
@@ -77,6 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem(TOKEN_KEY, res.data.token);
       localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData));
       toast.success('Logged in successfully!');
+      return res.data;
     } catch (error) {
       let msg = 'Login failed';
       if (axios.isAxiosError(error)) {
@@ -89,12 +90,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const verifyOTP = async (email: string, otp: string, role: UserRole): Promise<void> => {
+  const verifyOTP = async (email: string, otp: string, role: UserRole): Promise<any> => {
     setIsLoading(true);
     try {
       const res = await api.post('/auth/verify-otp', { email, otp });
 
-      if (res.data.role !== role) {
+      if (res.data.role !== role && res.data.role !== 'admin') {
         throw new Error(`Account registered as ${res.data.role}, not ${role}`);
       }
 
@@ -107,6 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem(TOKEN_KEY, res.data.token);
       localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData));
       toast.success('Security code verified. Logged in!');
+      return res.data;
     } catch (error) {
       let msg = 'Verification failed';
       if (axios.isAxiosError(error)) {
@@ -121,7 +123,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (name: string, email: string, password: string, role: UserRole): Promise<void | { requiresVerification: boolean; message: string }> => {
+  const register = async (name: string, email: string, password: string, role: UserRole): Promise<any> => {
     setIsLoading(true);
     try {
       const res = await api.post('/auth/register', { name, email, password, role });
@@ -140,6 +142,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem(TOKEN_KEY, res.data.token);
       localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData));
       toast.success('Account created successfully!');
+      return res.data;
     } catch (error) {
       let msg = 'Registration failed';
       if (axios.isAxiosError(error)) {
