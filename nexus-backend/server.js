@@ -23,7 +23,7 @@ import adminRoutes from './routes/adminRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 import User from './models/User.js';
-import { checkMaintenance } from './middleware/authMiddleware.js';
+import { checkMaintenance, checkFeatureToggle } from './middleware/authMiddleware.js';
 
 const app = express();
 
