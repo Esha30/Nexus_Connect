@@ -901,14 +901,43 @@ export const ChatPage: React.FC = () => {
         </form>
       </div>
  </>
- ) : (
-  <EmptyState 
-    icon={MessageCircle}
-    title="Secure Conversations"
-    description="Select a partner from the sidebar to start a secure, encrypted end-to-end conversation with potential investors or partners."
-    className="bg-gray-50/20 flex-1"
-  />
- )}
+  ) : (
+    <div className="flex-1 flex flex-col items-center justify-center bg-[#F8F9FA] relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute top-0 left-0 w-full h-1.5 bg-primary-600/10" />
+      <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary-600/5 rounded-full blur-3xl" />
+      <div className="absolute -top-24 -left-24 w-96 h-96 bg-indigo-600/5 rounded-full blur-3xl" />
+
+      <div className="relative z-10 flex flex-col items-center max-w-md px-8 text-center">
+        <div className="w-24 h-24 bg-white rounded-full shadow-xl shadow-primary-600/10 flex items-center justify-center mb-8 border border-gray-100 animate-bounce-subtle">
+          <MessageCircle size={48} className="text-primary-600" />
+        </div>
+        
+        <h2 className="text-3xl font-bold text-gray-900 mb-4 tracking-tight">Nexus Web</h2>
+        <p className="text-[15px] text-gray-500 leading-relaxed mb-8">
+          Select a partner from the sidebar to start a secure, encrypted end-to-end conversation with potential investors or founders.
+        </p>
+        
+        <div className="flex items-center gap-2 px-4 py-2 bg-gray-100/50 rounded-full border border-gray-200/50">
+          <Sparkles size={14} className="text-primary-600" />
+          <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">End-to-End Encrypted Channel</span>
+        </div>
+
+        <button 
+          onClick={() => window.location.href = currentUser?.role === 'investor' ? '/startups' : '/investors'}
+          className="mt-10 px-8 py-3 bg-gray-900 text-white rounded-xl font-bold text-sm hover:bg-primary-600 transition-all shadow-lg shadow-gray-900/20 active:scale-95"
+        >
+          Start New Connection
+        </button>
+      </div>
+      
+      <div className="absolute bottom-8 text-[10px] font-bold text-gray-300 uppercase tracking-[0.2em] flex items-center gap-2">
+        <div className="w-8 h-[1px] bg-gray-200" />
+        Secure Protocol v2.4
+        <div className="w-8 h-[1px] bg-gray-200" />
+      </div>
+    </div>
+  )}
  </div>
  
  {/* Custom Confirm Modal for Clearing Chat */}

@@ -4,7 +4,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { ChatConversation } from '../../types';
 import { Avatar } from '../ui/Avatar';
 import { Badge } from '../ui/Badge';
-import { Trash2, VolumeX, Archive } from 'lucide-react';
+import { Trash2, VolumeX, Archive, MessageCircle, Loader2 } from 'lucide-react';
 
 import { useAuth } from '../../context/AuthContext';
 
@@ -100,11 +100,21 @@ export const ChatUserList: React.FC<ChatUserListProps> = ({ conversations, onCle
  </div>
  );
  })
- ) : (
- <div className="px-4 py-8 text-center">
- <p className="text-sm text-gray-500">No conversations yet</p>
- </div>
- )}
+  ) : (
+    <div className="px-6 py-12 text-center">
+      <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+        <MessageCircle size={24} className="text-gray-300" />
+      </div>
+      <p className="text-sm font-semibold text-gray-900 mb-1">No chats yet</p>
+      <p className="text-xs text-gray-500 mb-6 px-4">Start connecting with founders and investors to see your messages here.</p>
+      <button 
+        onClick={() => navigate(currentUser.role === 'investor' ? '/startups' : '/investors')}
+        className="text-xs font-bold text-primary-600 hover:text-primary-700 bg-primary-50 px-4 py-2 rounded-lg transition-colors"
+      >
+        Discover Partners
+      </button>
+    </div>
+  )}
  </div>
  </div>
  );
