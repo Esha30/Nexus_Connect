@@ -488,6 +488,37 @@ export const AdminDashboard: React.FC = () => {
             )}
 
             {activeTab === 'priority' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {pendingInvestors.length === 0 ? (
+                  <div className="col-span-full text-center py-32 text-gray-500 font-bold uppercase tracking-widest">No pending priority investor requests.</div>
+                ) : (
+                  pendingInvestors.map((investor) => (
+                    <Card key={investor._id} className="bg-[#161B2C] border-white/5 p-8 text-center border-t-4 border-t-primary-500">
+                      <Avatar 
+                        src={investor.profile?.avatarUrl} 
+                        alt={investor.name} 
+                        size="xl" 
+                        className="mx-auto mb-6 border-4 border-white/5 p-1 ring-2 ring-primary-500/20"
+                      />
+                      <h3 className="text-xl font-bold text-white mb-1">{investor.name}</h3>
+                      <p className="text-sm text-gray-500 font-medium mb-4">{investor.email}</p>
+                      <div className="px-4 py-2 bg-white/5 rounded-xl inline-block mb-8">
+                        <p className="text-xs font-black text-primary-400 uppercase tracking-widest">
+                          {investor.profile?.company || 'Independent Investor'}
+                        </p>
+                      </div>
+                      
+                      <Button 
+                        onClick={() => approvePriority(investor._id)}
+                        fullWidth
+                        className="font-black bg-primary-600 hover:bg-primary-700 py-4 rounded-2xl shadow-[0_0_20px_rgba(37,99,235,0.3)]"
+                        leftIcon={<Shield size={18} />}
+                      >
+                        Grant Priority
+                      </Button>
+                    </Card>
+                  ))
+                )}
               </div>
             )}
 
