@@ -108,7 +108,7 @@ export const ChatUserList: React.FC<ChatUserListProps> = ({ conversations, onCle
       <p className="text-sm font-semibold text-gray-900 mb-1">No chats yet</p>
       <p className="text-xs text-gray-500 mb-6 px-4">Start connecting with founders and investors to see your messages here.</p>
       <button 
-        onClick={() => navigate(currentUser.role === 'investor' ? '/startups' : '/investors')}
+        onClick={() => navigate(currentUser.role === 'investor' ? '/entrepreneurs' : '/investors')}
         className="text-xs font-bold text-primary-600 hover:text-primary-700 bg-primary-50 px-4 py-2 rounded-lg transition-colors"
       >
         Discover Partners

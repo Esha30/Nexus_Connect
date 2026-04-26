@@ -924,7 +924,7 @@ export const ChatPage: React.FC = () => {
         </div>
 
         <button 
-          onClick={() => window.location.href = currentUser?.role === 'investor' ? '/startups' : '/investors'}
+          onClick={() => navigate(currentUser?.role === 'investor' ? '/entrepreneurs' : '/investors')}
           className="mt-10 px-8 py-3 bg-gray-900 text-white rounded-xl font-bold text-sm hover:bg-primary-600 transition-all shadow-lg shadow-gray-900/20 active:scale-95"
         >
           Start New Connection
