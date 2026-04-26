@@ -51,6 +51,12 @@ const PricingPage = lazy(() => import('./pages/billing/PricingPage').then(m => (
 const SuccessPage = lazy(() => import('./pages/billing/SuccessPage').then(m => ({ default: m.SuccessPage })));
 const CancelPage = lazy(() => import('./pages/billing/CancelPage').then(m => ({ default: m.CancelPage })));
 
+const RootRedirect = () => {
+  const { user, isAuthenticated } = useAuth();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  return <Navigate to={user?.role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor'} replace />;
+};
+
 function App() {
   return (
     <ThemeProvider>
@@ -160,8 +166,8 @@ function App() {
     
                   <Route path="/meeting/:meetingId" element={<MeetingRoomPage />} />
                   
-                  {/* Redirect root to login */}
-                  <Route path="/" element={<Navigate to="/login" replace />} />
+                  {/* Redirect root to login or dashboard based on auth */}
+                  <Route path="/" element={<RootRedirect />} />
                   
                   {/* Catch all other routes and redirect to login */}
                   <Route path="*" element={<Navigate to="/login" replace />} />
