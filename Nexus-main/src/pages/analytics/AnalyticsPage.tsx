@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, 
-  ResponsiveContainer, BarChart, Bar, Cell, PieChart, Pie, Legend 
+  ResponsiveContainer, Cell, PieChart, Pie, Legend 
 } from 'recharts';
 import { 
-  Activity, Eye, Users, TrendingUp, Presentation, Briefcase, 
-  Zap, Brain, Target, ShieldCheck, Globe, ArrowUpRight 
+  Activity, Eye, Users, TrendingUp, Presentation, 
+  Zap, Brain, Target, ShieldCheck, Globe
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
@@ -14,11 +14,10 @@ import api from '../../api/api';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 
-const COLORS = ['#4F46E5', '#8B5CF6', '#EC4899', '#10B981', '#F59E0B'];
 const PIE_COLORS = ['#6366f1', '#a855f7', '#ec4899', '#f43f5e', '#f97316'];
 
 export const AnalyticsPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user: _user } = useAuth();
   const [stats, setStats] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -226,7 +225,7 @@ export const AnalyticsPage: React.FC = () => {
                 </div>
                 <div className="space-y-6">
                   {stats.industryDistribution && stats.industryDistribution.length > 0 ? (
-                    stats.industryDistribution.slice(0, 4).map((ind, i) => (
+                    stats.industryDistribution.slice(0, 4).map((ind: { name: string, count: number }, i: number) => (
                       <div key={i} className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className="w-2 h-2 rounded-full bg-primary-500" />
