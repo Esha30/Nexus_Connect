@@ -127,6 +127,26 @@ export const getDashboardStats = async (req, res) => {
         .sort({ createdAt: -1 });
 
       return res.json({ stats, featuredStartups, recentActivity });
+    } else if (userRole === 'admin') {
+        // Stats for Admin (Global view)
+        const [totalUsers, totalEntrepreneurs, totalInvestors, totalDocs] = await Promise.all([
+            User.countDocuments(),
+            User.countDocuments({ role: 'entrepreneur' }),
+            User.countDocuments({ role: 'investor' }),
+            Document.countDocuments()
+        ]);
+
+        stats = {
+            totalConnections: totalUsers,
+            upcomingMeetings: 0,
+            profileViews: totalDocs,
+            yourConnections: totalInvestors,
+            totalStartups: totalEntrepreneurs,
+            chartData: [],
+            industryDistribution: []
+        };
+
+        return res.json({ stats, recentActivity: [] });
     }
 
     res.status(400).json({ message: 'Invalid user role' });

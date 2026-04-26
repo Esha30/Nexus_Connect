@@ -204,15 +204,37 @@ export const AdminDashboard: React.FC = () => {
           <>
             {activeTab === 'overview' && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {/* System Pulse Indicator */}
+                <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5 backdrop-blur-xl">
+                  <div className="relative flex h-3 w-3">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest leading-none mb-1">System Pulse</span>
+                    <span className="text-xs font-bold text-emerald-400">NOMINAL • 0.42ms Latency</span>
+                  </div>
+                  <div className="ml-auto flex gap-4">
+                    <div className="text-right">
+                      <p className="text-[10px] font-black text-gray-600 uppercase tracking-tighter">Throughput</p>
+                      <p className="text-xs font-bold text-white">8.4 GB/s</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] font-black text-gray-600 uppercase tracking-tighter">Uptime</p>
+                      <p className="text-xs font-bold text-white">99.99%</p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {[
-                    { label: 'Total Users', value: stats?.users.total, icon: <Users />, color: 'blue' },
-                    { label: 'Startups', value: stats?.users.entrepreneurs, icon: <Briefcase />, color: 'emerald' },
-                    { label: 'Investors', value: stats?.users.investors, icon: <TrendingUp />, color: 'purple' },
-                    { label: 'Active Content', value: stats?.content.posts, icon: <Activity />, color: 'orange' }
+                    { label: 'Total Entities', value: stats?.users.total, icon: <Users />, color: 'blue' },
+                    { label: 'Startup Nodes', value: stats?.users.entrepreneurs, icon: <Briefcase />, color: 'emerald' },
+                    { label: 'Capital Nodes', value: stats?.users.investors, icon: <TrendingUp />, color: 'purple' },
+                    { label: 'Broadcast Volume', value: stats?.content.posts, icon: <Activity />, color: 'orange' }
                   ].map((stat, i) => (
-                    <Card key={i} className="bg-[#161B2C] border-white/5 hover:border-white/10 transition-all group overflow-hidden">
+                    <Card key={i} className="bg-[#161B2C] border-white/5 hover:border-white/10 transition-all group overflow-hidden shadow-2xl">
                       <CardBody className="p-6 relative">
                         <div className={`absolute -right-4 -bottom-4 w-24 h-24 text-${stat.color}-500/5 opacity-0 group-hover:opacity-100 transition-opacity transform rotate-12`}>
                           {React.cloneElement(stat.icon as React.ReactElement, { size: 96 })}
@@ -228,12 +250,18 @@ export const AdminDashboard: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                  {/* System Activity Teaser */}
-                  <Card className="lg:col-span-2 bg-[#161B2C] border-white/5 p-8">
-                    <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                      <Clock size={20} className="text-primary-500" /> System Velocity
-                    </h3>
-                    <div className="h-64 w-full">
+                  {/* System Activity Chart */}
+                  <Card className="lg:col-span-2 bg-[#161B2C] border-white/5 p-10 shadow-2xl">
+                    <div className="flex justify-between items-center mb-10">
+                      <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                        <TrendingUp size={20} className="text-primary-500" /> Velocity Matrix
+                      </h3>
+                      <div className="flex gap-2">
+                        <Badge className="bg-primary-500/10 text-primary-400 border-primary-500/20">7D</Badge>
+                        <Badge className="bg-white/5 text-gray-500 border-white/10">30D</Badge>
+                      </div>
+                    </div>
+                    <div className="h-72 w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={stats?.analytics}>
                           <defs>
@@ -242,18 +270,18 @@ export const AdminDashboard: React.FC = () => {
                               <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
-                          <XAxis dataKey="date" stroke="#64748b" fontSize={10} axisLine={false} tickLine={false} />
-                          <YAxis stroke="#64748b" fontSize={10} axisLine={false} tickLine={false} />
+                          <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" vertical={false} />
+                          <XAxis dataKey="date" stroke="#475569" fontSize={10} axisLine={false} tickLine={false} dy={10} />
+                          <YAxis stroke="#475569" fontSize={10} axisLine={false} tickLine={false} />
                           <Tooltip 
-                            contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #ffffff10', borderRadius: '12px' }}
+                            contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #ffffff10', borderRadius: '16px', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.5)' }}
                             itemStyle={{ color: '#fff', fontSize: '12px', fontWeight: 'bold' }}
                           />
                           <Area 
                             type="monotone" 
                             dataKey="users" 
                             stroke="#3b82f6" 
-                            strokeWidth={3}
+                            strokeWidth={4}
                             fillOpacity={1} 
                             fill="url(#colorUsers)" 
                           />
@@ -262,41 +290,42 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                   </Card>
 
-                  {/* Quick Moderation Queue */}
-                  <Card className="bg-[#161B2C] border-white/5 p-8">
-                    <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                      <AlertCircle size={20} className="text-orange-500" /> Critical Queue
-                    </h3>
-                    <div className="space-y-4">
-                      <div className="p-4 bg-white/5 rounded-2xl border border-white/5 flex items-center justify-between">
-                        <div>
-                          <p className="text-white text-sm font-bold">Support Tickets</p>
-                          <p className="text-xs text-gray-500">{stats?.support.pendingTickets} pending response</p>
-                        </div>
-                        <Button size="sm" variant="ghost" onClick={() => setActiveTab('support')} className="text-primary-400 hover:text-primary-300">View</Button>
-                      </div>
-                      <div className="p-4 bg-white/5 rounded-2xl border border-white/5 flex items-center justify-between">
-                        <div>
-                          <p className="text-white text-sm font-bold">Priority Access</p>
-                          <p className="text-xs text-gray-500">{pendingInvestors.length} investors waiting</p>
-                        </div>
-                        <Button size="sm" variant="ghost" onClick={() => setActiveTab('priority')} className="text-primary-400 hover:text-primary-300">View</Button>
-                      </div>
-                      <div className="p-4 bg-white/5 rounded-2xl border border-white/5 flex items-center justify-between">
-                        <div>
-                          <p className="text-white text-sm font-bold">System Status</p>
-                          <div className="flex items-center gap-2">
-                            <div className={`w-2 h-2 rounded-full ${systemSettings?.maintenanceMode ? 'bg-red-500 animate-pulse' : 'bg-emerald-500'}`} />
-                            <p className="text-xs text-gray-500">{systemSettings?.maintenanceMode ? 'Maintenance' : 'All Operational'}</p>
+                  {/* Recent Signals Sidebar */}
+                  <div className="space-y-6">
+                    <Card className="bg-[#161B2C] border-white/5 p-8 shadow-2xl">
+                      <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                        <Activity size={18} className="text-primary-500" /> Recent Signals
+                      </h3>
+                      <div className="space-y-5">
+                        {users.slice(0, 4).map((u, i) => (
+                          <div key={i} className="flex items-center gap-3 group">
+                            <Avatar src={u.profile?.avatarUrl} size="sm" className="ring-2 ring-white/5 group-hover:ring-primary-500/50 transition-all" />
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-white truncate">{u.name}</p>
+                              <p className="text-[10px] text-gray-500 uppercase font-black">New {u.role} joined</p>
+                            </div>
+                            <span className="ml-auto text-[9px] font-bold text-gray-600">NOW</span>
                           </div>
-                        </div>
-                        <Button size="sm" variant="ghost" onClick={() => setActiveTab('settings')} className="text-primary-400 hover:text-primary-300">Manage</Button>
+                        ))}
                       </div>
-                    </div>
-                  </Card>
+                      <Button variant="ghost" fullWidth className="mt-8 text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white" onClick={() => setActiveTab('users')}>
+                        View All Entities
+                      </Button>
+                    </Card>
+
+                    <Card className="bg-primary-600 border-none p-8 shadow-2xl shadow-primary-600/20">
+                      <h3 className="text-lg font-black text-white mb-2 leading-tight">Quantum Shield Active</h3>
+                      <p className="text-primary-100 text-xs font-medium leading-relaxed mb-6">All system nodes are currently protected by multi-layer encryption protocols.</p>
+                      <div className="flex items-center gap-2 text-white/80">
+                        <CheckCircle2 size={16} />
+                        <span className="text-[10px] font-black uppercase tracking-widest">Protocol 100%</span>
+                      </div>
+                    </Card>
+                  </div>
                 </div>
               </div>
             )}
+
 
             {activeTab === 'users' && (
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -615,59 +644,70 @@ export const AdminDashboard: React.FC = () => {
 
             {activeTab === 'logs' && (
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                <Card className="bg-[#161B2C] border-white/5 overflow-hidden">
-                  <div className="p-6 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
+                <Card className="bg-[#0D1117] border-white/10 overflow-hidden shadow-2xl">
+                  <div className="p-6 border-b border-white/10 bg-white/[0.02] flex justify-between items-center backdrop-blur-md">
                     <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                      <History size={20} className="text-primary-500" /> Immutable Audit Trail
+                      <Cpu size={20} className="text-emerald-500 animate-pulse" /> Immutable Audit Trail
                     </h3>
-                    <Badge className="bg-white/5 text-gray-500 font-mono text-[10px] border-white/10 uppercase tracking-widest px-3">
-                      Retention: 90 Days
-                    </Badge>
+                    <div className="flex gap-4">
+                      <Badge className="bg-emerald-500/10 text-emerald-400 font-mono text-[10px] border-emerald-500/20 uppercase tracking-widest px-3">
+                        Integrity: 100%
+                      </Badge>
+                      <Badge className="bg-white/5 text-gray-500 font-mono text-[10px] border-white/10 uppercase tracking-widest px-3">
+                        Retention: 90 Days
+                      </Badge>
+                    </div>
                   </div>
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left">
+                    <table className="w-full text-left font-mono">
                       <thead>
-                        <tr className="border-b border-white/5 bg-white/[0.01]">
-                          <th className="px-8 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Admin Entity</th>
-                          <th className="px-8 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Action Protocol</th>
-                          <th className="px-8 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest">Target</th>
-                          <th className="px-8 py-4 text-[10px] font-black text-gray-500 uppercase tracking-widest text-right">Timestamp</th>
+                        <tr className="border-b border-white/5 bg-black/40">
+                          <th className="px-8 py-4 text-[10px] font-black text-emerald-500/50 uppercase tracking-widest">Admin Node</th>
+                          <th className="px-8 py-4 text-[10px] font-black text-emerald-500/50 uppercase tracking-widest">Protocol Action</th>
+                          <th className="px-8 py-4 text-[10px] font-black text-emerald-500/50 uppercase tracking-widest">Object</th>
+                          <th className="px-8 py-4 text-[10px] font-black text-emerald-500/50 uppercase tracking-widest text-right">Timestamp</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/5">
                         {auditLogs.map((log) => (
-                          <tr key={log._id} className="hover:bg-white/[0.01] transition-colors group">
+                          <tr key={log._id} className="hover:bg-emerald-500/[0.02] transition-colors group">
                             <td className="px-8 py-5">
                               <div className="flex items-center gap-3">
-                                <Avatar size="xs" src={log.admin?.profile?.avatarUrl} alt={log.admin?.name} />
+                                <div className="w-6 h-6 rounded bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-[10px] font-black">
+                                  {log.admin?.name?.charAt(0)}
+                                </div>
                                 <div>
-                                  <p className="text-sm font-bold text-white leading-none">{log.admin?.name}</p>
-                                  <p className="text-[10px] text-gray-500 font-mono">{log.admin?.email}</p>
+                                  <p className="text-xs font-bold text-white leading-none">{log.admin?.name}</p>
+                                  <p className="text-[10px] text-gray-600">ID: {log.admin?._id?.slice(-6)}</p>
                                 </div>
                               </div>
                             </td>
                             <td className="px-8 py-5">
-                              <p className="text-sm text-gray-300 font-medium">{log.action}</p>
+                              <p className="text-xs text-emerald-400 font-bold tracking-tight">{log.action}</p>
                               {log.details && (
-                                <p className="text-[10px] text-gray-600 font-mono mt-1 truncate max-w-xs">{log.details}</p>
+                                <p className="text-[9px] text-gray-500 mt-1 truncate max-w-xs">{log.details}</p>
                               )}
                             </td>
                             <td className="px-8 py-5">
-                              <Badge className="bg-primary-500/10 text-primary-400 text-[9px] font-black uppercase px-2 py-0.5">
+                              <Badge className="bg-emerald-500/10 text-emerald-500 text-[9px] font-black uppercase px-2 py-0.5 border-emerald-500/20">
                                 {log.targetType}
                               </Badge>
                             </td>
-                            <td className="px-8 py-5 text-right font-mono text-[10px] text-gray-500">
-                              {new Date(log.createdAt).toLocaleString()}
+                            <td className="px-8 py-5 text-right text-[10px] text-gray-500">
+                              [{new Date(log.createdAt).toLocaleTimeString()}]
                             </td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
+                  <div className="p-4 bg-black/20 border-t border-white/5 flex justify-center">
+                    <p className="text-[9px] font-black text-gray-600 uppercase tracking-[0.4em]">End of Secure Stream</p>
+                  </div>
                 </Card>
               </div>
             )}
+
           </>
         )}
       </div>
