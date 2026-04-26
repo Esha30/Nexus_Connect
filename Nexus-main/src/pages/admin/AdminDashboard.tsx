@@ -229,17 +229,20 @@ export const AdminDashboard: React.FC = () => {
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {[
-                    { label: 'Total Entities', value: stats?.users.total, icon: <Users />, color: 'blue' },
-                    { label: 'Startup Nodes', value: stats?.users.entrepreneurs, icon: <Briefcase />, color: 'emerald' },
-                    { label: 'Capital Nodes', value: stats?.users.investors, icon: <TrendingUp />, color: 'purple' },
-                    { label: 'Broadcast Volume', value: stats?.content.posts, icon: <Activity />, color: 'orange' }
+                    { label: 'Total Entities', subLabel: 'Total Users', value: stats?.users.total, icon: <Users />, color: 'blue' },
+                    { label: 'Startup Nodes', subLabel: 'Entrepreneurs', value: stats?.users.entrepreneurs, icon: <Briefcase />, color: 'emerald' },
+                    { label: 'Capital Nodes', subLabel: 'Investors', value: stats?.users.investors, icon: <TrendingUp />, color: 'purple' },
+                    { label: 'Broadcast Volume', subLabel: 'Total Posts', value: stats?.content.posts, icon: <Activity />, color: 'orange' }
                   ].map((stat, i) => (
                     <Card key={i} className="bg-[#161B2C] border-white/5 hover:border-white/10 transition-all group overflow-hidden shadow-2xl">
                       <CardBody className="p-6 relative">
                         <div className={`absolute -right-4 -bottom-4 w-24 h-24 text-${stat.color}-500/5 opacity-0 group-hover:opacity-100 transition-opacity transform rotate-12`}>
                           {React.cloneElement(stat.icon as React.ReactElement, { size: 96 })}
                         </div>
-                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4">{stat.label}</p>
+                        <div className="mb-4">
+                          <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">{stat.label}</p>
+                          <p className="text-[9px] font-bold text-gray-600 uppercase tracking-tighter -mt-0.5">{stat.subLabel}</p>
+                        </div>
                         <div className="flex items-end gap-3">
                           <h3 className="text-4xl font-black text-white leading-none">{stat.value}</h3>
                           <span className="text-emerald-400 text-xs font-bold mb-1">+12%</span>
@@ -253,9 +256,12 @@ export const AdminDashboard: React.FC = () => {
                   {/* System Activity Chart */}
                   <Card className="lg:col-span-2 bg-[#161B2C] border-white/5 p-10 shadow-2xl">
                     <div className="flex justify-between items-center mb-10">
-                      <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                        <TrendingUp size={20} className="text-primary-500" /> Velocity Matrix
-                      </h3>
+                      <div className="flex flex-col">
+                        <h3 className="text-xl font-bold text-white flex items-center gap-2 leading-none">
+                          <TrendingUp size={20} className="text-primary-500" /> Velocity Matrix
+                        </h3>
+                        <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1 ml-7">System Growth Protocol</span>
+                      </div>
                       <div className="flex gap-2">
                         <Badge className="bg-primary-500/10 text-primary-400 border-primary-500/20">7D</Badge>
                         <Badge className="bg-white/5 text-gray-500 border-white/10">30D</Badge>
@@ -293,9 +299,12 @@ export const AdminDashboard: React.FC = () => {
                   {/* Recent Signals Sidebar */}
                   <div className="space-y-6">
                     <Card className="bg-[#161B2C] border-white/5 p-8 shadow-2xl">
-                      <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                        <Activity size={18} className="text-primary-500" /> Recent Signals
-                      </h3>
+                      <div className="flex flex-col mb-6">
+                        <h3 className="text-lg font-bold text-white flex items-center gap-2 leading-none">
+                          <Activity size={18} className="text-primary-500" /> Recent Signals
+                        </h3>
+                        <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1 ml-6">Live Activity Stream</span>
+                      </div>
                       <div className="space-y-5">
                         {users.slice(0, 4).map((u, i) => (
                           <div key={i} className="flex items-center gap-3 group">
@@ -646,9 +655,12 @@ export const AdminDashboard: React.FC = () => {
               <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <Card className="bg-[#0D1117] border-white/10 overflow-hidden shadow-2xl">
                   <div className="p-6 border-b border-white/10 bg-white/[0.02] flex justify-between items-center backdrop-blur-md">
-                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                      <Cpu size={20} className="text-emerald-500 animate-pulse" /> Immutable Audit Trail
-                    </h3>
+                    <div className="flex flex-col">
+                      <h3 className="text-lg font-bold text-white flex items-center gap-2 leading-none">
+                        <Cpu size={20} className="text-emerald-500 animate-pulse" /> Immutable Audit Trail
+                      </h3>
+                      <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1 ml-7">Permanent Activity Log</span>
+                    </div>
                     <div className="flex gap-4">
                       <Badge className="bg-emerald-500/10 text-emerald-400 font-mono text-[10px] border-emerald-500/20 uppercase tracking-widest px-3">
                         Integrity: 100%
