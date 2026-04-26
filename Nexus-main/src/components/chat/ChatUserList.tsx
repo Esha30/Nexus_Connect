@@ -25,11 +25,8 @@ export const ChatUserList: React.FC<ChatUserListProps> = ({ conversations, onCle
  };
 
  return (
- <div className="bg-white border-r border-gray-200 w-full md:w-64 overflow-y-auto">
- <div className="py-4">
- <h2 className="px-4 text-lg font-semibold text-gray-800 mb-4">Messages</h2>
- 
- <div className="space-y-1">
+ <div className="bg-white border-r border-gray-200 w-full md:w-80 lg:w-96 overflow-y-auto">
+ <div className="py-2">
  {conversations.length > 0 ? (
  conversations.map(conversation => {
  const otherUser = conversation.partner;
@@ -42,10 +39,10 @@ export const ChatUserList: React.FC<ChatUserListProps> = ({ conversations, onCle
  return (
  <div
  key={conversation.id}
- className={`px-4 py-3 flex cursor-pointer transition-colors duration-200 group/listitem ${
+ className={`px-4 flex cursor-pointer transition-colors duration-200 group/listitem ${
  isActive
- ? 'bg-primary-50 border-l-4 border-primary-600'
- : 'hover:bg-gray-50 border-l-4 border-transparent'
+ ? 'bg-[#F0F2F5]'
+ : 'hover:bg-[#F5F6F6]'
  }`}
  onClick={() => handleSelectUser(otherUserId)}
  >
@@ -54,10 +51,10 @@ export const ChatUserList: React.FC<ChatUserListProps> = ({ conversations, onCle
  alt={otherUser.name}
  size="md"
  status={otherUser.isOnline ? 'online' : 'offline'}
- className="mr-3 flex-shrink-0"
+ className="mr-3 mt-3 flex-shrink-0"
  />
  
- <div className="flex-1 min-w-0">
+ <div className="flex-1 min-w-0 py-3 border-b border-gray-100">
  <div className="flex justify-between items-baseline">
  <div className="flex items-center gap-1.5 truncate">
    <h3 className={`text-sm font-medium truncate ${conversation.isMuted ? 'text-gray-500' : 'text-gray-900'}`}>
@@ -69,7 +66,7 @@ export const ChatUserList: React.FC<ChatUserListProps> = ({ conversations, onCle
  
  {lastMessage && (
  <span className="text-xs text-gray-500">
- {formatDistanceToNow(new Date(lastMessage.timestamp), { addSuffix: false })}
+ {new Date(lastMessage.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
  </span>
  )}
  </div>
@@ -108,7 +105,6 @@ export const ChatUserList: React.FC<ChatUserListProps> = ({ conversations, onCle
  <p className="text-sm text-gray-500">No conversations yet</p>
  </div>
  )}
- </div>
  </div>
  </div>
  );
