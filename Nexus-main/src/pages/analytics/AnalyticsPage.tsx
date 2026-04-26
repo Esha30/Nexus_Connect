@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
+import { Button } from '../../components/ui/Button';
 import api from '../../api/api';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
