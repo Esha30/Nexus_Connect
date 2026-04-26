@@ -28,6 +28,11 @@ const userSchema = new mongoose.Schema({
     enum: ['investor', 'entrepreneur', 'admin'],
     required: true,
   },
+  status: {
+    type: String,
+    enum: ['active', 'suspended'],
+    default: 'active'
+  },
   profile: {
     avatarUrl: String,
     bio: String,

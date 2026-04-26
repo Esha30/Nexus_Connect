@@ -10,7 +10,11 @@ import {
   getUserById,
   deleteUser,
   getAllPosts,
-  deletePost
+  deletePost,
+  updateUserStatus,
+  getSystemSettings,
+  updateSystemSettings,
+  getAuditLogs
 } from '../controllers/adminController.js';
 
 const router = express.Router();
@@ -29,5 +33,9 @@ router.get('/tickets', getSupportTickets);
 router.put('/tickets/:id', resolveTicket);
 router.get('/priority', getPendingPriority);
 router.put('/priority/:id', approvePriority);
+router.put('/users/:id/status', updateUserStatus);
+router.get('/settings', getSystemSettings);
+router.put('/settings', updateSystemSettings);
+router.get('/logs', getAuditLogs);
 
 export default router;

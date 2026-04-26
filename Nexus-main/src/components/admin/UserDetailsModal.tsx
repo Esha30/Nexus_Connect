@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Mail, Building2, Calendar, Shield, Trash2, LayoutGrid, Briefcase, FileText, Activity } from 'lucide-react';
+import { X, Mail, Building2, Calendar, Shield, Trash2, LayoutGrid, Briefcase, FileText, Activity, Ban, CheckCircle2 } from 'lucide-react';
 import { Avatar } from '../ui/Avatar';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
@@ -28,6 +28,15 @@ export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ userId, onCl
       console.error('Failed to fetch user details');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const updateStatus = async (updates: any) => {
+    try {
+      const res = await api.put(`/admin/users/${userId}/status`, updates);
+      setUserData(res.data);
+    } catch (err) {
+      console.error('Failed to update user');
     }
   };
 
@@ -83,18 +92,40 @@ export const UserDetailsModal: React.FC<UserDetailsModalProps> = ({ userId, onCl
                 </div>
               </div>
 
-              <Button 
-                variant="ghost" 
-                fullWidth 
-                className="mt-8 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white font-black py-4 rounded-2xl transition-all"
-                onClick={() => {
-                  onDelete(userData._id);
-                  onClose();
-                }}
-                leftIcon={<Trash2 size={18} />}
-              >
-                Terminate Account
-              </Button>
+              <div className="space-y-3 pt-6 border-t border-white/5">
+                <Button 
+                  variant="ghost" 
+                  fullWidth 
+                  className={`font-black py-4 rounded-2xl transition-all ${userData.status === 'suspended' ? 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white' : 'bg-orange-500/10 text-orange-500 hover:bg-orange-500 hover:text-white'}`}
+                  onClick={() => updateStatus({ status: userData.status === 'suspended' ? 'active' : 'suspended' })}
+                  leftIcon={userData.status === 'suspended' ? <CheckCircle2 size={18} /> : <Ban size={18} />}
+                >
+                  {userData.status === 'suspended' ? 'Restore Account' : 'Suspend Account'}
+                </Button>
+
+                <Button 
+                  variant="ghost" 
+                  fullWidth 
+                  className={`font-black py-4 rounded-2xl transition-all ${userData.profile?.isVerified ? 'bg-gray-500/10 text-gray-400' : 'bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white'}`}
+                  onClick={() => updateStatus({ isVerified: !userData.profile?.isVerified })}
+                  leftIcon={<Shield size={18} />}
+                >
+                  {userData.profile?.isVerified ? 'Revoke Verification' : 'Verify Identity'}
+                </Button>
+
+                <Button 
+                  variant="ghost" 
+                  fullWidth 
+                  className="bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white font-black py-4 rounded-2xl transition-all"
+                  onClick={() => {
+                    onDelete(userData._id);
+                    onClose();
+                  }}
+                  leftIcon={<Trash2 size={18} />}
+                >
+                  Terminate Account
+                </Button>
+              </div>
             </div>
 
             {/* Right Col: Activity & Data */}

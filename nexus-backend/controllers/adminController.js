@@ -2,6 +2,23 @@ import SupportTicket from '../models/SupportTicket.js';
 import User from '../models/User.js';
 import Post from '../models/Post.js';
 import Deal from '../models/Deal.js';
+import SystemSettings from '../models/SystemSettings.js';
+import AuditLog from '../models/AuditLog.js';
+
+// Helper to log admin actions
+const logAction = async (adminId, action, targetType, targetId, details) => {
+  try {
+    await AuditLog.create({
+      admin: adminId,
+      action,
+      targetType,
+      targetId,
+      details
+    });
+  } catch (error) {
+    console.error('Failed to log admin action:', error);
+  }
+};
 
 // @desc    Get Admin Dashboard Stats
 // @route   GET /api/admin/stats
@@ -15,6 +32,26 @@ export const getAdminStats = async (req, res) => {
     const dealCount = await Deal.countDocuments();
     const pendingTicketCount = await SupportTicket.countDocuments({ status: { $ne: 'resolved' } });
 
+    // Calculate historical data for the last 7 days
+    const historicalData = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      date.setHours(0, 0, 0, 0);
+      
+      const nextDate = new Date(date);
+      nextDate.setDate(nextDate.getDate() + 1);
+
+      const count = await User.countDocuments({
+        createdAt: { $gte: date, $lt: nextDate }
+      });
+
+      historicalData.push({
+        date: date.toLocaleDateString('en-US', { weekday: 'short' }),
+        users: count
+      });
+    }
+
     res.json({
       users: {
         total: userCount,
@@ -27,7 +64,8 @@ export const getAdminStats = async (req, res) => {
       },
       support: {
         pendingTickets: pendingTicketCount
-      }
+      },
+      analytics: historicalData
     });
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch admin stats', error: error.message });
@@ -175,5 +213,91 @@ export const approvePriority = async (req, res) => {
     res.json({ message: 'Priority access approved', user });
   } catch (error) {
     res.status(500).json({ message: 'Failed to approve priority access', error: error.message });
+  }
+};
+
+// @desc    Update user status (suspend/unsuspend/verify)
+// @route   PUT /api/admin/users/:id/status
+// @access  Private (Admin only)
+export const updateUserStatus = async (req, res) => {
+  const { status, isVerified } = req.body;
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (status) user.status = status;
+    if (typeof isVerified === 'boolean') user.profile.isVerified = isVerified;
+    
+    await user.save();
+
+    await logAction(
+      req.user._id,
+      `Updated user status to ${status || user.status}, verified: ${isVerified ?? user.profile.isVerified}`,
+      'User',
+      user._id,
+      `User: ${user.email}`
+    );
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update user status', error: error.message });
+  }
+};
+
+// @desc    Get system settings
+// @route   GET /api/admin/settings
+// @access  Private (Admin only)
+export const getSystemSettings = async (req, res) => {
+  try {
+    let settings = await SystemSettings.findOne();
+    if (!settings) {
+      settings = await SystemSettings.create({});
+    }
+    res.json(settings);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch system settings', error: error.message });
+  }
+};
+
+// @desc    Update system settings
+// @route   PUT /api/admin/settings
+// @access  Private (Admin only)
+export const updateSystemSettings = async (req, res) => {
+  try {
+    let settings = await SystemSettings.findOne();
+    if (!settings) {
+      settings = new SystemSettings();
+    }
+
+    Object.assign(settings, req.body);
+    settings.updatedBy = req.user._id;
+    await settings.save();
+
+    await logAction(
+      req.user._id,
+      'Updated system settings',
+      'SystemSettings',
+      settings._id,
+      JSON.stringify(req.body)
+    );
+
+    res.json(settings);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update system settings', error: error.message });
+  }
+};
+
+// @desc    Get audit logs
+// @route   GET /api/admin/logs
+// @access  Private (Admin only)
+export const getAuditLogs = async (req, res) => {
+  try {
+    const logs = await AuditLog.find()
+      .populate('admin', 'name email')
+      .sort({ createdAt: -1 })
+      .limit(100);
+    res.json(logs);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch audit logs', error: error.message });
   }
 };
