@@ -6,7 +6,8 @@ import {
  MessageSquare, 
  Calendar, 
  FileText,
- Clock
+ Clock,
+ Sparkles
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
