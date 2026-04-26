@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import Activity from '../models/Activity.js';
+import SystemSettings from '../models/SystemSettings.js';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import { sendOTPEmail, sendEmail } from '../utils/emailService.js';
@@ -30,6 +31,12 @@ export const registerUser = async (req, res) => {
   const { name, email, password, role } = req.body;
 
   try {
+    // Check if registrations are allowed
+    const settings = await SystemSettings.findOne();
+    if (settings && settings.allowNewRegistrations === false && !ADMIN_EMAILS.includes(email.toLowerCase())) {
+      return res.status(403).json({ message: 'New registrations are currently closed by the administrator.' });
+    }
+
     const userExists = await User.findOne({ email });
 
     if (userExists) {
@@ -99,6 +106,14 @@ export const loginUser = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (user && (await user.matchPassword(password))) {
+      // Check for suspension
+      if (user.status === 'suspended') {
+        return res.status(403).json({ 
+          message: 'Your account has been suspended by an administrator.',
+          suspended: true 
+        });
+      }
+
       if (user.profile && user.profile.twoFactorEnabled) {
         return res.json({
           _id: user._id,
@@ -433,6 +448,13 @@ export const googleLogin = async (req, res) => {
     const { name, email, picture, sub } = payload;
 
     let user = await User.findOne({ email });
+
+    if (user && user.status === 'suspended') {
+      return res.status(403).json({ 
+        message: 'Your account has been suspended by an administrator.',
+        suspended: true 
+      });
+    }
 
     if (!user) {
       // Create new user if not exists

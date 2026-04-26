@@ -23,8 +23,12 @@ import adminRoutes from './routes/adminRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 import User from './models/User.js';
+import { checkMaintenance } from './middleware/authMiddleware.js';
 
 const app = express();
+
+// Apply global maintenance mode check
+app.use(checkMaintenance);
 
 // AI Rate Limiter – 20 requests per 15 minutes per IP
 const aiRateLimiter = rateLimit({
@@ -119,14 +123,14 @@ app.use('/api/documents', documentRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/collaborations', collaborationRoutes);
-app.use('/api/messages', messageRoutes);
+app.use('/api/messages', checkFeatureToggle('messaging'), messageRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/notifications', notificationRoutes);
-app.use('/api/deals', dealRoutes);
+app.use('/api/deals', checkFeatureToggle('deals'), dealRoutes);
 app.use('/api/stripe', stripeRoutes);
 app.use('/api/support', supportRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/ai', aiRateLimiter, aiRoutes);
+app.use('/api/ai', checkFeatureToggle('aiMatching'), aiRateLimiter, aiRoutes);
 app.use('/api/posts', postRoutes);
 
 // Make uploads folder accessible
