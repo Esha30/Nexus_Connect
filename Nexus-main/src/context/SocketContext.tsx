@@ -58,6 +58,15 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  // Listen to DOM event fired by NotificationsPage when it marks items as read or deletes them
+  useEffect(() => {
+    const handleNotificationsUpdated = () => {
+      fetchNotificationCount();
+    };
+    window.addEventListener('notifications-updated', handleNotificationsUpdated);
+    return () => window.removeEventListener('notifications-updated', handleNotificationsUpdated);
+  }, []);
+
   useEffect(() => {
     if (!user) {
       if (socketRef.current) {
@@ -159,14 +168,17 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     });
 
     socket.on('receive-message', (payload) => {
-      // If we are not in the chat with the sender, increment unread count
-      if (!window.location.pathname.includes(`/messages/${payload.senderId}`)) {
+      const isInChat = window.location.pathname.includes(`/messages/${payload.senderId}`);
+      if (!isInChat) {
+        // User is NOT in the chat — show badge + toast
         setTotalUnreadCount(prev => prev + 1);
         toast.success(`Message: ${payload.content.substring(0, 30)}${payload.content.length > 30 ? '...' : ''}`, {
           icon: '💬',
           duration: 4000
         });
       }
+      // Always re-sync notification count in case a notification was created
+      fetchNotificationCount();
     });
 
     // Initial fetch

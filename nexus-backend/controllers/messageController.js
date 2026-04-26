@@ -88,10 +88,21 @@ export const getMessages = async (req, res) => {
       await conversation.save();
     }
 
-    // Emit event to update unread counts in real-time for the reader
+    // Emit event to update unread message counts in real-time for the reader
     const io = req.app.get('socketio');
     if (io) {
       io.to(req.user._id.toString()).emit('message-count-update');
+    }
+
+    // Mark any unread message-type notifications from this sender as read
+    // This clears the notification badge on the bell icon
+    await Notification.updateMany(
+      { recipient: req.user._id, sender: userId, type: 'message', isRead: false },
+      { $set: { isRead: true } }
+    );
+    // Emit notification count update so the bell badge clears in real-time
+    if (io) {
+      io.to(req.user._id.toString()).emit('notification-count-update');
     }
 
     const messages = await Message.find({ conversationId: conversation._id })

@@ -13,28 +13,37 @@ import { EmptyState } from '../../components/ui/EmptyState';
 
 export const NotificationsPage: React.FC = () => {
  const { user } = useAuth();
- const { socket } = useSocket();
+ const { socket, refreshNotificationCount } = useSocket();
  const navigate = useNavigate();
  const [notifications, setNotifications] = useState<Notification[]>([]);
  const [activeFilter, setActiveFilter] = useState<string>('All');
  const [isClearModalOpen, setIsClearModalOpen] = useState(false);
  const [isLoading, setIsLoading] = useState(true);
 
- const fetchNotifications = async () => {
- setIsLoading(true);
- try {
- const res = await api.get('/notifications/');
- setNotifications(res.data);
- } catch (_err) {
- toast.error('Failed to load notifications');
- } finally {
- setIsLoading(false);
- }
- };
-
- useEffect(() => {
- if (user) fetchNotifications();
- }, [user]);
+  useEffect(() => {
+  if (!user) return;
+  const init = async () => {
+    setIsLoading(true);
+    try {
+      const res = await api.get('/notifications/');
+      setNotifications(res.data);
+      // Auto-mark all as read when page opens (like WhatsApp/Gmail)
+      const hasUnread = res.data.some((n: Notification) => !n.isRead);
+      if (hasUnread) {
+        await api.put('/notifications/read-all');
+        setNotifications((prev: Notification[]) => prev.map(n => ({ ...n, isRead: true })));
+        // Sync the navbar badge count immediately
+        window.dispatchEvent(new CustomEvent('notifications-updated'));
+        refreshNotificationCount();
+      }
+    } catch (_err) {
+      toast.error('Failed to load notifications');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  init();
+  }, [user]);
 
  // Real-time notification updates
  useEffect(() => {
