@@ -43,12 +43,12 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, isCurrentUser
       )}
       
       <div className={`flex flex-col ${isCurrentUser ? 'items-end' : 'items-start'} max-w-[70%]`}>
-        <div className={`relative px-4 py-2 rounded-lg shadow-sm ${
+        <div className={`relative px-3 py-2 rounded-lg shadow-[0_1px_0.5px_rgba(11,20,26,0.13)] ${
           message.isDeleted 
           ? 'bg-gray-100 text-gray-500 italic border border-gray-200'
           : isCurrentUser
-          ? 'bg-primary-600 text-white rounded-br-none'
-          : 'bg-white border border-gray-100 text-gray-800 rounded-bl-none'
+          ? 'bg-[#D9FDD3] text-[#111B21] rounded-tr-none'
+          : 'bg-white text-[#111B21] rounded-tl-none'
         }`}>
           {message.isDeleted ? (
             <div className="flex items-center gap-2 text-gray-500 italic pr-6 pb-2 pt-1">
@@ -111,7 +111,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, isCurrentUser
           )}
           
           {/* Time and Ticks */}
-          <div className={`flex items-center justify-end gap-1 mt-1 ${isCurrentUser && !message.isDeleted ? 'text-blue-50/80 text-right w-full overflow-hidden' : 'text-gray-400'}`}>
+          <div className={`flex items-center justify-end gap-1 mt-1 ${isCurrentUser && !message.isDeleted ? 'text-[#667781] text-right w-full overflow-hidden' : 'text-[#667781]'}`}>
             {message.isEdited && (
               <span className="text-[10px] tracking-wide mr-1 opacity-80">(edited)</span>
             )}
@@ -119,7 +119,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, isCurrentUser
               {format(new Date(message.timestamp), 'h:mm a')}
             </span>
             {isCurrentUser && !message.isDeleted && (
-              <span className={message.isRead ? 'text-blue-500' : 'text-gray-400'}>
+              <span className={message.isRead ? 'text-[#53bdeb]' : 'text-[#667781]'}>
                 {message.isRead ? <CheckCheck size={14} /> : <Check size={14} />}
               </span>
             )}

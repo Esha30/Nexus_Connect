@@ -667,9 +667,9 @@ export const ChatPage: React.FC = () => {
  {/* Sidebar */}
  <div className={`${userId ? 'hidden md:flex' : 'flex w-full'} md:flex-shrink-0`}>
  <div className="flex flex-col w-full md:w-80 lg:w-96 bg-white border-r border-gray-100">
- <div className="px-6 py-8 border-b border-gray-50">
- <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Messages</h2>
- <p className="text-sm text-gray-500 font-medium">Connect with your network.</p>
+ <div className="h-16 px-4 flex items-center border-b border-gray-200 bg-[#F0F2F5] shrink-0">
+ <Avatar src={currentUser?.profile?.avatarUrl} alt="Me" size="sm" className="mr-3" />
+ <h2 className="text-lg font-semibold text-gray-800">Chats</h2>
  </div>
  <ChatUserList
  conversations={conversations}
@@ -683,7 +683,7 @@ export const ChatPage: React.FC = () => {
  {userId ? (
  <>
  {/* Chat Header */}
- <div className="h-20 flex items-center justify-between px-6 border-b border-gray-50 bg-white/80 backdrop-blur-md sticky top-0 z-10">
+ <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200 bg-[#F0F2F5] shrink-0 z-10">
  <div className="flex items-center gap-4">
  <button className="md:hidden p-2 text-gray-400 hover:text-gray-600" onClick={() => (window.location.href = '/messages')}>
  <ChevronLeft size={24} />
@@ -736,7 +736,7 @@ export const ChatPage: React.FC = () => {
  </div>
 
  {/* Messages Container */}
- <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50/30">
+ <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-2 relative" style={{ backgroundColor: '#EFEAE2', backgroundImage: "url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')", backgroundRepeat: 'repeat' }}>
  {messages.map((msg) => (
  <ChatMessage 
  key={msg.id} 
@@ -832,75 +832,74 @@ export const ChatPage: React.FC = () => {
  </div>
  )}
 
- {/* Input Area */}
- <div className="px-6 py-6 border-t border-gray-50 bg-white">
- {replyingToMessage && (
- <div className="mb-3 p-3 bg-gray-50 rounded-xl flex items-center justify-between border-l-4 border-primary-500 animate-in slide-in-from-bottom-2 duration-200">
- <div className="text-xs">
- <p className="font-bold text-primary-600">Replying to {replyingToMessage.senderId === currentUser?.id ? 'Yourself' : chatPartner?.name}</p>
- <p className="text-gray-500 truncate">{replyingToMessage.content}</p>
- </div>
- <button onClick={() => setReplyingToMessage(null)} className="p-1 text-gray-400 hover:text-gray-600">
- <X size={16} />
- </button>
- </div>
- )}
-  
- {attachment && (
- <div className="mb-3 p-3 bg-primary-50 rounded-xl flex items-center justify-between border border-primary-100 animate-in slide-in-from-bottom-2 duration-200">
- <div className="flex items-center gap-3">
- <Paperclip size={16} className="text-primary-600" />
- <div className="text-xs">
- <p className="font-bold text-gray-900 truncate">{attachment.name}</p>
- <p className="text-primary-600 font-medium">Ready to send</p>
- </div>
- </div>
- <button onClick={() => setAttachment(null)} className="p-1 text-gray-400 hover:text-gray-600">
- <X size={16} />
- </button>
- </div>
- )}
+      {/* Input Area */}
+      <div className="px-4 py-3 bg-[#F0F2F5] flex flex-col shrink-0">
+        {replyingToMessage && (
+        <div className="mb-3 p-3 bg-gray-50 rounded-xl flex items-center justify-between border-l-4 border-primary-500 animate-in slide-in-from-bottom-2 duration-200">
+        <div className="text-xs">
+        <p className="font-bold text-primary-600">Replying to {replyingToMessage.senderId === currentUser?.id ? 'Yourself' : chatPartner?.name}</p>
+        <p className="text-gray-500 truncate">{replyingToMessage.content}</p>
+        </div>
+        <button onClick={() => setReplyingToMessage(null)} className="p-1 text-gray-400 hover:text-gray-600">
+        <X size={16} />
+        </button>
+        </div>
+        )}
+         
+        {attachment && (
+        <div className="mb-3 p-3 bg-primary-50 rounded-xl flex items-center justify-between border border-primary-100 animate-in slide-in-from-bottom-2 duration-200">
+        <div className="flex items-center gap-3">
+        <Paperclip size={16} className="text-primary-600" />
+        <div className="text-xs">
+        <p className="font-bold text-gray-900 truncate">{attachment.name}</p>
+        <p className="text-primary-600 font-medium">Ready to send</p>
+        </div>
+        </div>
+        <button onClick={() => setAttachment(null)} className="p-1 text-gray-400 hover:text-gray-600">
+        <X size={16} />
+        </button>
+        </div>
+        )}
 
- <form onSubmit={handleSendMessage} className="flex items-center gap-4 bg-gray-50 p-2 rounded-2xl border border-gray-100/50 shadow-sm focus-within:ring-2 focus-within:ring-primary-500/20 transition-all duration-300">
- <div className="relative">
- <button type="button" onClick={() => setShowEmojiPicker(!showEmojiPicker)} className="p-3 text-gray-400 hover:text-primary-600 hover:bg-white rounded-xl transition">
- <Smile size={20} />
- </button>
- {showEmojiPicker && (
- <div className="absolute bottom-16 left-0 z-50 shadow-2xl border-none rounded-2xl overflow-hidden">
- <EmojiPicker onEmojiClick={onEmojiClick} />
- </div>
- )}
- </div>
-  
- <button type="button" onClick={() => fileInputRef.current?.click()} className="p-3 text-gray-400 hover:text-primary-600 hover:bg-white rounded-xl transition">
- <Paperclip size={20} />
- </button>
- <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileSelect} />
+        <form onSubmit={handleSendMessage} className="flex items-center gap-2 md:gap-4 w-full">
+          <div className="relative flex items-center">
+            <button type="button" onClick={() => setShowEmojiPicker(!showEmojiPicker)} className="p-2 text-gray-500 hover:text-gray-700 transition">
+              <Smile size={24} />
+            </button>
+            {showEmojiPicker && (
+            <div className="absolute bottom-16 left-0 z-50 shadow-2xl border-none rounded-2xl overflow-hidden">
+            <EmojiPicker onEmojiClick={onEmojiClick} />
+            </div>
+            )}
+            <button type="button" onClick={() => fileInputRef.current?.click()} className="p-2 text-gray-500 hover:text-gray-700 transition">
+              <Paperclip size={24} />
+            </button>
+          </div>
+          <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileSelect} />
 
- <button 
-    type="button" 
-    onClick={handleAiDraft} 
-    disabled={isDrafting || !userId}
-    className={`p-3 rounded-xl transition-all duration-300 ${isDrafting ? 'text-primary-600 bg-primary-50' : 'text-gray-400 hover:text-primary-600 hover:bg-white'}`}
-    title="AI Assist"
-  >
-    {isDrafting ? <Loader2 size={20} className="animate-spin" /> : <Sparkles size={20} />}
-  </button>
+          <button 
+            type="button" 
+            onClick={handleAiDraft} 
+            disabled={isDrafting || !userId}
+            className={`p-2 transition-all duration-300 ${isDrafting ? 'text-primary-600' : 'text-gray-500 hover:text-primary-600'}`}
+            title="AI Assist"
+          >
+            {isDrafting ? <Loader2 size={24} className="animate-spin" /> : <Sparkles size={24} />}
+          </button>
 
- <input
- type="text"
- value={newMessage}
- onChange={(e) => { setNewMessage(e.target.value); handleTyping(); }}
- placeholder={editingMessage ? "Edit message..." : "Type your message..."}
- className="flex-1 bg-transparent border-none py-3 px-2 text-sm text-gray-900 placeholder-gray-400 focus:ring-0 outline-none font-medium"
- />
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => { setNewMessage(e.target.value); handleTyping(); }}
+            placeholder={editingMessage ? "Edit message..." : "Type a message"}
+            className="flex-1 bg-white border border-gray-200 py-2.5 px-4 rounded-xl text-[15px] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-primary-500 outline-none shadow-sm"
+          />
 
- <Button type="submit" className="p-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl shadow-lg shadow-primary-500/20 active:scale-95 transition-all" disabled={isUploading || (!newMessage.trim() && !attachment)}>
- <Send size={20} />
- </Button>
- </form>
- </div>
+          <button type="submit" className="p-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-sm active:scale-95 transition-all flex items-center justify-center h-10 w-10 ml-1" disabled={isUploading || (!newMessage.trim() && !attachment)}>
+            <Send size={18} className="ml-1" />
+          </button>
+        </form>
+      </div>
  </>
  ) : (
   <EmptyState 
