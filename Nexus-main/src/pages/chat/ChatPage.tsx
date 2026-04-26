@@ -742,12 +742,13 @@ export const ChatPage: React.FC = () => {
  key={msg.id} 
  message={msg} 
  isCurrentUser={msg.senderId === currentUser?.id}
- sender={
-   msg.senderId === currentUser?.id
-     ? { name: currentUser?.name || 'You', avatarUrl: currentUser?.profile?.avatarUrl }
-     : { name: chatPartner?.name || 'Partner', avatarUrl: chatPartner?.profile?.avatarUrl, isOnline: chatPartner?.isOnline ?? false }
- }
- onEdit={() => handleEditInit(msg)}
+  sender={
+    msg.senderId === currentUser?.id
+      ? { name: currentUser?.name || 'You', avatarUrl: currentUser?.profile?.avatarUrl }
+      : { name: chatPartner?.name || 'Partner', avatarUrl: chatPartner?.profile?.avatarUrl, isOnline: chatPartner?.isOnline ?? false }
+  }
+  partnerName={chatPartner?.name}
+  onEdit={() => handleEditInit(msg)}
  onDelete={() => handleDeleteMessage(msg.id)}
  onReply={() => setReplyingToMessage(msg)}
  />

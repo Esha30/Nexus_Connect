@@ -17,9 +17,10 @@ interface ChatMessageProps {
  onDelete?: (id: string) => void;
  onEdit?: (message: Message) => void;
  onReply?: (message: Message) => void;
+ partnerName?: string;
 }
 
-export const ChatMessage: React.FC<ChatMessageProps> = ({ message, isCurrentUser, sender, onDelete, onEdit, onReply }) => {
+export const ChatMessage: React.FC<ChatMessageProps> = ({ message, isCurrentUser, sender, partnerName, onDelete, onEdit, onReply }) => {
   const [showMenu, setShowMenu] = useState(false);
 
   if (!sender) return null;
@@ -59,7 +60,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, isCurrentUser
               {message.replyTo && (
                 <div className={`mb-2 p-2 rounded text-xs border-l-4 ${isCurrentUser ? 'bg-primary-700/30 border-l-white text-blue-50' : 'bg-gray-100 border-l-primary-500 text-gray-700'}`}>
                   <span className="font-bold opacity-80 block mb-1">
-                    {message.replyTo.senderId === message.senderId ? sender?.name : (isCurrentUser ? 'Partner' : 'You')}
+                    {message.replyTo.senderId === message.senderId ? sender?.name : (isCurrentUser ? (partnerName || 'Partner') : 'You')}
                   </span>
                   <span className="opacity-90 line-clamp-2">{message.replyTo.content}</span>
                 </div>
