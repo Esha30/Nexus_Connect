@@ -41,7 +41,7 @@ export const CollaborationRequestCard: React.FC<CollaborationRequestCardProps> =
  const handleReject = () => handleUpdateStatus('rejected');
  
  const handleMessage = () => {
- navigate(`/chat/${investor.id}`);
+ navigate(`/messages/${investor.id}`);
  };
  
  const handleViewProfile = () => {

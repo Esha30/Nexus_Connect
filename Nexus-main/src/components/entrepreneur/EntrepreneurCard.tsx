@@ -27,7 +27,7 @@ export const EntrepreneurCard: React.FC<EntrepreneurCardProps> = ({
  
  const handleMessage = (e: React.MouseEvent) => {
  e.stopPropagation();
- navigate(`/chat/${entrepreneur.id || entrepreneur._id}`);
+ navigate(`/messages/${entrepreneur.id || entrepreneur._id}`);
  };
 
  const [aiPitch, setAiPitch] = useState<string | null>(null);

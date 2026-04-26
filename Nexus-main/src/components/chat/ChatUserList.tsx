@@ -21,7 +21,7 @@ export const ChatUserList: React.FC<ChatUserListProps> = ({ conversations, onCle
  if (!currentUser) return null;
  
  const handleSelectUser = (userId: string) => {
- navigate(`/chat/${userId}`);
+ navigate(`/messages/${userId}`);
  };
 
  return (

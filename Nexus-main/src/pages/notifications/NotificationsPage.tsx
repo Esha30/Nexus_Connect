@@ -76,7 +76,7 @@ export const NotificationsPage: React.FC = () => {
  // Navigate based on type
  switch (notification.type) {
  case 'message':
- navigate(`/chat/${notification.sender._id}`);
+ navigate(`/messages/${notification.sender._id}`);
  break;
  case 'meeting':
  navigate('/meetings');

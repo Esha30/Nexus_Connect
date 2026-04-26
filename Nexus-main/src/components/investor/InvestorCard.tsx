@@ -26,9 +26,9 @@ export const InvestorCard: React.FC<InvestorCardProps> = ({
    setShowAnalysis(true);
  };
  
- const handleMessage = (e: React.MouseEvent) => {
+ const handleMessageClick = (e: React.MouseEvent) => {
  e.stopPropagation();
- navigate(`/chat/${investor.id || investor._id}`);
+ navigate(`/messages/${investor.id || investor._id}`);
  };
 
  const name = investor.name || 'Anonymous Investor';

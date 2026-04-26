@@ -347,7 +347,7 @@ export const EntrepreneurProfile: React.FC = () => {
  <div className="flex flex-wrap gap-4 justify-center sm:justify-end">
  {!isCurrentUser && (
  <>
- <Link to={`/chat/${entrepreneur.id || (entrepreneur as any)._id}`}>
+ <Link to={`/messages/${entrepreneur.id || (entrepreneur as any)._id}`}>
  <Button
  variant="outline"
  className="rounded-lg font-medium border-gray-200 py-2.5 px-6"

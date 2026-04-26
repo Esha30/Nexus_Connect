@@ -685,7 +685,7 @@ export const ChatPage: React.FC = () => {
  {/* Chat Header */}
  <div className="h-20 flex items-center justify-between px-6 border-b border-gray-50 bg-white/80 backdrop-blur-md sticky top-0 z-10">
  <div className="flex items-center gap-4">
- <button className="md:hidden p-2 text-gray-400 hover:text-gray-600" onClick={() => (window.location.href = '/chat')}>
+ <button className="md:hidden p-2 text-gray-400 hover:text-gray-600" onClick={() => (window.location.href = '/messages')}>
  <ChevronLeft size={24} />
  </button>
  <div className="relative">

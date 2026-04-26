@@ -203,7 +203,7 @@ export const InvestorProfile: React.FC = () => {
  <div className="flex flex-wrap gap-4 justify-center sm:justify-end">
  {!isCurrentUser && (
  <>
- <Link to={`/chat/${investor.id || (investor as any)._id}`}>
+ <Link to={`/messages/${investor.id || (investor as any)._id}`}>
  <Button
  className="rounded-lg font-semibold bg-primary-600 py-2.5 px-5 shadow-sm"
  leftIcon={<MessageCircle size={18} />}

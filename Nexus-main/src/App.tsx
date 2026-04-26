@@ -28,7 +28,6 @@ const InvestorProfile = lazy(() => import('./pages/profile/InvestorProfile').the
 // Feature Pages
 const InvestorsPage = lazy(() => import('./pages/investors/InvestorsPage').then(m => ({ default: m.InvestorsPage })));
 const EntrepreneursPage = lazy(() => import('./pages/entrepreneurs/EntrepreneursPage').then(m => ({ default: m.EntrepreneursPage })));
-const MessagesPage = lazy(() => import('./pages/messages/MessagesPage').then(m => ({ default: m.MessagesPage })));
 const NotificationsPage = lazy(() => import('./pages/notifications/NotificationsPage').then(m => ({ default: m.NotificationsPage })));
 const DocumentsPage = lazy(() => import('./pages/documents/DocumentsPage').then(m => ({ default: m.DocumentsPage })));
 const SettingsPage = lazy(() => import('./pages/settings/SettingsPage').then(m => ({ default: m.SettingsPage })));
@@ -41,7 +40,7 @@ const DealsPage = lazy(() => import('./pages/deals/DealsPage').then(m => ({ defa
 const MeetingsPage = lazy(() => import('./pages/meetings/MeetingsPage').then(m => ({ default: m.MeetingsPage })));
 const FeedPage = lazy(() => import('./pages/feed/FeedPage').then(m => ({ default: m.FeedPage })));
 
-// Chat Pages
+// Chat Page (Unified Messages)
 const ChatPage = lazy(() => import('./pages/chat/ChatPage').then(m => ({ default: m.ChatPage })));
 
 // Admin Page
@@ -97,9 +96,10 @@ function App() {
                     <Route index element={<EntrepreneursPage />} />
                   </Route>
                   
-                  {/* Activity Groups */}
+                  {/* Unified Messages */}
                   <Route path="/messages" element={<DashboardLayout />}>
-                    <Route index element={<MessagesPage />} />
+                    <Route index element={<ChatPage />} />
+                    <Route path=":userId" element={<ChatPage />} />
                   </Route>
                   
                   {/* Other routes unchanged */}
@@ -156,11 +156,7 @@ function App() {
                     <Route index element={<PricingPage />} />
                   </Route>
                   
-                  {/* Chat Routes */}
-                  <Route path="/chat" element={<DashboardLayout />}>
-                    <Route index element={<ChatPage />} />
-                    <Route path=":userId" element={<ChatPage />} />
-                  </Route>
+                  {/* Chat Routes (Removed in favor of unified /messages route) */}
     
                   <Route path="/meeting/:meetingId" element={<MeetingRoomPage />} />
                   

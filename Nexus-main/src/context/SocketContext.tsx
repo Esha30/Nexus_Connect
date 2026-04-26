@@ -160,7 +160,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     socket.on('receive-message', (payload) => {
       // If we are not in the chat with the sender, increment unread count
-      if (!window.location.pathname.includes(`/chat/${payload.senderId}`)) {
+      if (!window.location.pathname.includes(`/messages/${payload.senderId}`)) {
         setTotalUnreadCount(prev => prev + 1);
         toast.success(`Message: ${payload.content.substring(0, 30)}${payload.content.length > 30 ? '...' : ''}`, {
           icon: '💬',
