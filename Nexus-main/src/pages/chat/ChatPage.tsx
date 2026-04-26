@@ -1,6 +1,6 @@
 // Nexus Chat System - Production Ready
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Send, Phone, Video as VideoIcon, Info, Smile, Mic, MicOff, VideoOff, MessageCircle, Paperclip, X, ChevronLeft, MoreVertical, Trash2, Sparkles, Loader2 } from 'lucide-react';
 import api from '../../api/api';
 import { Avatar } from '../../components/ui/Avatar';
@@ -39,6 +39,7 @@ interface IcePayload {
 
 export const ChatPage: React.FC = () => {
  const { userId } = useParams<{ userId: string }>();
+  const navigate = useNavigate();
  const { user: currentUser } = useAuth();
  const [messages, setMessages] = useState<Message[]>([]);
  const [newMessage, setNewMessage] = useState('');
