@@ -18,7 +18,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const syncUserAvatar = (userData: User | null): User | null => {
     if (!userData) return null;
     
-    let synchronized = { ...userData };
+    const synchronized = { ...userData };
     
     // Sync Avatar
     if (userData.profile?.avatarUrl) {

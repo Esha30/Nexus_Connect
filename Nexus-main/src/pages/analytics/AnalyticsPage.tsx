@@ -17,7 +17,6 @@ import { useAuth } from '../../context/AuthContext';
 const PIE_COLORS = ['#6366f1', '#a855f7', '#ec4899', '#f43f5e', '#f97316'];
 
 export const AnalyticsPage: React.FC = () => {
-  const { user: _user } = useAuth();
   const [stats, setStats] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -34,7 +33,7 @@ export const AnalyticsPage: React.FC = () => {
       try {
         const res = await api.get('/dashboard/stats');
         setStats(res.data.stats);
-      } catch (err) {
+      } catch {
         toast.error('Failed to load analytics data');
       } finally {
         setIsLoading(false);
