@@ -62,19 +62,10 @@ app.use(cors({
   credentials: true
 }));
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      "script-src": ["'self'", "https://accounts.google.com", "https://www.gstatic.com", "https://unpkg.com", "'unsafe-eval'"],
-      "frame-src": ["'self'", "https://accounts.google.com"],
-      "connect-src": ["'self'", "http://localhost:5001", "http://127.0.0.1:5001", "ws://localhost:5001", "ws://127.0.0.1:5001", "https://accounts.google.com"],
-      "img-src": ["'self'", "data:", "blob:", "http://localhost:5001", "http://127.0.0.1:5001", "https://*"],
-      "worker-src": ["'self'", "blob:", "https://unpkg.com"], 
-    },
-  },
-  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+  contentSecurityPolicy: false,
+  crossOriginOpenerPolicy: false,
+  crossOriginResourcePolicy: false,
 }));
-app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 
 // Custom NoSQL Injection Protection (Express 5 Compatible)
 const deepSanitize = (obj) => {

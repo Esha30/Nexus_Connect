@@ -147,7 +147,7 @@ export const ChatPage: React.FC = () => {
 
   // Connect Socket.IO
   socketRef.current = io(SOCKET_URL, {
-    transports: ['websocket', 'polling'],
+    withCredentials: true,
     reconnectionAttempts: 5,
     reconnectionDelay: 2000,
     timeout: 10000,
