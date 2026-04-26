@@ -32,9 +32,9 @@ export const createCheckoutSession = async (req, res) => {
   }
 
   try {
-    // --- NEXUS DEMO MODE FALLBACK ---
-    if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY === 'your_stripe_secret_key') {
-      console.warn('⚠️ [NEXUS DEMO MODE] Stripe keys missing. Simulating checkout success.');
+    // --- NEXUS DEMO MODE FORCED ---
+    if (true) { // Always use demo mode for now as requested
+      console.warn('⚠️ [NEXUS DEMO MODE] Stripe is in dummy mode. Simulating checkout success.');
       
       // Auto-upgrade user for demo purposes
       const demoUser = await User.findById(req.user._id);

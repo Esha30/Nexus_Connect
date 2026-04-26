@@ -50,5 +50,10 @@ const messageSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// Performance Indexes for fast chat loading
+messageSchema.index({ conversationId: 1, createdAt: -1 });
+messageSchema.index({ senderId: 1 });
+messageSchema.index({ receiverId: 1 });
+
 const Message = mongoose.model('Message', messageSchema);
 export default Message;

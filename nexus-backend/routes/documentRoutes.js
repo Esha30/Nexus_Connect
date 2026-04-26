@@ -3,6 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { uploadDocument, getUserDocuments, updateDocument, deleteDocument, shareDocument } from '../controllers/documentController.js';
+import { analyzePitchDeck } from '../controllers/aiDocumentController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import validateObjectId from '../middleware/validateObjectId.js';
 
@@ -69,5 +70,6 @@ router.route('/:id')
   .delete(protect, validateObjectId('id'), deleteDocument);
 
 router.post('/:id/share', protect, validateObjectId('id'), shareDocument);
+router.post('/:id/analyze', protect, validateObjectId('id'), analyzePitchDeck);
 
 export default router;

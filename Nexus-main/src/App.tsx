@@ -54,6 +54,8 @@ const CancelPage = lazy(() => import('./pages/billing/CancelPage').then(m => ({ 
 const RootRedirect = () => {
   const { user, isAuthenticated } = useAuth();
   if (!isAuthenticated) return <Navigate to="/login" replace />;
+  
+  if (user?.role === 'admin') return <Navigate to="/admin" replace />;
   return <Navigate to={user?.role === 'entrepreneur' ? '/dashboard/entrepreneur' : '/dashboard/investor'} replace />;
 };
 

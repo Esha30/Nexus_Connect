@@ -4,7 +4,7 @@ import api from '../../api/api';
 import { 
   FileText, Download, Trash2, Loader, Eye, Upload, Share2, 
   Shield, Info, ChevronDown, CheckCircle2, X, Search, 
-  Clock, Zap, Lock, Filter, ArrowRight
+  Clock, Zap, Lock, Filter, ArrowRight, RefreshCw
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -25,6 +25,22 @@ interface DocumentType {
   category: string;
   sharedWith: string[];
   isEncrypted: boolean;
+  aiAnalysis?: {
+    swot: {
+      strengths: string[];
+      weaknesses: string[];
+      opportunities: string[];
+      threats: string[];
+    };
+    scores: {
+      market: number;
+      product: number;
+      team: number;
+      overall: number;
+    };
+    summary: string;
+    analyzedAt: string;
+  };
   updatedAt: string;
   createdAt: string;
   uploader: {
@@ -50,6 +66,8 @@ export const DocumentsPage: React.FC = () => {
  const [isGuideOpen, setIsGuideOpen] = useState(false);
  const [activeFilter, setActiveFilter] = useState<'all' | 'recent' | 'encrypted'>('all');
  const [uploadCategory, setUploadCategory] = useState<'pitch_deck' | 'financials' | 'legal' | 'identity' | 'other'>('other');
+ const [isAnalyzing, setIsAnalyzing] = useState<string | null>(null);
+ const [showAnalysis, setShowAnalysis] = useState<string | null>(null);
 
  const filteredDocuments = useMemo(() => {
    let docs = [...documents];
@@ -184,6 +202,20 @@ export const DocumentsPage: React.FC = () => {
     } catch (err) {
       toast.error('Failed to update permissions');
       throw err;
+    }
+  };
+
+  const handleAnalyze = async (docId: string) => {
+    setIsAnalyzing(docId);
+    try {
+      const res = await api.post(`/documents/${docId}/analyze`);
+      toast.success('AI Analysis Complete!');
+      fetchDocuments();
+      setShowAnalysis(docId);
+    } catch (err) {
+      toast.error('AI Analysis failed. Ensure the document contains readable text.');
+    } finally {
+      setIsAnalyzing(null);
     }
   };
 
@@ -428,8 +460,8 @@ export const DocumentsPage: React.FC = () => {
       ) : (
       <div className="divide-y divide-gray-100">
       {filteredDocuments.map(doc => (
+      <React.Fragment key={doc._id}>
       <div
-      key={doc._id}
       className="flex items-center p-8 hover:bg-gray-50/50 transition-all duration-500 group cursor-default"
       >
       <div className="p-5 bg-gray-50 rounded-2xl mr-6 group-hover:scale-110 group-hover:bg-primary-600 group-hover:text-white transition-all duration-500 text-gray-400 border border-gray-100 shadow-sm">
@@ -495,6 +527,34 @@ export const DocumentsPage: React.FC = () => {
        </Button>
        )}
        
+        {doc.category === 'pitch_deck' && (
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`w-12 h-12 p-0 rounded-2xl transition-all font-bold border border-transparent ${doc.aiAnalysis?.summary ? 'text-emerald-500 bg-emerald-50 border-emerald-100' : 'text-primary-600 hover:bg-primary-50 hover:border-primary-100'}`}
+              title={doc.aiAnalysis?.summary ? "View AI Analysis" : "AI Pitch Analysis"}
+              onClick={() => doc.aiAnalysis?.summary ? setShowAnalysis(showAnalysis === doc._id ? null : doc._id) : handleAnalyze(doc._id)}
+              isLoading={isAnalyzing === doc._id}
+            >
+              <Zap size={20} className={isAnalyzing === doc._id ? 'animate-pulse' : ''} />
+            </Button>
+            
+            {doc.aiAnalysis?.summary && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-12 h-12 p-0 rounded-2xl text-gray-400 hover:text-primary-600 transition-all font-bold border border-transparent hover:border-primary-100"
+                title="Re-analyze"
+                onClick={() => handleAnalyze(doc._id)}
+                isLoading={isAnalyzing === doc._id}
+              >
+                <RefreshCw size={18} />
+              </Button>
+            )}
+          </div>
+        )}
+
        <Button
         variant="ghost"
         size="sm"
@@ -516,6 +576,122 @@ export const DocumentsPage: React.FC = () => {
        </Button>
        </div>
       </div>
+      
+      {/* AI Analysis Overlay */}
+      {showAnalysis === doc._id && doc.aiAnalysis && (
+        <div className="px-8 pb-8 animate-in slide-in-from-top-2 duration-300">
+          <div className="bg-gray-900 rounded-3xl p-8 border border-white/10 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary-600/10 rounded-full blur-3xl -mr-32 -mt-32" />
+
+            {/* Header */}
+            <div className="flex justify-between items-start mb-8 relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary-600 rounded-xl text-white shadow-lg shadow-primary-500/20">
+                  <Zap size={20} />
+                </div>
+                <div>
+                  <h4 className="text-white font-black uppercase tracking-tight">AI Pitch Deck Analysis</h4>
+                  <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Generated by Gemini 2.5 Flash</p>
+                </div>
+              </div>
+              <button onClick={() => setShowAnalysis(null)} className="text-gray-500 hover:text-white transition-colors p-2 hover:bg-white/5 rounded-full">
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Body: no-data fallback or analysis results */}
+            {!doc.aiAnalysis?.summary
+              ? (
+                <div className="text-center py-20 relative z-10">
+                  <p className="text-gray-400 font-medium">No analysis data found. Please trigger the analysis protocol.</p>
+                  <Button
+                    onClick={() => handleAnalyze(doc._id)}
+                    className="mt-6 bg-primary-600 hover:bg-primary-500 text-white rounded-2xl px-8"
+                    isLoading={isAnalyzing === doc._id}
+                  >
+                    Start AI Protocol
+                  </Button>
+                </div>
+              )
+              : (
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
+                  {/* Left: Summary + SWOT */}
+                  <div className="md:col-span-3 space-y-8">
+                    <div className="bg-white/5 rounded-2xl p-6 border border-white/5">
+                      <h5 className="text-[10px] font-black text-primary-400 uppercase tracking-widest mb-3">Executive Summary</h5>
+                      <p className="text-gray-200 text-sm leading-relaxed font-medium">{doc.aiAnalysis?.summary}</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <h5 className="text-[10px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" /> Strengths
+                        </h5>
+                        <ul className="space-y-2">
+                          {doc.aiAnalysis?.swot?.strengths?.map((s, i) => (
+                            <li key={i} className="text-xs text-gray-400 font-medium flex gap-2">
+                              <span className="text-emerald-500">•</span> {s}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="space-y-4">
+                        <h5 className="text-[10px] font-black text-red-400 uppercase tracking-widest flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-red-500 rounded-full" /> Weaknesses
+                        </h5>
+                        <ul className="space-y-2">
+                          {doc.aiAnalysis?.swot?.weaknesses?.map((w, i) => (
+                            <li key={i} className="text-xs text-gray-400 font-medium flex gap-2">
+                              <span className="text-red-500">•</span> {w}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right: Scores */}
+                  <div className="space-y-6">
+                    <div className="bg-white/5 rounded-2xl p-6 border border-white/5 flex flex-col items-center justify-center text-center">
+                      <div className="relative w-24 h-24 flex items-center justify-center mb-4">
+                        <svg className="w-full h-full transform -rotate-90">
+                          <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-white/5" />
+                          <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" fill="transparent"
+                            strokeDasharray={251.2}
+                            strokeDashoffset={251.2 * (1 - (doc.aiAnalysis?.scores?.overall || 0) / 10)}
+                            className="text-primary-500"
+                          />
+                        </svg>
+                        <span className="absolute text-2xl font-black text-white">{doc.aiAnalysis?.scores?.overall || 0}</span>
+                      </div>
+                      <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Overall Readiness</p>
+                    </div>
+
+                    <div className="space-y-4">
+                      {[
+                        { label: 'Market', score: doc.aiAnalysis?.scores?.market },
+                        { label: 'Product', score: doc.aiAnalysis?.scores?.product },
+                        { label: 'Team', score: doc.aiAnalysis?.scores?.team }
+                      ].map((s, i) => (
+                        <div key={i} className="space-y-1.5">
+                          <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
+                            <span className="text-gray-500">{s.label}</span>
+                            <span className="text-white">{s.score}/10</span>
+                          </div>
+                          <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div className="h-full bg-primary-500 rounded-full" style={{ width: `${(s.score || 0) * 10}%` }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )
+            }
+          </div>
+        </div>
+      )}
+      </React.Fragment>
       ))}
       </div>
       )}

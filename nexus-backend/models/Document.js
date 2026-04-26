@@ -44,6 +44,22 @@ const documentSchema = new mongoose.Schema({
   isEncrypted: {
     type: Boolean,
     default: false
+  },
+  aiAnalysis: {
+    swot: {
+      strengths: [String],
+      weaknesses: [String],
+      opportunities: [String],
+      threats: [String]
+    },
+    scores: {
+      market: Number,
+      product: Number,
+      team: Number,
+      overall: Number
+    },
+    summary: String,
+    analyzedAt: Date
   }
 }, {
   timestamps: true

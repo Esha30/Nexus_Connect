@@ -110,6 +110,12 @@ userSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+// Performance Indexes
+userSchema.index({ role: 1 });
+userSchema.index({ status: 1 });
+userSchema.index({ 'profile.industry': 1 });
+userSchema.index({ 'profile.isOnline': -1 });
+
 const User = mongoose.model('User', userSchema);
 
 export default User;
