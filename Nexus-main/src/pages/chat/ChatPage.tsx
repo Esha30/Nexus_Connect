@@ -516,16 +516,16 @@ export const ChatPage: React.FC = () => {
    fileType?: string;
  }
 
- const payload: MessagePayload = {
+  const payload: MessagePayload = {
    receiverId: userId,
    content
- };
+  };
   
- if (replyingToMessage) {
- payload.replyTo = replyingToMessage._id;
- }
+  if (replyingToMessage) {
+    payload.replyTo = replyingToMessage.id || (replyingToMessage as any)._id;
+  }
   
- if (attachment) {
+  if (attachment) {
  payload.fileUrl = attachment.url;
  payload.fileName = attachment.name;
  payload.fileType = attachment.type;
@@ -607,7 +607,31 @@ export const ChatPage: React.FC = () => {
  }
  };
 
- const onEmojiClick = (emojiData: EmojiClickData) => {
+  const handleToggleMute = async () => {
+    if (!userId) return;
+    try {
+      await api.put(`/messages/mute/${userId}`);
+      toast.success('Mute settings updated');
+      fetchConversations();
+    } catch (err) {
+      toast.error('Failed to update mute settings');
+    }
+    setShowChatOptions(false);
+  };
+
+  const handleToggleArchive = async () => {
+    if (!userId) return;
+    try {
+      await api.put(`/messages/archive/${userId}`);
+      toast.success('Archive settings updated');
+      fetchConversations();
+    } catch (err) {
+      toast.error('Failed to update archive settings');
+    }
+    setShowChatOptions(false);
+  };
+
+  const onEmojiClick = (emojiData: EmojiClickData) => {
  setNewMessage(prev => prev + emojiData.emoji);
  };
 
@@ -695,11 +719,17 @@ export const ChatPage: React.FC = () => {
      <MoreVertical size={20} />
    </button>
    {showChatOptions && (
-     <div className="absolute right-0 top-12 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50">
-       <button onClick={() => handleClearChatPrompt()} className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center transition-colors">
-         <Trash2 size={16} className="mr-3" /> Clear Chat
-       </button>
-     </div>
+      <div className="absolute right-0 top-12 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50">
+        <button onClick={handleToggleMute} className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center transition-colors">
+          Mute Sender
+        </button>
+        <button onClick={handleToggleArchive} className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center transition-colors border-b border-gray-50">
+          Archive Chat
+        </button>
+        <button onClick={() => { setShowChatOptions(false); handleClearChatPrompt(); }} className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center transition-colors">
+          <Trash2 size={16} className="mr-3" /> Delete Chat
+        </button>
+      </div>
    )}
  </div>
  </div>

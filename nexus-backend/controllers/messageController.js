@@ -48,6 +48,8 @@ export const getConversations = async (req, res) => {
           fileType: conv.lastMessage.fileType
         } : null,
         unreadCount: conv.unreadCounts ? conv.unreadCounts[req.user._id.toString()] || 0 : 0,
+        isMuted: conv.mutedBy?.some(id => id.toString() === req.user._id.toString()) || false,
+        isArchived: conv.archivedBy?.some(id => id.toString() === req.user._id.toString()) || false,
         updatedAt: conv.updatedAt
       };
     });
@@ -172,7 +174,8 @@ export const sendMessage = async (req, res) => {
 
     // Check receiver's notification preferences
     const receiver = await User.findById(receiverId).select('profile.pushNotifications').lean();
-    const shouldNotify = receiver?.profile?.pushNotifications !== false;
+    const isMuted = conversation.mutedBy?.some(id => id.toString() === receiverId.toString());
+    const shouldNotify = receiver?.profile?.pushNotifications !== false && !isMuted;
 
     if (shouldNotify) {
       // Create Notification
@@ -338,5 +341,71 @@ export const clearChat = async (req, res) => {
   } catch (err) {
     console.error('Error clearing chat:', err);
     res.status(500).json({ message: 'Server error clearing chat' });
+  }
+};
+
+// @desc    Toggle Mute Chat
+// @route   PUT /api/messages/mute/:partnerId
+// @access  Private
+export const toggleMuteChat = async (req, res) => {
+  try {
+    const { partnerId } = req.params;
+    const userId = req.user._id;
+
+    const conversation = await Conversation.findOne({
+      participants: { $all: [userId, partnerId] }
+    });
+
+    if (!conversation) {
+      return res.status(404).json({ message: 'Conversation not found' });
+    }
+
+    const isMuted = conversation.mutedBy?.some(id => id.toString() === userId.toString());
+    
+    if (isMuted) {
+      conversation.mutedBy = conversation.mutedBy.filter(id => id.toString() !== userId.toString());
+    } else {
+      conversation.mutedBy = conversation.mutedBy || [];
+      conversation.mutedBy.push(userId);
+    }
+
+    await conversation.save();
+    res.json({ message: isMuted ? 'Chat unmuted' : 'Chat muted', isMuted: !isMuted });
+  } catch (err) {
+    console.error('Error toggling mute:', err);
+    res.status(500).json({ message: 'Server error toggling mute' });
+  }
+};
+
+// @desc    Toggle Archive Chat
+// @route   PUT /api/messages/archive/:partnerId
+// @access  Private
+export const toggleArchiveChat = async (req, res) => {
+  try {
+    const { partnerId } = req.params;
+    const userId = req.user._id;
+
+    const conversation = await Conversation.findOne({
+      participants: { $all: [userId, partnerId] }
+    });
+
+    if (!conversation) {
+      return res.status(404).json({ message: 'Conversation not found' });
+    }
+
+    const isArchived = conversation.archivedBy?.some(id => id.toString() === userId.toString());
+    
+    if (isArchived) {
+      conversation.archivedBy = conversation.archivedBy.filter(id => id.toString() !== userId.toString());
+    } else {
+      conversation.archivedBy = conversation.archivedBy || [];
+      conversation.archivedBy.push(userId);
+    }
+
+    await conversation.save();
+    res.json({ message: isArchived ? 'Chat unarchived' : 'Chat archived', isArchived: !isArchived });
+  } catch (err) {
+    console.error('Error toggling archive:', err);
+    res.status(500).json({ message: 'Server error toggling archive' });
   }
 };

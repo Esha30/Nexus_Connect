@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import compression from 'compression';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
@@ -26,6 +27,9 @@ import User from './models/User.js';
 import { checkMaintenance, checkFeatureToggle } from './middleware/authMiddleware.js';
 
 const app = express();
+
+// Apply compression middleware to compress responses
+app.use(compression());
 
 // Apply global maintenance mode check
 app.use(checkMaintenance);
@@ -317,6 +321,15 @@ const PORT = process.env.PORT || 5001;
 if (process.env.NODE_ENV !== 'test') {
   httpServer.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
+    
+    // Keep-alive self-ping for Render
+    setInterval(() => {
+      try {
+        fetch(`http://localhost:${PORT}/test-ping`).catch(() => {});
+      } catch (err) {
+        // ignore
+      }
+    }, 10 * 60 * 1000); // Ping every 10 minutes
   });
 }
 

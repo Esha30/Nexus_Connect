@@ -110,6 +110,8 @@ export interface ChatConversation {
   lastMessage?: Message;
   updatedAt: string;
   unreadCount?: number;
+  isMuted?: boolean;
+  isArchived?: boolean;
 }
 
 export interface CollaborationRequest {

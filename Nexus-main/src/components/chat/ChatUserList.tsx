@@ -4,7 +4,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { ChatConversation } from '../../types';
 import { Avatar } from '../ui/Avatar';
 import { Badge } from '../ui/Badge';
-import { Trash2 } from 'lucide-react';
+import { Trash2, VolumeX, Archive } from 'lucide-react';
 
 import { useAuth } from '../../context/AuthContext';
 
@@ -59,9 +59,13 @@ export const ChatUserList: React.FC<ChatUserListProps> = ({ conversations, onCle
  
  <div className="flex-1 min-w-0">
  <div className="flex justify-between items-baseline">
- <h3 className="text-sm font-medium text-gray-900 truncate">
- {otherUser.name}
- </h3>
+ <div className="flex items-center gap-1.5 truncate">
+   <h3 className={`text-sm font-medium truncate ${conversation.isMuted ? 'text-gray-500' : 'text-gray-900'}`}>
+   {otherUser.name}
+   </h3>
+   {conversation.isMuted && <VolumeX size={12} className="text-gray-400" title="Muted" />}
+   {conversation.isArchived && <Archive size={12} className="text-gray-400" title="Archived" />}
+ </div>
  
  {lastMessage && (
  <span className="text-xs text-gray-500">
