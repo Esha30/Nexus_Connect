@@ -127,7 +127,7 @@ export const InvestorCard: React.FC<InvestorCardProps> = ({
  {showActions && (
  <div className="flex items-center gap-3 pt-2">
  <button 
- onClick={handleMessage}
+ onClick={handleMessageClick}
  className="w-12 h-12 flex items-center justify-center bg-white hover:bg-gray-50 text-gray-400 hover:text-primary-600 rounded-lg transition-all duration-300 border border-gray-100 shadow-sm"
  title="Secure Channel"
  >
