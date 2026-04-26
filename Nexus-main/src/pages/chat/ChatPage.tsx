@@ -736,7 +736,7 @@ export const ChatPage: React.FC = () => {
  </div>
 
  {/* Messages Container */}
- <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-2 relative" style={{ backgroundColor: '#EFEAE2', backgroundImage: "url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')", backgroundRepeat: 'repeat' }}>
+ <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50/30">
  {messages.map((msg) => (
  <ChatMessage 
  key={msg.id} 

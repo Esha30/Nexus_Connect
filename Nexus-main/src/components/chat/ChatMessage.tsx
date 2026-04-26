@@ -32,15 +32,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, isCurrentUser
       className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-4 animate-fade-in group relative`}
       onMouseLeave={() => setShowMenu(false)}
     >
-      {!isCurrentUser && (
-        <Avatar
-          src={sender.avatarUrl}
-          alt={sender.name}
-          size="sm"
-          status={sender.isOnline ? 'online' : 'offline'}
-          className="mr-2 self-end shrink-0"
-        />
-      )}
+
       
       <div className={`flex flex-col ${isCurrentUser ? 'items-end' : 'items-start'} max-w-[70%]`}>
         <div className={`relative px-3 py-2 rounded-lg shadow-[0_1px_0.5px_rgba(11,20,26,0.13)] ${
