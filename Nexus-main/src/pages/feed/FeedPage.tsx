@@ -35,9 +35,9 @@ export const FeedPage: React.FC = () => {
     if (!socket) return;
 
     socket.on('new-post', (newPost: any) => {
-      // Prevent duplicate posts if the sender also receives the broadcast
       setNewPostsBuffer(prev => {
-        if (posts.some(p => p._id === newPost._id) || prev.some(p => p._id === newPost._id)) return prev;
+        // We only check against the buffer here; the merge function will handle the rest
+        if (prev.some(p => p._id === newPost._id)) return prev;
         return [newPost, ...prev];
       });
       toast.success('New update from the community!', { icon: '🚀' });
@@ -54,7 +54,10 @@ export const FeedPage: React.FC = () => {
   };
 
   const handleApplyNewPosts = () => {
-    setPosts(prev => [...newPostsBuffer, ...prev]);
+    setPosts(prev => {
+      const filteredNew = newPostsBuffer.filter(nb => !prev.some(p => p._id === nb._id));
+      return [...filteredNew, ...prev];
+    });
     setNewPostsBuffer([]);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
