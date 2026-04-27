@@ -505,6 +505,10 @@ export const reportUser = async (req, res) => {
       return res.status(400).json({ message: 'Reported ID and reason are required' });
     }
 
+    if (!mongoose.Types.ObjectId.isValid(reportedId)) {
+      return res.status(400).json({ message: 'Invalid reported user ID format' });
+    }
+
     await Report.create({
       reporterId,
       reportedId,
@@ -514,7 +518,7 @@ export const reportUser = async (req, res) => {
     res.json({ message: 'User reported successfully to admin' });
   } catch (err) {
     console.error('Error reporting user:', err);
-    res.status(500).json({ message: 'Server error reporting user' });
+    res.status(500).json({ message: 'Server error reporting user', error: err.message });
   }
 };
 

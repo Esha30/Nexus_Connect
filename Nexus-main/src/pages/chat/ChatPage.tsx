@@ -704,8 +704,8 @@ export const ChatPage: React.FC = () => {
       toast.success('Report submitted to administration');
       setIsReportModalOpen(false);
       setReportReason('');
-    } catch (err) {
-      toast.error('Failed to submit report');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to submit report');
     }
   };
 
