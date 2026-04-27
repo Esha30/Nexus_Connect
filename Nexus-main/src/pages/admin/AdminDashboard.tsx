@@ -18,6 +18,7 @@ import { useAuth } from '../../context/AuthContext';
 import { formatDistanceToNow } from 'date-fns';
 
 import { UserDetailsModal } from '../../components/admin/UserDetailsModal';
+import { ConfirmationModal } from '../../components/ui/ConfirmationModal';
 
 type AdminTab = 'overview' | 'users' | 'posts' | 'support' | 'priority' | 'reports' | 'settings' | 'logs';
 
@@ -37,6 +38,18 @@ export const AdminDashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [showUserModal, setShowUserModal] = useState(false);
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    variant?: 'danger' | 'primary';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
 
   useEffect(() => {
     if (user?.role !== 'admin') return;
@@ -95,25 +108,39 @@ export const AdminDashboard: React.FC = () => {
   };
 
   const deleteUser = async (id: string) => {
-    if (!window.confirm('PERMANENT DELETION: Are you sure you want to remove this user?')) return;
-    try {
-      await api.delete(`/admin/users/${id}`);
-      setUsers(prev => prev.filter(u => u._id !== id));
-      toast.success('User protocol terminated');
-    } catch (err) {
-      toast.error('Termination failed');
-    }
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Delete User Node',
+      message: 'PERMANENT DELETION: This action will purge the user and all associated data. Are you sure you want to terminate this entity?',
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await api.delete(`/admin/users/${id}`);
+          setUsers(prev => prev.filter(u => u._id !== id));
+          toast.success('User protocol terminated');
+        } catch (err) {
+          toast.error('Termination failed');
+        }
+      }
+    });
   };
 
   const deletePost = async (id: string) => {
-    if (!window.confirm('Confirm moderation: Remove this content?')) return;
-    try {
-      await api.delete(`/admin/posts/${id}`);
-      setPosts(prev => prev.filter(p => p._id !== id));
-      toast.success('Broadcast removed');
-    } catch (err) {
-      toast.error('Moderation failed');
-    }
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Remove Content',
+      message: 'Are you sure you want to remove this broadcast? This action cannot be undone.',
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await api.delete(`/api/posts/${id}`);
+          setPosts(prev => prev.filter(p => p._id !== id));
+          toast.success('Broadcast removed');
+        } catch (err) {
+          toast.error('Moderation failed');
+        }
+      }
+    });
   };
 
   const resolveTicket = async (id: string) => {
@@ -127,14 +154,21 @@ export const AdminDashboard: React.FC = () => {
   };
 
   const deleteReport = async (id: string) => {
-    if (!window.confirm('Mark as resolved and remove report?')) return;
-    try {
-      await api.delete(`/admin/reports/${id}`);
-      setReports(prev => prev.filter(r => r._id !== id));
-      toast.success('Report resolved');
-    } catch (err) {
-      toast.error('Failed to resolve report');
-    }
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Resolve Report',
+      message: 'Mark this report as resolved? This will remove it from the active report stream.',
+      variant: 'primary',
+      onConfirm: async () => {
+        try {
+          await api.delete(`/admin/reports/${id}`);
+          setReports(prev => prev.filter(r => r._id !== id));
+          toast.success('Report resolved');
+        } catch (err) {
+          toast.error('Failed to resolve report');
+        }
+      }
+    });
   };
 
   const approvePriority = async (id: string) => {
@@ -838,6 +872,15 @@ export const AdminDashboard: React.FC = () => {
           onDelete={deleteUser}
         />
       )}
+
+      <ConfirmationModal 
+        isOpen={confirmConfig.isOpen}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        onConfirm={confirmConfig.onConfirm}
+        onClose={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+        variant={confirmConfig.variant as any}
+      />
     </div>
   );
 };
