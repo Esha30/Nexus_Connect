@@ -661,10 +661,10 @@ export const ChatPage: React.FC = () => {
  };
 
  return (
- <div className="h-[calc(100vh-56px)] md:h-[calc(100vh-64px)] bg-gray-50 flex overflow-hidden">
+  <div className="h-full bg-white flex overflow-hidden pb-16 md:pb-0">
  {/* Sidebar */}
- <div className={`${userId ? 'hidden md:flex' : 'flex w-full'} md:flex-shrink-0`}>
- <div className="flex flex-col w-full md:w-80 lg:w-96 bg-white border-r border-gray-100">
+ <div className={`${userId ? 'hidden md:flex' : 'flex w-full'} md:flex-shrink-0 border-r border-gray-100`}>
+ <div className="flex flex-col w-full md:w-80 lg:w-96 bg-white">
  <div className="h-16 px-4 flex items-center border-b border-gray-200 bg-[#F0F2F5] shrink-0">
  <Avatar src={currentUser?.profile?.avatarUrl} alt="Me" size="sm" className="mr-3" />
  <h2 className="text-lg font-semibold text-gray-800">Chats</h2>
@@ -682,8 +682,8 @@ export const ChatPage: React.FC = () => {
  <>
  {/* Chat Header */}
  <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200 bg-[#F0F2F5] shrink-0 z-10">
- <div className="flex items-center gap-4">
- <button className="md:hidden p-2 text-gray-400 hover:text-gray-600" onClick={() => (window.location.href = '/messages')}>
+ <div className="flex items-center gap-2 md:gap-4 min-w-0">
+ <button className="md:hidden p-2 -ml-2 text-gray-500 hover:text-gray-700" onClick={() => navigate('/messages')}>
  <ChevronLeft size={24} />
  </button>
  <div className="relative">
@@ -692,25 +692,25 @@ export const ChatPage: React.FC = () => {
  <span className="absolute bottom-0 right-0 block h-3 w-3 rounded-full bg-green-500 ring-2 ring-white" />
  )}
  </div>
- <div>
- <h3 className="text-base font-bold text-gray-900">{chatPartner?.name || 'Loading...'}</h3>
- <p className="text-xs font-medium text-gray-400">{chatPartner?.isOnline ? 'Online Now' : 'Last seen recently'}</p>
+ <div className="min-w-0">
+ <h3 className="text-sm md:text-base font-bold text-gray-900 truncate">{chatPartner?.name || 'Loading...'}</h3>
+ <p className="text-[10px] md:text-xs font-medium text-gray-400 truncate">{chatPartner?.isOnline ? 'Online Now' : 'Last seen recently'}</p>
  </div>
  </div>
 
- <div className="flex items-center gap-2">
- <button onClick={() => startCall('audio')} className="p-2.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition duration-200">
- <Phone size={20} />
+ <div className="flex items-center gap-0.5 md:gap-2">
+ <button onClick={() => startCall('audio')} className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition duration-200">
+ <Phone size={18} className="md:w-5 md:h-5" />
  </button>
- <button onClick={() => startCall('video')} className="p-2.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition duration-200">
- <VideoIcon size={20} />
+ <button onClick={() => startCall('video')} className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition duration-200">
+ <VideoIcon size={18} className="md:w-5 md:h-5" />
  </button>
  <button 
    onClick={() => setShowProfileInfo(!showProfileInfo)} 
-   className={`p-2.5 rounded-xl transition duration-200 ${showProfileInfo ? 'bg-primary-100 text-primary-600' : 'text-gray-400 hover:text-primary-600 hover:bg-primary-50'}`}
+   className={`p-2 rounded-lg transition duration-200 ${showProfileInfo ? 'bg-primary-100 text-primary-600' : 'text-gray-400 hover:text-primary-600 hover:bg-primary-50'}`}
    title="Partner Information"
  >
-   <Info size={20} />
+   <Info size={18} className="md:w-5 md:h-5" />
  </button>
  <div className="relative">
    <button onClick={() => setShowChatOptions(!showChatOptions)} className="p-2.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition duration-200">

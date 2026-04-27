@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Navbar } from './Navbar';
 import { Sidebar } from './Sidebar';
@@ -8,6 +8,9 @@ import { CopilotWidget } from '../ai/CopilotWidget';
 
 export const DashboardLayout: React.FC = () => {
  const { isAuthenticated, isLoading } = useAuth();
+ const location = useLocation();
+ 
+ const isChatPage = location.pathname.startsWith('/messages');
  
  if (isLoading) {
  return (
@@ -34,8 +37,8 @@ export const DashboardLayout: React.FC = () => {
   <div className="flex-1 flex overflow-hidden relative z-10">
   <Sidebar />
   
-  <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 lg:p-10 pb-20 md:pb-8 hide-scrollbar scroll-smooth">
-  <div className="max-w-7xl mx-auto animate-fade-in">
+  <main className={`flex-1 ${isChatPage ? 'p-0 overflow-hidden' : 'overflow-y-auto p-4 sm:p-6 md:p-8 lg:p-10 pb-20 md:pb-8'} hide-scrollbar scroll-smooth`}>
+  <div className={`${isChatPage ? 'max-w-none h-full' : 'max-w-7xl mx-auto'} animate-fade-in`}>
   <Outlet />
   </div>
   </main>
