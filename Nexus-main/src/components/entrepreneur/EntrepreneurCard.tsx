@@ -95,69 +95,69 @@ export const EntrepreneurCard: React.FC<EntrepreneurCardProps> = ({
  style={{ isolation: 'isolate' }}
  >
  
- {/* Header section */}
- <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-5">
-  <div className="flex items-center gap-4">
-  <div className="relative">
-  <Avatar
-  src={entrepreneur.profile?.avatarUrl || entrepreneur.avatarUrl}
-  alt={entrepreneur.name}
-  size="xl"
-  className=" shadow-sm z-10"
-  status={entrepreneur.profile?.isOnline || entrepreneur.isOnline ? 'online' : 'offline'}
-  />
-  </div>
-  <div>
-  <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 line-clamp-1 leading-tight">{startupName}</h3>
-  <p className="text-[10px] font-bold text-primary-600 flex items-center gap-1 mt-0.5 uppercase tracking-widest">
-  <Sparkles size={12} /> {industry}
-  </p>
-  </div>
-  </div>
-  <div className="flex flex-row sm:flex-col items-center sm:items-end gap-2 w-full sm:w-auto">
-    <div className="bg-gray-100/80 px-3 py-1.5 rounded-full flex items-center gap-1.5 shrink-0">
-    <MapPin size={12} className="text-gray-500" />
-    <span className="text-[10px] font-bold text-gray-700 uppercase">{location}</span>
+  {/* Header section */}
+  <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-5">
+    <div className="flex items-center gap-3 flex-1 min-w-0">
+      <div className="relative shrink-0">
+        <Avatar
+          src={entrepreneur.profile?.avatarUrl || entrepreneur.avatarUrl}
+          alt={entrepreneur.name}
+          size="xl"
+          className="shadow-sm z-10"
+          status={entrepreneur.profile?.isOnline || entrepreneur.isOnline ? 'online' : 'offline'}
+        />
+      </div>
+      <div className="flex-1 min-w-0">
+        <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 truncate leading-tight">{startupName}</h3>
+        <p className="text-[10px] font-bold text-primary-600 flex items-center gap-1 mt-0.5 uppercase tracking-widest truncate">
+          <Sparkles size={12} className="shrink-0" /> <span className="truncate">{industry}</span>
+        </p>
+      </div>
     </div>
-    <button 
-      onClick={handleGeneratePitch} 
-      disabled={isGeneratingPitch || !!aiPitch}
-      className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all border shrink-0 ${
-        aiPitch 
-          ? 'bg-purple-100 text-purple-700 border-purple-200'
-          : 'bg-white text-primary-600 border-primary-200 hover:bg-primary-50 hover:scale-105 shadow-sm'
-      }`}
-    >
-      {aiPitch ? <Sparkles size={12} className="text-purple-500" /> : <Sparkles size={12} />}
-      {isGeneratingPitch ? 'Synthesizing...' : aiPitch ? 'AI Optimized' : 'AI Summary'}
-    </button>
-  </div>
+    <div className="flex flex-row sm:flex-col items-center sm:items-end gap-2 w-full sm:w-auto shrink-0">
+      <div className="bg-gray-100/80 px-3 py-1.5 rounded-full flex items-center gap-1.5 shrink-0">
+        <MapPin size={12} className="text-gray-500 shrink-0" />
+        <span className="text-[10px] font-bold text-gray-700 uppercase truncate max-w-[100px]">{location}</span>
+      </div>
+      <button 
+        onClick={handleGeneratePitch} 
+        disabled={isGeneratingPitch || !!aiPitch}
+        className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all border shrink-0 ${
+          aiPitch 
+            ? 'bg-purple-100 text-purple-700 border-purple-200'
+            : 'bg-white text-primary-600 border-primary-200 hover:bg-primary-50 hover:scale-105 shadow-sm'
+        }`}
+      >
+        {aiPitch ? <Sparkles size={12} className="text-purple-500 shrink-0" /> : <Sparkles size={12} className="shrink-0" />}
+        {isGeneratingPitch ? 'Synthesizing...' : aiPitch ? 'AI Optimized' : 'AI Summary'}
+      </button>
+    </div>
   </div>
 
- {/* Pitch Summary */}
- <div className="mb-6 h-[72px] relative overflow-hidden group/pitch flex flex-col justify-center">
-   <p className={`text-[15px] leading-relaxed line-clamp-3 font-medium transition-all ${
-     aiPitch ? 'text-gray-900 italic tracking-tight' : 'text-gray-600'
-   }`}>"{aiPitch || pitch}"</p>
- </div>
+  {/* Pitch Summary */}
+  <div className="mb-6 h-[72px] relative overflow-hidden group/pitch flex flex-col justify-center">
+    <p className={`text-[15px] leading-relaxed line-clamp-3 font-medium transition-all ${
+      aiPitch ? 'text-gray-900 italic tracking-tight' : 'text-gray-600'
+    }`}>"{aiPitch || pitch}"</p>
+  </div>
 
- {/* Stats Grid */}
- <div className="grid grid-cols-2 gap-3 mb-6 bg-gray-50/50 p-4 rounded-lg border border-gray-100/80">
- <div className="flex gap-3 items-center">
- <div className="bg-white p-2 rounded-lg shadow-sm text-secondary-500"><Target size={16} /></div>
- <div>
- <p className="text-xs font-semibold text-gray-400">Funding Goal</p>
- <p className="text-sm font-medium text-gray-900">{entrepreneur.profile?.fundingNeeded || entrepreneur.fundingNeeded || 'Undisclosed'}</p>
- </div>
- </div>
- <div className="flex gap-3 items-center">
- <div className="bg-white p-2 rounded-lg shadow-sm text-accent-500"><Users size={16} /></div>
- <div>
- <p className="text-xs font-semibold text-gray-400">Team Size</p>
- <p className="text-sm font-medium text-gray-900">{entrepreneur.profile?.teamSize || entrepreneur.teamSize || '1-10'} Members</p>
- </div>
- </div>
- </div>
+  {/* Stats Grid */}
+  <div className="flex flex-wrap gap-3 mb-6 bg-gray-50/50 p-4 rounded-lg border border-gray-100/80">
+    <div className="flex gap-3 items-center flex-1 min-w-[120px]">
+      <div className="bg-white p-2 rounded-lg shadow-sm text-secondary-500 shrink-0"><Target size={16} /></div>
+      <div className="min-w-0">
+        <p className="text-xs font-semibold text-gray-400 truncate">Funding Goal</p>
+        <p className="text-sm font-medium text-gray-900 truncate">{entrepreneur.profile?.fundingNeeded || entrepreneur.fundingNeeded || 'Undisclosed'}</p>
+      </div>
+    </div>
+    <div className="flex gap-3 items-center flex-1 min-w-[120px]">
+      <div className="bg-white p-2 rounded-lg shadow-sm text-accent-500 shrink-0"><Users size={16} /></div>
+      <div className="min-w-0">
+        <p className="text-xs font-semibold text-gray-400 truncate">Team Size</p>
+        <p className="text-sm font-medium text-gray-900 truncate">{entrepreneur.profile?.teamSize || entrepreneur.teamSize || '1-10'} Members</p>
+      </div>
+    </div>
+  </div>
 
   {/* AI Analysis Overlay */}
   {showAnalysis && (
@@ -170,50 +170,50 @@ export const EntrepreneurCard: React.FC<EntrepreneurCardProps> = ({
     </div>
   )}
 
- {/* Actions */}
- {showActions && (
- <div className="flex justify-between items-center pt-2 gap-3">
- <div className="text-xs font-semibold text-gray-500 flex items-center gap-1.5">
- <Avatar size="xs" src={entrepreneur.avatarUrl} alt="" className="opacity-50" />
- <span>Led by {entrepreneur.name.split(' ')[0]}</span>
- </div>
- <div className="flex gap-2">
- {user && user.role === 'investor' && (
-   <button 
-     onClick={handleEndorse}
-     disabled={isEndorsing}
-     className={`h-10 flex items-center justify-center gap-1.5 px-3 rounded-full transition-all duration-300 font-bold text-xs ${
-       isEndorsed 
-         ? 'bg-orange-100 text-orange-600 border border-orange-200' 
-         : 'bg-white border border-gray-200 text-gray-500 hover:bg-orange-50 hover:text-orange-500 hover:border-orange-200'
-     }`}
-   >
-     <Flame size={16} className={isEndorsed ? 'fill-orange-500' : ''} />
-     <span>{endorsementCount > 0 ? endorsementCount : 'Endorse'}</span>
-   </button>
- )}
- <button 
- onClick={handleMessage}
- className="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full transition-colors duration-200 "
- >
- <MessageCircle size={18} />
- </button>
- <button 
-    onClick={handleOpenAnalysis}
-    className="w-10 h-10 flex items-center justify-center bg-primary-50 hover:bg-primary-100 text-primary-600 rounded-full transition-all duration-300 border border-primary-100 shadow-sm"
-    title="AI Pulse Analysis"
-  >
-    <Brain size={18} />
-  </button>
- <button 
- onClick={handleViewProfile}
- className="px-5 h-10 flex items-center justify-center bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-full transition-all duration-300 shadow-sm hover:shadow-sm"
- >
- View Deck <ExternalLink size={16} className="ml-2 opacity-80" />
- </button>
- </div>
- </div>
- )}
+  {/* Actions */}
+  {showActions && (
+  <div className="flex flex-wrap justify-between items-center pt-2 gap-3">
+    <div className="text-xs font-semibold text-gray-500 flex items-center gap-1.5 shrink-0">
+      <Avatar size="xs" src={entrepreneur.avatarUrl} alt="" className="opacity-50 shrink-0" />
+      <span className="truncate max-w-[100px]">Led by {entrepreneur.name.split(' ')[0]}</span>
+    </div>
+    <div className="flex flex-wrap items-center gap-2 flex-1 justify-end">
+      {user && user.role === 'investor' && (
+        <button 
+          onClick={handleEndorse}
+          disabled={isEndorsing}
+          className={`h-10 flex items-center justify-center gap-1.5 px-3 rounded-full transition-all duration-300 font-bold text-xs shrink-0 ${
+            isEndorsed 
+              ? 'bg-orange-100 text-orange-600 border border-orange-200' 
+              : 'bg-white border border-gray-200 text-gray-500 hover:bg-orange-50 hover:text-orange-500 hover:border-orange-200'
+          }`}
+        >
+          <Flame size={16} className={isEndorsed ? 'fill-orange-500 shrink-0' : 'shrink-0'} />
+          <span>{endorsementCount > 0 ? endorsementCount : 'Endorse'}</span>
+        </button>
+      )}
+      <button 
+        onClick={handleMessage}
+        className="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full transition-colors duration-200 shrink-0"
+      >
+        <MessageCircle size={18} />
+      </button>
+      <button 
+        onClick={handleOpenAnalysis}
+        className="w-10 h-10 flex items-center justify-center bg-primary-50 hover:bg-primary-100 text-primary-600 rounded-full transition-all duration-300 border border-primary-100 shadow-sm shrink-0"
+        title="AI Pulse Analysis"
+      >
+        <Brain size={18} />
+      </button>
+      <button 
+        onClick={handleViewProfile}
+        className="px-4 h-10 flex items-center justify-center bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-full transition-all duration-300 shadow-sm hover:shadow-sm shrink-0 whitespace-nowrap"
+      >
+        View Deck <ExternalLink size={16} className="ml-2 opacity-80 shrink-0" />
+      </button>
+    </div>
+  </div>
+  )}
  </div>
  );
 };
