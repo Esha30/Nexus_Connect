@@ -148,7 +148,7 @@ Be highly concise, professional, insightful and action-oriented. Do not write gi
         const axios = (await import('axios')).default;
         const restUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent?key=${process.env.GEMINI_API_KEY}`;
         const restRes = await axios.post(restUrl, {
-          contents: [{ parts: [{ text: userQuery }] }]
+          contents: [{ parts: [{ text: message }] }]
         }, { timeout: 4000 });
         
         if (restRes.data?.candidates?.[0]?.content?.parts?.[0]?.text) {
@@ -278,25 +278,24 @@ export const generateSynergy = async (req, res) => {
       return res.status(403).json({ error: 'AI_LIMIT_REACHED' });
     }
 
-    const prompt = `Analyze the synergy between this Investor and this Entrepreneur. Return ONLY a valid JSON object, no markdown code blocks, no other text.
-Format required:
+    const prompt = `Analyze the synergy between this Investor and this Entrepreneur. 
+Return ONLY a valid JSON object. No markdown, no commentary.
+Format:
 {
-  "score": <integer from 0 to 100>,
-  "verdict": "<short 1 sentence verdict>",
+  "score": <integer 0-100>,
+  "verdict": "<1 sentence summary>",
   "strengths": ["<strength 1>", "<strength 2>"],
   "risks": ["<risk 1>"]
 }
 
-Investor Specs:
-Interests: ${String(investor.profile?.investmentInterests?.join(', ') || 'Various')}
-Stages: ${String(investor.profile?.investmentStage?.join(', ') || 'Any')}
-Min Check: ${String(investor.profile?.minimumInvestment || 'TBD')}
+Investor (Name: ${investor.name}):
+Interests: ${String(investor.profile?.investmentInterests || 'General Investment')}
+Stage: ${String(investor.profile?.investmentStage || 'Any')}
 
-Entrepreneur Specs:
-Startup: ${String(entrepreneur.profile?.startupName || 'Startup')}
-Industry: ${String(entrepreneur.profile?.industry || 'Unknown')}
-Funding Needed: ${String(entrepreneur.profile?.fundingNeeded || 'TBD')}
-Pitch: ${String(entrepreneur.profile?.pitchSummary || 'Awaiting pitch submission')}
+Entrepreneur (Startup: ${String(entrepreneur.profile?.startupName || 'Innovative Venture')}):
+Industry: ${String(entrepreneur.profile?.industry || 'Emerging Tech')}
+Pitch: ${String(entrepreneur.profile?.pitchSummary || 'Early stage development')}
+Funding Needed: ${String(entrepreneur.profile?.fundingNeeded || 'Undisclosed')}
 `;
 
     try {
