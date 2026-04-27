@@ -311,32 +311,32 @@ export const EntrepreneurProfile: React.FC = () => {
  {/* Hero Header */}
  <div className="relative py-8 px-6 overflow-hidden bg-white border-b border-gray-100/50">
  <div className="max-w-7xl mx-auto relative z-10">
- <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-10">
- <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-8">
+ <div className="flex flex-col lg:flex-row justify-between items-center lg:items-end gap-8 md:gap-10">
+ <div className="flex flex-col md:flex-row items-center md:items-start md:space-x-8">
  <Avatar
  src={entrepreneur.avatarUrl}
  alt={entrepreneur.name}
  size="xl"
  status={entrepreneur.profile?.isOnline || entrepreneur.isOnline ? 'online' : 'offline'}
- className="mx-auto sm:mx-0 shadow-sm "
+ className="shadow-sm ring-4 ring-white"
  />
  
- <div className="mt-6 sm:mt-0 text-center sm:text-left">
- <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-50 text-primary-600 text-xs font-semibold mb-4">
+ <div className="mt-6 md:mt-0 text-center md:text-left flex flex-col items-center md:items-start">
+ <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-50 text-primary-600 text-[10px] font-bold uppercase tracking-wider mb-4">
  <Building2 size={14} /> Venture Founder
  </div>
- <h1 className="text-lg md:text-xl font-medium text-gray-900 tracking-tight leading-tight mb-4">
- {entrepreneur.name.split(' ')[0]} <span className="text-primary-600">{entrepreneur.name.split(' ').slice(1).join(' ')}.</span>
+ <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight leading-tight mb-2">
+ {entrepreneur.name}
  </h1>
- <p className="text-base md:text-lg text-gray-500 font-medium max-w-2xl leading-relaxed flex items-center justify-center sm:justify-start">
- Founder at <span className="text-gray-900 font-medium ml-1.5">{entrepreneur.profile?.startupName || entrepreneur.startupName || 'Startup N/A'}</span>
+ <p className="text-base md:text-lg text-gray-500 font-medium max-w-2xl leading-relaxed">
+ Founder at <span className="text-gray-900 font-bold ml-1.5">{entrepreneur.profile?.startupName || entrepreneur.startupName || 'Startup N/A'}</span>
  </p>
  
- <div className="flex flex-wrap gap-3 justify-center sm:justify-start mt-6">
- <Badge variant="secondary" className="bg-gray-100 text-gray-600 border-none font-semibold text-xs px-3 py-1.5">
+ <div className="flex flex-wrap gap-2 justify-center md:justify-start mt-6">
+ <Badge variant="secondary" className="bg-gray-100 text-gray-700 border-none font-bold text-[10px] px-3 py-1.5 uppercase tracking-wider">
  {entrepreneur.profile?.industry || entrepreneur.industry || 'Industry N/A'}
  </Badge>
- <Badge variant="secondary" className="bg-gray-100 text-gray-600 border-none font-semibold text-xs px-3 py-1.5">
+ <Badge variant="secondary" className="bg-gray-100 text-gray-700 border-none font-bold text-[10px] px-3 py-1.5 uppercase tracking-wider">
  <MapPin size={12} className="mr-1" />
  {entrepreneur.profile?.location || entrepreneur.location || 'Location N/A'}
  </Badge>
@@ -344,83 +344,85 @@ export const EntrepreneurProfile: React.FC = () => {
  </div>
  </div>
  
- <div className="flex flex-wrap gap-4 justify-center sm:justify-end">
- {!isCurrentUser && (
- <>
- <Link to={`/messages/${entrepreneur.id || (entrepreneur as any)._id}`}>
- <Button
- variant="outline"
- className="rounded-lg font-medium border-gray-200 py-2.5 px-6"
- leftIcon={<MessageCircle size={18} />}
- >
- Message
- </Button>
- </Link>
- <Link to={`/meetings?recipientId=${entrepreneur.id || (entrepreneur as any)._id}&name=${encodeURIComponent(entrepreneur.name)}`}>
- <Button
- variant="outline"
- className="rounded-lg font-medium border-gray-200 py-2.5 px-6"
- leftIcon={<Calendar size={18} />}
- >
- Schedule
- </Button>
- </Link>
- 
- {isInvestor && (
- <>
- <Button
- className="rounded-lg font-semibold bg-primary-600 py-2.5 px-4 shadow-sm"
- leftIcon={<Send size={18} />}
- disabled={hasRequestedCollaboration}
- onClick={handleSendRequest}
- >
- {hasRequestedCollaboration ? 'Request sent' : 'Collaborate'}
- </Button>
- <Button
- variant="outline"
- className="rounded-lg font-semibold border-primary-200 bg-primary-50 text-primary-700 hover:bg-primary-100 py-2.5 px-4 shadow-sm transition-all"
- leftIcon={<Sparkles size={18} className="text-primary-500" />}
- onClick={handleAnalyzeSynergy}
- isLoading={isAnalyzingSynergy}
- >
- Analyze Synergy
- </Button>
- <Button
- variant="outline"
- className="rounded-lg font-semibold border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100 py-2.5 px-4 shadow-sm transition-all"
- leftIcon={<Sparkles size={18} className="text-purple-500" />}
- onClick={handleGenerateTermSheet}
- isLoading={isGeneratingTermSheet}
- >
- AI Deal (Term Sheet)
- </Button>
- </>
- )}
- </>
- )}
- 
- {isCurrentUser && (
- <Button
- variant={isEditing ? 'outline' : 'primary'}
- className="rounded-lg font-medium py-2.5 px-5"
- leftIcon={isEditing ? <X size={18} /> : <Edit3 size={18} />}
- onClick={() => setIsEditing(!isEditing)}
- >
- {isEditing ? 'Cancel Edit' : 'Edit Terminal'}
- </Button>
- )}
- 
- {isEditing && (
- <Button
- className="rounded-lg font-medium bg-primary-600 py-2.5 px-5 shadow-sm"
- leftIcon={<Save size={18} />}
- onClick={handleSubmit(onUpdateProfile)}
- isLoading={isSubmitting}
- >
- Save Sync
- </Button>
- )}
- </div>
+ <div className="flex flex-wrap gap-2 sm:gap-4 justify-center lg:justify-end w-full lg:w-auto">
+  {!isCurrentUser && (
+  <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-4 w-full">
+  <Link to={`/messages/${entrepreneur.id || (entrepreneur as any)._id}`} className="w-full sm:w-auto">
+  <Button
+  variant="outline"
+  className="w-full rounded-lg font-medium border-gray-200 py-2.5 px-4 sm:px-6"
+  leftIcon={<MessageCircle size={18} />}
+  >
+  Message
+  </Button>
+  </Link>
+  <Link to={`/meetings?recipientId=${entrepreneur.id || (entrepreneur as any)._id}&name=${encodeURIComponent(entrepreneur.name)}`} className="w-full sm:w-auto">
+  <Button
+  variant="outline"
+  className="w-full rounded-lg font-medium border-gray-200 py-2.5 px-4 sm:px-6"
+  leftIcon={<Calendar size={18} />}
+  >
+  Schedule
+  </Button>
+  </Link>
+  
+  {isInvestor && (
+  <div className="col-span-2 grid grid-cols-1 sm:flex sm:flex-wrap gap-2 sm:gap-4 w-full">
+  <Button
+  className="w-full sm:w-auto rounded-lg font-semibold bg-primary-600 py-2.5 px-4 shadow-sm"
+  leftIcon={<Send size={18} />}
+  disabled={hasRequestedCollaboration}
+  onClick={handleSendRequest}
+  >
+  {hasRequestedCollaboration ? 'Request sent' : 'Collaborate'}
+  </Button>
+  <Button
+  variant="outline"
+  className="w-full sm:w-auto rounded-lg font-semibold border-primary-200 bg-primary-50 text-primary-700 hover:bg-primary-100 py-2.5 px-4 shadow-sm transition-all"
+  leftIcon={<Sparkles size={18} className="text-primary-500" />}
+  onClick={handleAnalyzeSynergy}
+  isLoading={isAnalyzingSynergy}
+  >
+  Analyze Synergy
+  </Button>
+  <Button
+  variant="outline"
+  className="w-full sm:w-auto rounded-lg font-semibold border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100 py-2.5 px-4 shadow-sm transition-all"
+  leftIcon={<Sparkles size={18} className="text-purple-500" />}
+  onClick={handleGenerateTermSheet}
+  isLoading={isGeneratingTermSheet}
+  >
+  AI Deal
+  </Button>
+  </div>
+  )}
+  </div>
+  )}
+  
+  {isCurrentUser && (
+  <div className="flex gap-2 w-full sm:w-auto justify-center">
+  <Button
+  variant={isEditing ? 'outline' : 'primary'}
+  className="flex-1 sm:flex-none rounded-lg font-medium py-2.5 px-5"
+  leftIcon={isEditing ? <X size={18} /> : <Edit3 size={18} />}
+  onClick={() => setIsEditing(!isEditing)}
+  >
+  {isEditing ? 'Cancel' : 'Edit Profile'}
+  </Button>
+  
+  {isEditing && (
+  <Button
+  className="flex-1 sm:flex-none rounded-lg font-medium bg-primary-600 py-2.5 px-5 shadow-sm"
+  leftIcon={<Save size={18} />}
+  onClick={handleSubmit(onUpdateProfile)}
+  isLoading={isSubmitting}
+  >
+  Save Changes
+  </Button>
+  )}
+  </div>
+  )}
+  </div>
  </div>
  </div>
  </div>

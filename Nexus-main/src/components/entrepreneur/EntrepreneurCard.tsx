@@ -96,43 +96,43 @@ export const EntrepreneurCard: React.FC<EntrepreneurCardProps> = ({
  >
  
  {/* Header section */}
- <div className="flex items-start justify-between mb-5">
- <div className="flex items-center gap-4">
- <div className="relative">
- <Avatar
- src={entrepreneur.profile?.avatarUrl || entrepreneur.avatarUrl}
- alt={entrepreneur.name}
- size="xl"
- className=" shadow-sm z-10"
- status={entrepreneur.profile?.isOnline || entrepreneur.isOnline ? 'online' : 'offline'}
- />
- </div>
- <div>
- <h3 className="text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 line-clamp-1">{startupName}</h3>
- <p className="text-sm font-semibold text-primary-600 flex items-center gap-1 mt-0.5">
- <Sparkles size={14} /> {industry}
- </p>
- </div>
- </div>
- <div className="flex flex-col items-end gap-2">
-   <div className="bg-gray-100/80 px-3 py-1.5 rounded-full flex items-center gap-1.5 ">
-   <MapPin size={12} className="text-gray-500" />
-   <span className="text-xs font-semibold text-gray-700">{location}</span>
-   </div>
-   <button 
-     onClick={handleGeneratePitch} 
-     disabled={isGeneratingPitch || !!aiPitch}
-     className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 px-3 py-1 rounded-full transition-all border ${
-       aiPitch 
-         ? 'bg-purple-100 text-purple-700 border-purple-200'
-         : 'bg-white text-primary-600 border-primary-200 hover:bg-primary-50 hover:scale-105 shadow-sm'
-     }`}
-   >
-     {aiPitch ? <Sparkles size={12} className="text-purple-500" /> : <Sparkles size={12} />}
-     {isGeneratingPitch ? 'Synthesizing...' : aiPitch ? 'AI Optimized' : 'AI Summary'}
-   </button>
- </div>
- </div>
+ <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-5">
+  <div className="flex items-center gap-4">
+  <div className="relative">
+  <Avatar
+  src={entrepreneur.profile?.avatarUrl || entrepreneur.avatarUrl}
+  alt={entrepreneur.name}
+  size="xl"
+  className=" shadow-sm z-10"
+  status={entrepreneur.profile?.isOnline || entrepreneur.isOnline ? 'online' : 'offline'}
+  />
+  </div>
+  <div>
+  <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 line-clamp-1 leading-tight">{startupName}</h3>
+  <p className="text-[10px] font-bold text-primary-600 flex items-center gap-1 mt-0.5 uppercase tracking-widest">
+  <Sparkles size={12} /> {industry}
+  </p>
+  </div>
+  </div>
+  <div className="flex flex-row sm:flex-col items-center sm:items-end gap-2 w-full sm:w-auto">
+    <div className="bg-gray-100/80 px-3 py-1.5 rounded-full flex items-center gap-1.5 shrink-0">
+    <MapPin size={12} className="text-gray-500" />
+    <span className="text-[10px] font-bold text-gray-700 uppercase">{location}</span>
+    </div>
+    <button 
+      onClick={handleGeneratePitch} 
+      disabled={isGeneratingPitch || !!aiPitch}
+      className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all border shrink-0 ${
+        aiPitch 
+          ? 'bg-purple-100 text-purple-700 border-purple-200'
+          : 'bg-white text-primary-600 border-primary-200 hover:bg-primary-50 hover:scale-105 shadow-sm'
+      }`}
+    >
+      {aiPitch ? <Sparkles size={12} className="text-purple-500" /> : <Sparkles size={12} />}
+      {isGeneratingPitch ? 'Synthesizing...' : aiPitch ? 'AI Optimized' : 'AI Summary'}
+    </button>
+  </div>
+  </div>
 
  {/* Pitch Summary */}
  <div className="mb-6 h-[72px] relative overflow-hidden group/pitch flex flex-col justify-center">

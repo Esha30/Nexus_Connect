@@ -49,7 +49,7 @@ export const InvestorCard: React.FC<InvestorCardProps> = ({
  <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-primary-600/5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none -z-10" />
 
  {/* Header section */}
- <div className="flex items-start justify-between mb-8">
+ <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-8">
  <div className="flex items-center gap-5">
  <div className="relative">
  <Avatar
@@ -61,15 +61,15 @@ export const InvestorCard: React.FC<InvestorCardProps> = ({
  />
  </div>
  <div>
- <h3 className="text-2xl font-medium text-gray-900 tracking-tight leading-none truncate max-w-[180px]">{name}</h3>
- <p className="text-xs font-medium text-primary-600 flex items-center gap-1.5 mt-2 ">
- <Award size={12} className="shrink-0" /> {company}
+ <h3 className="text-2xl font-bold text-gray-900 tracking-tight leading-tight">{name}</h3>
+ <p className="text-[10px] font-bold text-primary-600 flex items-center gap-1.5 mt-2 uppercase tracking-widest">
+ <Award size={14} className="shrink-0" /> {company}
  </p>
  </div>
  </div>
- <div className="bg-gray-50 px-3 py-1.5 rounded-lg flex items-center gap-2 border border-gray-100 ">
+ <div className="bg-gray-50 px-3 py-1.5 rounded-full flex items-center gap-2 border border-gray-100 shrink-0">
  <MapPin size={12} className="text-gray-400" />
- <span className="text-xs font-medium text-gray-500 leading-none">{location}</span>
+ <span className="text-[10px] font-bold text-gray-700 uppercase">{location}</span>
  </div>
  </div>
 

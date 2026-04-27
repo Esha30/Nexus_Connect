@@ -136,16 +136,16 @@ export const EntrepreneurDashboard: React.FC = () => {
       </div>
       
       {/* Stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
         {statCards.map((stat, i) => (
           <Card key={i}>
-            <CardBody className="flex items-center gap-4 py-5">
-              <div className={`p-2.5 rounded-lg ${stat.bg}`}>
+            <CardBody className="flex flex-col sm:flex-row items-center sm:items-start md:items-center gap-2 sm:gap-4 py-4 sm:py-5">
+              <div className={`p-2 sm:p-2.5 rounded-lg ${stat.bg} shrink-0`}>
                 {stat.icon}
               </div>
-              <div>
-                <p className="text-sm text-gray-500">{stat.label}</p>
-                <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
+              <div className="text-center sm:text-left">
+                <p className="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">{stat.label}</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">{stat.value}</p>
               </div>
             </CardBody>
           </Card>
