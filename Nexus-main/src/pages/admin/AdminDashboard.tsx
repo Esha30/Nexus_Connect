@@ -19,7 +19,7 @@ import { formatDistanceToNow } from 'date-fns';
 
 import { UserDetailsModal } from '../../components/admin/UserDetailsModal';
 
-type AdminTab = 'overview' | 'users' | 'posts' | 'support' | 'priority' | 'settings' | 'logs';
+type AdminTab = 'overview' | 'users' | 'posts' | 'support' | 'priority' | 'reports' | 'settings' | 'logs';
 
 export const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -30,6 +30,7 @@ export const AdminDashboard: React.FC = () => {
   const [tickets, setTickets] = useState<any[]>([]);
   const [pendingInvestors, setPendingInvestors] = useState<any[]>([]);
   const [systemSettings, setSystemSettings] = useState<any>(null);
+  const [reports, setReports] = useState<any[]>([]);
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -52,7 +53,8 @@ export const AdminDashboard: React.FC = () => {
         api.get('/admin/tickets'),
         api.get('/admin/priority'),
         api.get('/admin/settings'),
-        api.get('/admin/logs')
+        api.get('/admin/logs'),
+        api.get('/admin/reports')
       ]);
       setStats(statsRes.data);
       setUsers(usersRes.data);
@@ -61,6 +63,7 @@ export const AdminDashboard: React.FC = () => {
       setPendingInvestors(priorityRes.data);
       setSystemSettings(settingsRes.data);
       setAuditLogs(logsRes.data);
+      setReports(reportsRes.data);
     } catch (err) {
       toast.error('System failure: Could not retrieve secure data');
     } finally {
@@ -123,6 +126,17 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
+  const deleteReport = async (id: string) => {
+    if (!window.confirm('Mark as resolved and remove report?')) return;
+    try {
+      await api.delete(`/admin/reports/${id}`);
+      setReports(prev => prev.filter(r => r._id !== id));
+      toast.success('Report resolved');
+    } catch (err) {
+      toast.error('Failed to resolve report');
+    }
+  };
+
   const approvePriority = async (id: string) => {
     try {
       await api.put(`/admin/priority/${id}`);
@@ -174,6 +188,7 @@ export const AdminDashboard: React.FC = () => {
                 { id: 'posts', icon: <LayoutGrid size={18} />, label: 'Broadcasts' },
                 { id: 'support', icon: <Ticket size={18} />, label: 'Support' },
                 { id: 'priority', icon: <UserCheck size={18} />, label: 'Priority' },
+                { id: 'reports', icon: <AlertCircle size={18} />, label: 'Reports' },
                 { id: 'settings', icon: <Settings size={18} />, label: 'System' },
                 { id: 'logs', icon: <History size={18} />, label: 'Audit' }
               ].map((tab) => (
@@ -521,6 +536,98 @@ export const AdminDashboard: React.FC = () => {
                       </div>
                     </Card>
                   ))
+                )}
+              </div>
+            )}
+
+            {activeTab === 'reports' && (
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {reports.length === 0 ? (
+                  <div className="text-center py-32 text-gray-500 font-bold uppercase tracking-widest">No active user reports detected.</div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {reports.map((report) => (
+                      <Card key={report._id} className="bg-[#161B2C] border-white/5 p-8 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-1.5 h-full bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]" />
+                        
+                        <div className="flex flex-col gap-6">
+                          <div className="flex justify-between items-start">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 bg-red-500/10 rounded-lg text-red-500">
+                                <AlertCircle size={20} />
+                              </div>
+                              <div>
+                                <h3 className="text-white font-bold uppercase tracking-tight">Safety Report</h3>
+                                <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest">ID: {report._id.slice(-8)}</p>
+                              </div>
+                            </div>
+                            <Button 
+                              size="sm" 
+                              variant="ghost" 
+                              className="text-gray-500 hover:text-white"
+                              onClick={() => deleteReport(report._id)}
+                            >
+                              <CheckCircle2 size={18} />
+                            </Button>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
+                              <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3">Reporter</p>
+                              <div className="flex items-center gap-2">
+                                <Avatar src={report.reporterId?.profile?.avatarUrl} size="xs" />
+                                <div className="min-w-0">
+                                  <p className="text-xs font-bold text-white truncate">{report.reporterId?.name}</p>
+                                  <p className="text-[8px] text-gray-600 font-black uppercase">{report.reporterId?.role}</p>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
+                              <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3">Reported Entity</p>
+                              <div className="flex items-center gap-2">
+                                <Avatar src={report.reportedId?.profile?.avatarUrl} size="xs" />
+                                <div className="min-w-0">
+                                  <p className="text-xs font-bold text-white truncate">{report.reportedId?.name}</p>
+                                  <p className="text-[8px] text-gray-600 font-black uppercase">{report.reportedId?.role}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="bg-red-500/5 p-5 rounded-2xl border border-red-500/10">
+                            <p className="text-[10px] font-black text-red-400 uppercase tracking-widest mb-2">Allegation / Reason</p>
+                            <p className="text-sm text-gray-300 font-medium leading-relaxed italic">"{report.reason}"</p>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-2">
+                            <span className="text-[10px] font-bold text-gray-600">
+                              FILED: {new Date(report.createdAt).toLocaleString()}
+                            </span>
+                            <div className="flex gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="border-red-500/30 text-red-500 hover:bg-red-500/10 text-[10px] font-black uppercase"
+                                onClick={() => updateUserStatus(report.reportedId?._id, { status: 'suspended' })}
+                              >
+                                Suspend Entity
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                className="bg-primary-600 text-[10px] font-black uppercase"
+                                onClick={() => {
+                                  setSelectedUserId(report.reportedId?._id);
+                                  setShowUserModal(true);
+                                }}
+                              >
+                                Inspect Node
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
                 )}
               </div>
             )}

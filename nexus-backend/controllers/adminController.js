@@ -4,6 +4,7 @@ import Post from '../models/Post.js';
 import Deal from '../models/Deal.js';
 import SystemSettings from '../models/SystemSettings.js';
 import AuditLog from '../models/AuditLog.js';
+import Report from '../models/Report.js';
 
 // Helper to log admin actions
 const logAction = async (adminId, action, targetType, targetId, details) => {
@@ -299,5 +300,31 @@ export const getAuditLogs = async (req, res) => {
     res.json(logs);
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch audit logs', error: error.message });
+  }
+};
+// @desc    Get all reports
+// @route   GET /api/admin/reports
+// @access  Private (Admin only)
+export const getReports = async (req, res) => {
+  try {
+    const reports = await Report.find()
+      .populate('reporterId', 'name email role')
+      .populate('reportedId', 'name email role')
+      .sort({ createdAt: -1 });
+    res.json(reports);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch reports', error: error.message });
+  }
+};
+
+// @desc    Delete/Resolve a report
+// @route   DELETE /api/admin/reports/:id
+// @access  Private (Admin only)
+export const deleteReport = async (req, res) => {
+  try {
+    await Report.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Report removed/resolved' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete report', error: error.message });
   }
 };

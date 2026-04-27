@@ -14,7 +14,10 @@ import {
   updateUserStatus,
   getSystemSettings,
   updateSystemSettings,
-  getAuditLogs
+  updateSystemSettings,
+  getAuditLogs,
+  getReports,
+  deleteReport
 } from '../controllers/adminController.js';
 
 const router = express.Router();
@@ -37,5 +40,7 @@ router.put('/users/:id/status', updateUserStatus);
 router.get('/settings', getSystemSettings);
 router.put('/settings', updateSystemSettings);
 router.get('/logs', getAuditLogs);
+router.get('/reports', getReports);
+router.delete('/reports/:id', deleteReport);
 
 export default router;
