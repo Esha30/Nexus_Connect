@@ -72,7 +72,7 @@ export const CopilotWidget: React.FC = () => {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 p-4 bg-gray-900 text-white rounded-full shadow-2xl hover:bg-gray-800 transition-all hover:scale-110 z-50 group flex items-center justify-center animate-fade-in"
+          className="fixed bottom-24 right-6 md:bottom-6 md:right-6 p-4 bg-gray-900 text-white rounded-full shadow-2xl hover:bg-gray-800 transition-all hover:scale-110 z-50 group flex items-center justify-center animate-fade-in"
         >
           <div className="absolute inset-0 bg-primary-500 rounded-full blur-md opacity-40 group-hover:opacity-60 transition-opacity animate-pulse" />
           <Sparkles size={24} className="relative z-10 text-primary-400 group-hover:text-primary-300" />
@@ -82,7 +82,7 @@ export const CopilotWidget: React.FC = () => {
       {/* Chat Window */}
       {isOpen && (
         <div 
-          className={`fixed right-6 bottom-6 z-50 flex flex-col transition-all duration-300 transform shadow-2xl origin-bottom-right rounded-2xl overflow-hidden bg-white border border-gray-100 ${
+          className={`fixed right-6 bottom-24 md:bottom-6 z-50 flex flex-col transition-all duration-300 transform shadow-2xl origin-bottom-right rounded-2xl overflow-hidden bg-white border border-gray-100 ${
             isExpanded ? 'w-[450px] h-[600px] sm:w-[500px] sm:h-[700px]' : 'w-[350px] h-[500px]'
           }`}
         >
