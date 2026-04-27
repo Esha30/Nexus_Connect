@@ -908,7 +908,7 @@ export const ChatPage: React.FC = () => {
             }`} 
             disabled={isUploading || (!newMessage.trim() && !attachment)}
           >
-            <Send size={18} className={`sm:w-6 sm:h-6 transition-colors ${!newMessage.trim() && !attachment ? 'text-gray-500' : 'text-white ml-0.5'}`} />
+            <Send size={22} className={`transition-colors ${!newMessage.trim() && !attachment ? 'text-gray-400' : 'text-white'}`} />
           </button>
         </form>
       </div>
