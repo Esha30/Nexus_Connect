@@ -84,6 +84,29 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
     }
   };
 
+  const handleShare = async () => {
+    const shareData = {
+      title: `Nexus Update from ${post.author?.name}`,
+      text: post.content,
+      url: `${window.location.origin}/feed` // In a real app, this would be a link to the specific post
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareData.url);
+        toast.success('Link copied to clipboard');
+      } catch (err) {
+        toast.error('Failed to share');
+      }
+    }
+  };
+
   return (
     <div className="glass-card rounded-[2rem] overflow-hidden group">
       <div className="p-8">
@@ -180,7 +203,10 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
             <span className="tabular-nums">{post.comments?.length || 0}</span>
           </button>
 
-          <button className="flex items-center gap-2.5 text-xs font-extrabold text-gray-400 hover:text-primary-600 transition-all hover:scale-110 active:scale-95 ml-auto">
+          <button 
+            onClick={handleShare}
+            className="flex items-center gap-2.5 text-xs font-extrabold text-gray-400 hover:text-primary-600 transition-all hover:scale-110 active:scale-95 ml-auto"
+          >
             <Share size={22} />
           </button>
         </div>

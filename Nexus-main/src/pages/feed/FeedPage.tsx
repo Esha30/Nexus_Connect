@@ -15,6 +15,7 @@ export const FeedPage: React.FC = () => {
   const [newPostsBuffer, setNewPostsBuffer] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('All Signal');
 
   const fetchPosts = async () => {
     try {
@@ -62,6 +63,17 @@ export const FeedPage: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const filteredPosts = activeFilter === 'All Signal' 
+    ? posts 
+    : posts.filter(p => {
+        const type = p.type || 'News'; // Default to News if no type
+        if (activeFilter === 'Milestones') return type === 'milestone';
+        if (activeFilter === 'Mandates') return type === 'mandate';
+        if (activeFilter === 'Analysis') return type === 'analysis';
+        if (activeFilter === 'News') return type === 'news' || type === 'News';
+        return true;
+      });
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -97,8 +109,9 @@ export const FeedPage: React.FC = () => {
               {['All Signal', 'Milestones', 'Mandates', 'News', 'Analysis'].map((filter) => (
                 <button 
                   key={filter} 
+                  onClick={() => setActiveFilter(filter)}
                   className={`whitespace-nowrap lg:w-full text-left px-4 py-2 rounded-xl text-[10px] sm:text-xs font-bold transition-all ${
-                    filter === 'All Signal' 
+                    activeFilter === filter 
                       ? 'bg-primary-600 text-white shadow-sm' 
                       : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
                   }`}
@@ -142,9 +155,9 @@ export const FeedPage: React.FC = () => {
             </div>
           ) : posts.length > 0 ? (
             <div className="space-y-6">
-              {posts.map((post) => (
-                <PostCard key={post._id} post={post} onUpdate={fetchPosts} />
-              ))}
+                {filteredPosts.map((post) => (
+                  <PostCard key={post._id} post={post} onUpdate={fetchPosts} />
+                ))}
             </div>
           ) : (
             <div className="bg-white rounded-2xl border border-gray-100 p-16 shadow-sm text-center">
