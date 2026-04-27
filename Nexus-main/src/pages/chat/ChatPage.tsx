@@ -689,7 +689,7 @@ export const ChatPage: React.FC = () => {
   const handleToggleBlock = async () => {
     if (!userId) return;
     try {
-      const res = await api.put(`/messages/block/${userId}`);
+      const res = await api.put(`/messages/action/block-user/${userId}`);
       setIsBlocked(res.data.isBlocked);
       toast.success(res.data.message);
     } catch (err) {
@@ -700,7 +700,7 @@ export const ChatPage: React.FC = () => {
   const handleReportUser = async () => {
     if (!userId || !reportReason.trim()) return;
     try {
-      await api.post('/messages/report', { reportedId: userId, reason: reportReason });
+      await api.post('/messages/action/report-user', { reportedId: userId, reason: reportReason });
       toast.success('Report submitted to administration');
       setIsReportModalOpen(false);
       setReportReason('');

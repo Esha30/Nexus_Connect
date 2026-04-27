@@ -5,14 +5,14 @@ import validateObjectId from '../middleware/validateObjectId.js';
 
 const router = express.Router();
 
+router.put('/action/block-user/:partnerId', protect, validateObjectId('partnerId'), toggleBlockUser);
+router.post('/action/report-user', protect, reportUser);
 router.get('/conversations', protect, getConversations);
 router.delete('/clear/:partnerId', protect, validateObjectId('partnerId'), clearChat);
 router.put('/mute/:partnerId', protect, validateObjectId('partnerId'), toggleMuteChat);
 router.put('/archive/:partnerId', protect, validateObjectId('partnerId'), toggleArchiveChat);
 router.put('/read/:partnerId', protect, validateObjectId('partnerId'), markAllRead);
 router.get('/:userId', protect, validateObjectId('userId'), getMessages);
-router.put('/block/:partnerId', protect, validateObjectId('partnerId'), toggleBlockUser);
-router.post('/report', protect, reportUser);
 router.post('/', protect, sendMessage);
 router.delete('/:id', protect, validateObjectId('id'), deleteMessage);
 router.put('/:id', protect, validateObjectId('id'), editMessage);
