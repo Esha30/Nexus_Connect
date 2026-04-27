@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, X, Send, Minimize2, Maximize2, LayoutSide, GripVertical } from 'lucide-react';
+import { Sparkles, X, Send, Minimize2, Maximize2, PanelRight, GripVertical } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../ui/Card';
 import { Input } from '../ui/Input';
 import api from '../../api/api';
@@ -30,7 +30,7 @@ export const CopilotWidget: React.FC<CopilotWidgetProps> = ({ isDocked = false, 
   // Draggable state
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
-  const dragRef = useRef<{ startX: number, startY: number, initialX: number, initialY: number } | null>(null);
+  const dragRef = useRef<{ startX: number, startY: number, initialX: number, initialY: number, isMoved: boolean } | null>(null);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (isDocked) return;
@@ -39,7 +39,8 @@ export const CopilotWidget: React.FC<CopilotWidgetProps> = ({ isDocked = false, 
       startX: e.clientX,
       startY: e.clientY,
       initialX: position.x,
-      initialY: position.y
+      initialY: position.y,
+      isMoved: false
     };
   };
 
@@ -50,6 +51,10 @@ export const CopilotWidget: React.FC<CopilotWidgetProps> = ({ isDocked = false, 
       const deltaX = e.clientX - dragRef.current.startX;
       const deltaY = e.clientY - dragRef.current.startY;
       
+      if (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3) {
+        dragRef.current.isMoved = true;
+      }
+      
       setPosition({
         x: dragRef.current.initialX + deltaX,
         y: dragRef.current.initialY + deltaY
@@ -58,7 +63,6 @@ export const CopilotWidget: React.FC<CopilotWidgetProps> = ({ isDocked = false, 
 
     const handleMouseUp = () => {
       setIsDragging(false);
-      dragRef.current = null;
     };
 
     if (isDragging) {
@@ -71,6 +75,14 @@ export const CopilotWidget: React.FC<CopilotWidgetProps> = ({ isDocked = false, 
       window.removeEventListener('mouseup', handleMouseUp);
     };
   }, [isDragging]);
+
+  const handleFabClick = (e: React.MouseEvent) => {
+    if (dragRef.current?.isMoved) {
+      e.preventDefault();
+      return;
+    }
+    setIsOpen(true);
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -121,8 +133,12 @@ export const CopilotWidget: React.FC<CopilotWidgetProps> = ({ isDocked = false, 
       {/* Floating Action Button */}
       {!isOpen && !isDocked && (
         <button
-          onClick={() => setIsOpen(true)}
-          className="fixed top-20 left-4 md:top-auto md:bottom-6 md:right-6 p-4 bg-gray-900 text-white rounded-full shadow-2xl hover:bg-gray-800 transition-all hover:scale-110 z-50 group flex items-center justify-center animate-fade-in"
+          onMouseDown={handleMouseDown}
+          onClick={handleFabClick}
+          style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
+          className={`fixed top-20 left-4 md:top-auto md:bottom-6 md:right-6 p-4 bg-gray-900 text-white rounded-full shadow-2xl hover:bg-gray-800 hover:scale-110 z-50 group flex items-center justify-center animate-fade-in ${
+            isDragging ? 'cursor-grabbing transition-none' : 'cursor-grab transition-all'
+          }`}
         >
           <div className="absolute inset-0 bg-primary-500 rounded-full blur-md opacity-40 group-hover:opacity-60 transition-opacity animate-pulse" />
           <Sparkles size={24} className="relative z-10 text-primary-400 group-hover:text-primary-300" />
@@ -162,7 +178,7 @@ export const CopilotWidget: React.FC<CopilotWidgetProps> = ({ isDocked = false, 
                   title={isDocked ? "Undock" : "Dock to Side"}
                   className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition"
                 >
-                  <LayoutSide size={16} />
+                  <PanelRight size={16} />
                 </button>
               )}
               {!isDocked && (
