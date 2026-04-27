@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, X, Send, Minimize2, Maximize2 } from 'lucide-react';
+import { Sparkles, X, Send, Minimize2, Maximize2, LayoutSide, GripVertical } from 'lucide-react';
 import { Card, CardHeader, CardBody } from '../ui/Card';
 import { Input } from '../ui/Input';
 import api from '../../api/api';
@@ -11,7 +11,12 @@ interface Message {
   text: string;
 }
 
-export const CopilotWidget: React.FC = () => {
+interface CopilotWidgetProps {
+  isDocked?: boolean;
+  onDockToggle?: () => void;
+}
+
+export const CopilotWidget: React.FC<CopilotWidgetProps> = ({ isDocked = false, onDockToggle }) => {
   const { isConnected } = useSocket();
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -21,6 +26,51 @@ export const CopilotWidget: React.FC = () => {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Draggable state
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const dragRef = useRef<{ startX: number, startY: number, initialX: number, initialY: number } | null>(null);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (isDocked) return;
+    setIsDragging(true);
+    dragRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      initialX: position.x,
+      initialY: position.y
+    };
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging || !dragRef.current) return;
+      
+      const deltaX = e.clientX - dragRef.current.startX;
+      const deltaY = e.clientY - dragRef.current.startY;
+      
+      setPosition({
+        x: dragRef.current.initialX + deltaX,
+        y: dragRef.current.initialY + deltaY
+      });
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      dragRef.current = null;
+    };
+
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -69,7 +119,7 @@ export const CopilotWidget: React.FC = () => {
   return (
     <>
       {/* Floating Action Button */}
-      {!isOpen && (
+      {!isOpen && !isDocked && (
         <button
           onClick={() => setIsOpen(true)}
           className="fixed top-20 left-4 md:top-auto md:bottom-6 md:right-6 p-4 bg-gray-900 text-white rounded-full shadow-2xl hover:bg-gray-800 transition-all hover:scale-110 z-50 group flex items-center justify-center animate-fade-in"
@@ -80,15 +130,20 @@ export const CopilotWidget: React.FC = () => {
       )}
 
       {/* Chat Window */}
-      {isOpen && (
+      {(isOpen || isDocked) && (
         <div 
-          className={`fixed left-4 md:left-auto md:right-6 top-20 md:top-auto md:bottom-6 z-50 flex flex-col transition-all duration-300 transform shadow-2xl origin-top-left md:origin-bottom-right rounded-2xl overflow-hidden bg-white border border-gray-100 ${
-            isExpanded ? 'w-[450px] h-[600px] sm:w-[500px] sm:h-[700px]' : 'w-[350px] h-[500px]'
-          }`}
+          style={!isDocked ? { transform: `translate(${position.x}px, ${position.y}px)` } : {}}
+          className={`${isDocked ? 'relative h-full w-full rounded-none border-none shadow-none' : 'fixed left-4 md:left-auto md:right-6 top-20 md:top-auto md:bottom-6 shadow-2xl rounded-2xl border border-gray-100'} z-50 flex flex-col transition-all duration-300 transform origin-top-left md:origin-bottom-right overflow-hidden bg-white ${
+            isDocked ? '' : isExpanded ? 'w-[450px] h-[600px] sm:w-[500px] sm:h-[700px]' : 'w-[350px] h-[500px]'
+          } ${isDragging ? 'transition-none scale-[1.02] z-[60] cursor-grabbing select-none' : ''}`}
         >
           {/* Header */}
-          <div className="bg-gray-900 border-b border-gray-800 p-4 flex justify-between items-center shrink-0">
+          <div 
+            onMouseDown={handleMouseDown}
+            className={`bg-gray-900 border-b border-gray-800 p-4 flex justify-between items-center shrink-0 ${!isDocked ? 'cursor-grab active:cursor-grabbing' : ''}`}
+          >
             <div className="flex items-center gap-3">
+              {!isDocked && <GripVertical size={16} className="text-gray-500 mr-1" />}
               <div className="w-8 h-8 rounded-full bg-primary-600/20 flex items-center justify-center border border-primary-500/30">
                 <Sparkles size={16} className="text-primary-400" />
               </div>
@@ -101,18 +156,31 @@ export const CopilotWidget: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center gap-1">
-              <button 
-                onClick={() => setIsExpanded(!isExpanded)} 
-                className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition"
-              >
-                {isExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-              </button>
-              <button 
-                onClick={() => setIsOpen(false)} 
-                className="p-1.5 text-gray-400 hover:text-red-400 hover:bg-gray-800 rounded-lg transition"
-              >
-                <X size={18} />
-              </button>
+              {onDockToggle && (
+                <button 
+                  onClick={onDockToggle}
+                  title={isDocked ? "Undock" : "Dock to Side"}
+                  className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition"
+                >
+                  <LayoutSide size={16} />
+                </button>
+              )}
+              {!isDocked && (
+                <button 
+                  onClick={() => setIsExpanded(!isExpanded)} 
+                  className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition"
+                >
+                  {isExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                </button>
+              )}
+              {!isDocked && (
+                <button 
+                  onClick={() => setIsOpen(false)} 
+                  className="p-1.5 text-gray-400 hover:text-red-400 hover:bg-gray-800 rounded-lg transition"
+                >
+                  <X size={18} />
+                </button>
+              )}
             </div>
           </div>
 

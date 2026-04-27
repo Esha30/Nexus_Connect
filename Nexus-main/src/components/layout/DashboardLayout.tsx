@@ -6,10 +6,21 @@ import { Sidebar } from './Sidebar';
 import { BottomNavbar } from './BottomNavbar';
 import { CopilotWidget } from '../ai/CopilotWidget';
 import { MeetingReminder } from '../meetings/MeetingReminder';
+import { useState } from 'react';
 
 export const DashboardLayout: React.FC = () => {
- const { isAuthenticated, isLoading } = useAuth();
- const location = useLocation();
+  const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
+  
+  const [isCopilotDocked, setIsCopilotDocked] = useState(() => {
+    return localStorage.getItem('nexus_copilot_docked') === 'true';
+  });
+
+  const handleDockToggle = () => {
+    const newState = !isCopilotDocked;
+    setIsCopilotDocked(newState);
+    localStorage.setItem('nexus_copilot_docked', String(newState));
+  };
  
  const isChatPage = location.pathname.startsWith('/messages');
  
@@ -43,10 +54,16 @@ export const DashboardLayout: React.FC = () => {
   <Outlet />
   </div>
   </main>
+  
+  {isCopilotDocked && (
+    <div className="w-[400px] xl:w-[450px] border-l border-gray-100 bg-white hidden lg:block overflow-hidden shadow-inner">
+      <CopilotWidget isDocked={true} onDockToggle={handleDockToggle} />
+    </div>
+  )}
   </div>
   
   <BottomNavbar />
-  <CopilotWidget />
+  {!isCopilotDocked && <CopilotWidget onDockToggle={handleDockToggle} />}
   <MeetingReminder />
   </div>
   );
