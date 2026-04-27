@@ -691,7 +691,7 @@ export const ChatPage: React.FC = () => {
   <div className="h-full bg-white flex overflow-hidden pb-32 md:pb-0">
  {/* Sidebar */}
  <div className={`${userId ? 'hidden md:flex' : 'flex w-full'} md:flex-shrink-0 border-r border-gray-100`}>
- <div className="flex flex-col w-full md:w-80 lg:w-96 bg-white">
+ <div className="flex flex-col w-full md:w-80 lg:w-96 bg-white h-full">
  <div className="h-16 px-4 flex items-center border-b border-gray-200 bg-[#F0F2F5] shrink-0">
  <Avatar src={currentUser?.profile?.avatarUrl} alt="Me" size="sm" className="mr-3" />
  <h2 className="text-lg font-semibold text-gray-800">Chats</h2>

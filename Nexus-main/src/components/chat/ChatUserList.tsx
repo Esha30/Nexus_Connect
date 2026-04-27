@@ -70,7 +70,7 @@ export const ChatUserList: React.FC<ChatUserListProps> = ({
 
   return (
   <div className="bg-white border-r border-gray-200 w-full md:w-80 lg:w-96 overflow-y-auto relative flex-1 h-full min-h-0">
-  <div className="py-2">
+  <div className="pt-2 pb-48">
   {visibleConversations.length > 0 ? (
   visibleConversations.map(conversation => {
  const otherUser = conversation.partner;
