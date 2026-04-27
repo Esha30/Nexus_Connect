@@ -629,6 +629,33 @@ export const ChatPage: React.FC = () => {
     setShowChatOptions(false);
   };
 
+  const handleMarkAllReadList = async (id: string) => {
+    try {
+      await api.put(`/messages/read/${id}`);
+      fetchConversations();
+    } catch (err) {
+      toast.error('Failed to mark read');
+    }
+  };
+
+  const handleMuteChatList = async (id: string) => {
+    try {
+      await api.put(`/messages/mute/${id}`);
+      fetchConversations();
+    } catch (err) {
+      toast.error('Failed to update mute settings');
+    }
+  };
+
+  const handleArchiveChatList = async (id: string) => {
+    try {
+      await api.put(`/messages/archive/${id}`);
+      fetchConversations();
+    } catch (err) {
+      toast.error('Failed to update archive settings');
+    }
+  };
+
   const onEmojiClick = (emojiData: EmojiClickData) => {
  setNewMessage(prev => prev + emojiData.emoji);
  };
@@ -673,6 +700,9 @@ export const ChatPage: React.FC = () => {
  conversations={conversations}
  activePartner={chatPartner}
  onClearChat={async (id) => handleClearChatPrompt(id)}
+ onMarkAllRead={handleMarkAllReadList}
+ onMuteChat={handleMuteChatList}
+ onArchiveChat={handleArchiveChatList}
  />
  </div>
  </div>

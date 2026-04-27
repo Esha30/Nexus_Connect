@@ -61,6 +61,53 @@ export const getConversations = async (req, res) => {
   }
 };
 
+// @desc    Mark all messages in a conversation as read
+// @route   PUT /api/messages/read/:partnerId
+// @access  Private
+export const markAllRead = async (req, res) => {
+  try {
+    const { partnerId } = req.params;
+    const userId = req.user._id;
+
+    const conversation = await Conversation.findOne({
+      participants: { $all: [userId, partnerId] }
+    });
+
+    if (!conversation) {
+      return res.status(404).json({ message: 'Conversation not found' });
+    }
+
+    // Mark unread messages as read
+    await Message.updateMany(
+      { conversationId: conversation._id, receiverId: userId, isRead: false },
+      { $set: { isRead: true } }
+    );
+
+    // Reset unread count for this user
+    if (conversation.unreadCounts) {
+      conversation.unreadCounts.set(userId.toString(), 0);
+      await conversation.save();
+    }
+
+    // Mark any unread message-type notifications from this sender as read
+    await Notification.updateMany(
+      { recipient: userId, sender: partnerId, type: 'message', isRead: false },
+      { $set: { isRead: true } }
+    );
+
+    const io = req.app.get('socketio');
+    if (io) {
+      io.to(userId.toString()).emit('message-count-update');
+      io.to(userId.toString()).emit('notification-count-update');
+    }
+
+    res.json({ message: 'Marked all as read' });
+  } catch (error) {
+    console.error('Error marking all as read:', error);
+    res.status(500).json({ message: 'Server error marking messages as read' });
+  }
+};
+
 // @desc    Get messages between logged in user and another user
 // @route   GET /api/messages/:userId
 // @access  Private
