@@ -89,10 +89,7 @@ app.use((req, res, next) => {
 });
 
 // Stripe Webhook needs raw body - MUST be before express.json()
-app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), (req, res, next) => {
-  // Logic will be in the controller, but we need the route here to capture the raw body
-  next();
-});
+app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
 
 app.use(express.json());
 

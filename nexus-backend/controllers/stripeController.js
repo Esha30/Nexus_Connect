@@ -32,26 +32,6 @@ export const createCheckoutSession = async (req, res) => {
   }
 
   try {
-    // --- NEXUS DEMO MODE FORCED ---
-    if (true) { // Always use demo mode for now as requested
-      console.warn('⚠️ [NEXUS DEMO MODE] Stripe is in dummy mode. Simulating checkout success.');
-      
-      // Auto-upgrade user for demo purposes
-      const demoUser = await User.findById(req.user._id);
-      if (demoUser) {
-        demoUser.profile.subscription = {
-          plan: plan,
-          status: 'active',
-          updatedAt: new Date()
-        };
-        await demoUser.save();
-      }
-
-      return res.json({ 
-        url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/billing/success?demo=true`,
-        message: 'Demo mode active. Subscription simulated.' 
-      });
-    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
