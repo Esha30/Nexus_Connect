@@ -527,7 +527,11 @@ export const toggleBlockUser = async (req, res) => {
     const userId = req.user._id;
 
     const user = await User.findById(userId);
-    const isBlocked = user.blockedUsers.includes(partnerId);
+    if (!user.blockedUsers) {
+      user.blockedUsers = [];
+    }
+    
+    const isBlocked = user.blockedUsers.some(id => id.toString() === partnerId.toString());
 
     if (isBlocked) {
       user.blockedUsers = user.blockedUsers.filter(id => id.toString() !== partnerId.toString());
