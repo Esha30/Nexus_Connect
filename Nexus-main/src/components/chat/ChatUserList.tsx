@@ -63,11 +63,7 @@ export const ChatUserList: React.FC<ChatUserListProps> = ({
   }
 
   const archivedConversations = displayConversations.filter(c => c.isArchived);
-  const unarchivedConversations = displayConversations.filter(c => {
-    const otherUserId = c.partner?.id || (c.partner as any)?._id;
-    if (activeUserId === otherUserId) return true;
-    return !c.isArchived;
-  });
+  const unarchivedConversations = displayConversations.filter(c => !c.isArchived);
 
   const activeConversations = showArchived ? archivedConversations : unarchivedConversations;
 
