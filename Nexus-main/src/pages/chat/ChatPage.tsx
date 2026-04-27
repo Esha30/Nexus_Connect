@@ -889,12 +889,26 @@ export const ChatPage: React.FC = () => {
             type="text"
             value={newMessage}
             onChange={(e) => { setNewMessage(e.target.value); handleTyping(); }}
-            placeholder={editingMessage ? "Edit..." : "Message"}
-            className="flex-1 bg-white border border-gray-200 py-2 sm:py-2.5 px-3 sm:px-4 rounded-xl text-sm sm:text-[15px] text-gray-900 placeholder-gray-400 focus:ring-1 focus:ring-primary-500 outline-none shadow-sm"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage(e);
+              }
+            }}
+            placeholder={editingMessage ? "Edit your message..." : "Type a message"}
+            className="flex-1 bg-white border border-gray-200 py-2.5 sm:py-3 px-4 sm:px-5 rounded-2xl text-sm sm:text-[15px] text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none shadow-sm transition-all"
           />
 
-          <button type="submit" className="p-2 sm:p-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-md active:scale-90 transition-all flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 shrink-0" disabled={isUploading || (!newMessage.trim() && !attachment)}>
-            <Send size={16} className="sm:w-5 sm:h-5 ml-0.5" />
+          <button 
+            type="submit" 
+            className={`p-2.5 sm:p-3 rounded-full shadow-lg transition-all flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 shrink-0 ${
+              !newMessage.trim() && !attachment 
+              ? 'bg-gray-300 cursor-not-allowed' 
+              : 'bg-primary-600 hover:bg-primary-700 hover:scale-105 active:scale-95 shadow-primary-600/20'
+            }`} 
+            disabled={isUploading || (!newMessage.trim() && !attachment)}
+          >
+            <Send size={18} className={`sm:w-6 sm:h-6 transition-colors ${!newMessage.trim() && !attachment ? 'text-gray-500' : 'text-white ml-0.5'}`} />
           </button>
         </form>
       </div>
