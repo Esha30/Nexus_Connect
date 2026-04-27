@@ -77,6 +77,11 @@ export const ChatPage: React.FC = () => {
  const [editingMessage, setEditingMessage] = useState<Message | null>(null);
  const [replyingToMessage, setReplyingToMessage] = useState<Message | null>(null);
 
+ // Block & Report State
+ const [isBlocked, setIsBlocked] = useState(false);
+ const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+ const [reportReason, setReportReason] = useState('');
+
  const getRoomId = useCallback(() => {
  if (!currentUser || !userId) return '';
  return [currentUser.id, userId].sort().join('-');
@@ -120,18 +125,25 @@ export const ChatPage: React.FC = () => {
     readerId: currentUser?.id
   });
  // Load chat partner info from conversations or via API
- const loadChatPartner = async () => {
- const conv = conversations.find(c => c.partner?.id === userId);
- if (conv?.partner) {
- setChatPartner(conv.partner as User);
- } else {
- try {
- const userRes = await api.get(`/auth/profile/${userId}`);
- const data = userRes.data;
- setChatPartner({ ...data, id: data._id, isOnline: data.profile?.isOnline || false });
- } catch (_) { /* ignore */ }
- }
- };
+  const loadChatPartner = async () => {
+  const conv = conversations.find(c => c.partner?.id === userId);
+  if (conv?.partner) {
+  setChatPartner(conv.partner as User);
+  } else {
+  try {
+  const userRes = await api.get(`/auth/profile/${userId}`);
+  const data = userRes.data;
+  setChatPartner({ ...data, id: data._id, isOnline: data.profile?.isOnline || false });
+  } catch (_) { /* ignore */ }
+  }
+  
+  // Check if blocked
+  try {
+    const profileRes = await api.get('/auth/profile/me');
+    const blockedList = profileRes.data.blockedUsers || [];
+    setIsBlocked(blockedList.includes(userId));
+  } catch (_) {}
+  };
  loadChatPartner();
  // eslint-disable-next-line react-hooks/exhaustive-deps
  }, [currentUser, userId]);
@@ -674,6 +686,29 @@ export const ChatPage: React.FC = () => {
     }
   };
 
+  const handleToggleBlock = async () => {
+    if (!userId) return;
+    try {
+      const res = await api.put(`/messages/block/${userId}`);
+      setIsBlocked(res.data.isBlocked);
+      toast.success(res.data.message);
+    } catch (err) {
+      toast.error('Failed to update block status');
+    }
+  };
+
+  const handleReportUser = async () => {
+    if (!userId || !reportReason.trim()) return;
+    try {
+      await api.post('/messages/report', { reportedId: userId, reason: reportReason });
+      toast.success('Report submitted to administration');
+      setIsReportModalOpen(false);
+      setReportReason('');
+    } catch (err) {
+      toast.error('Failed to submit report');
+    }
+  };
+
   const onEmojiClick = (emojiData: EmojiClickData) => {
  setNewMessage(prev => prev + emojiData.emoji);
  };
@@ -766,15 +801,21 @@ export const ChatPage: React.FC = () => {
      <MoreVertical size={20} />
    </button>
    {showChatOptions && (
-      <div className="absolute right-0 top-12 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50">
-        <button onClick={handleToggleMute} className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center transition-colors">
-          Mute Sender
+      <div className="absolute right-0 top-12 w-52 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-200">
+        <button onClick={() => { setShowChatOptions(false); handleToggleMute(); }} className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center transition-colors">
+          Mute Notifications
         </button>
-        <button onClick={handleToggleArchive} className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center transition-colors border-b border-gray-50">
+        <button onClick={() => { setShowChatOptions(false); handleToggleArchive(); }} className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center transition-colors">
           Archive Chat
         </button>
-        <button onClick={() => { setShowChatOptions(false); handleClearChatPrompt(); }} className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 flex items-center transition-colors">
-          <Trash2 size={16} className="mr-3" /> Delete Chat
+        <button onClick={() => { setShowChatOptions(false); handleClearChatPrompt(); }} className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center transition-colors border-b border-gray-50">
+          Clear Chat History
+        </button>
+        <button onClick={() => { setShowChatOptions(false); setIsReportModalOpen(true); }} className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center transition-colors">
+          Report User
+        </button>
+        <button onClick={() => { setShowChatOptions(false); handleToggleBlock(); }} className="w-full text-left px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 flex items-center transition-colors">
+          {isBlocked ? 'Unblock User' : 'Block User'}
         </button>
       </div>
    )}
@@ -962,8 +1003,9 @@ export const ChatPage: React.FC = () => {
                 handleSendMessage(e);
               }
             }}
-            placeholder={editingMessage ? "Edit your message..." : "Type a message"}
-            className="flex-1 bg-white border border-gray-200 py-2.5 sm:py-3 px-4 sm:px-5 rounded-2xl text-sm sm:text-[15px] text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none shadow-sm transition-all"
+            disabled={isBlocked}
+            placeholder={isBlocked ? "You have blocked this user" : (editingMessage ? "Edit your message..." : "Type a message")}
+            className={`flex-1 bg-white border border-gray-200 py-2.5 sm:py-3 px-4 sm:px-5 rounded-2xl text-sm sm:text-[15px] text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none shadow-sm transition-all ${isBlocked ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''}`}
           />
 
           <button 
@@ -1041,6 +1083,44 @@ export const ChatPage: React.FC = () => {
   </div>
  )}
  
+  {/* Report User Modal */}
+  {isReportModalOpen && (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
+      <div className="bg-white w-full max-w-sm rounded-3xl p-8 flex flex-col space-y-6 shadow-2xl scale-in">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center text-orange-500">
+            <Info size={24} />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-gray-900">Report Partner</h3>
+            <p className="text-xs font-medium text-gray-500">Help us keep Nexus safe.</p>
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">Reason for report</label>
+          <textarea 
+            value={reportReason}
+            onChange={(e) => setReportReason(e.target.value)}
+            placeholder="Describe the issue..."
+            className="w-full bg-gray-50 border border-gray-100 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all h-32 resize-none"
+          />
+        </div>
+
+        <div className="flex gap-3 w-full">
+          <button onClick={() => { setIsReportModalOpen(false); setReportReason(''); }} className="flex-1 py-3 text-sm font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors">Cancel</button>
+          <button 
+            onClick={handleReportUser}
+            disabled={!reportReason.trim()}
+            className="flex-1 py-3 text-sm font-semibold text-white bg-gray-900 hover:bg-black rounded-xl shadow-md transition-colors disabled:opacity-50"
+          >
+            Submit Report
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
+
     {/* Partner Info Sidebar */}
     {showProfileInfo && chatPartner && (
       <div className="hidden lg:flex w-80 border-l border-gray-100 bg-white flex-col animate-in slide-in-from-right duration-300">

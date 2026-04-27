@@ -92,7 +92,11 @@ const userSchema = new mongoose.Schema({
     }
   },
   resetPasswordToken: String,
-  resetPasswordExpires: Date
+  resetPasswordExpires: Date,
+  blockedUsers: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }]
 }, {
   timestamps: true,
 });

@@ -3,6 +3,7 @@ import Conversation from '../models/Conversation.js';
 import Notification from '../models/Notification.js';
 import User from '../models/User.js';
 import mongoose from 'mongoose';
+import Report from '../models/Report.js';
 
 // @desc    Get all conversations for the logged in user
 // @route   GET /api/messages/conversations
@@ -203,6 +204,18 @@ export const sendMessage = async (req, res) => {
 
     if (!mongoose.Types.ObjectId.isValid(receiverId)) {
       return res.status(400).json({ message: 'Invalid receiverId format' });
+    }
+
+    // Check for block status
+    const sender = await User.findById(senderId).select('blockedUsers');
+    const receiverData = await User.findById(receiverId).select('blockedUsers');
+
+    if (sender.blockedUsers.includes(receiverId)) {
+      return res.status(403).json({ message: 'You have blocked this user' });
+    }
+
+    if (receiverData.blockedUsers.includes(senderId)) {
+      return res.status(403).json({ message: 'This user has blocked you' });
     }
 
     let conversation = await Conversation.findOne({
@@ -477,5 +490,55 @@ export const toggleArchiveChat = async (req, res) => {
   } catch (err) {
     console.error('Error toggling archive:', err);
     res.status(500).json({ message: 'Server error toggling archive' });
+  }
+};
+
+// @desc    Report a user
+// @route   POST /api/messages/report
+// @access  Private
+export const reportUser = async (req, res) => {
+  try {
+    const { reportedId, reason } = req.body;
+    const reporterId = req.user._id;
+
+    if (!reportedId || !reason) {
+      return res.status(400).json({ message: 'Reported ID and reason are required' });
+    }
+
+    await Report.create({
+      reporterId,
+      reportedId,
+      reason
+    });
+
+    res.json({ message: 'User reported successfully to admin' });
+  } catch (err) {
+    console.error('Error reporting user:', err);
+    res.status(500).json({ message: 'Server error reporting user' });
+  }
+};
+
+// @desc    Toggle Block User
+// @route   PUT /api/messages/block/:partnerId
+// @access  Private
+export const toggleBlockUser = async (req, res) => {
+  try {
+    const { partnerId } = req.params;
+    const userId = req.user._id;
+
+    const user = await User.findById(userId);
+    const isBlocked = user.blockedUsers.includes(partnerId);
+
+    if (isBlocked) {
+      user.blockedUsers = user.blockedUsers.filter(id => id.toString() !== partnerId.toString());
+    } else {
+      user.blockedUsers.push(partnerId);
+    }
+
+    await user.save();
+    res.json({ message: isBlocked ? 'User unblocked' : 'User blocked', isBlocked: !isBlocked });
+  } catch (err) {
+    console.error('Error toggling block:', err);
+    res.status(500).json({ message: 'Server error toggling block' });
   }
 };
