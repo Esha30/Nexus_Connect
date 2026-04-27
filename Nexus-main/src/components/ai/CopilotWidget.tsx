@@ -150,7 +150,7 @@ export const CopilotWidget: React.FC<CopilotWidgetProps> = ({ isDocked = false, 
         <div 
           style={!isDocked ? { transform: `translate(${position.x}px, ${position.y}px)` } : {}}
           className={`${isDocked ? 'relative h-full w-full rounded-none border-none shadow-none' : 'fixed left-4 md:left-auto md:right-6 top-20 md:top-auto md:bottom-6 shadow-2xl rounded-2xl border border-gray-100'} z-50 flex flex-col transition-all duration-300 transform origin-top-left md:origin-bottom-right overflow-hidden bg-white ${
-            isDocked ? '' : isExpanded ? 'w-[450px] h-[600px] sm:w-[500px] sm:h-[700px]' : 'w-[350px] h-[500px]'
+            isDocked ? '' : isExpanded ? 'w-[450px] h-[600px] sm:w-[500px] sm:h-[700px] max-h-[calc(100vh-100px)] max-w-[calc(100vw-2rem)]' : 'w-[350px] h-[500px] max-h-[calc(100vh-100px)] max-w-[calc(100vw-2rem)]'
           } ${isDragging ? 'transition-none scale-[1.02] z-[60] cursor-grabbing select-none' : ''}`}
         >
           {/* Header */}
