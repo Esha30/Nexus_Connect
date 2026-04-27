@@ -212,11 +212,24 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       fetchNotificationCount();
     });
 
+    socket.on('refresh-data', (payload: { type: string }) => {
+      window.dispatchEvent(new CustomEvent('nexus-refresh', { detail: payload }));
+      if (payload.type === 'notification' || payload.type === 'all') fetchNotificationCount();
+      if (payload.type === 'message' || payload.type === 'all') fetchMessageCount();
+    });
+
     // Initial fetch
     fetchMessageCount();
     fetchNotificationCount();
 
+    // Polling fallback for high-integrity data
+    const interval = setInterval(() => {
+      fetchMessageCount();
+      fetchNotificationCount();
+    }, 60000);
+
     return () => {
+      clearInterval(interval);
       socket.disconnect();
       socketRef.current = null;
       setIsConnected(false);

@@ -239,6 +239,13 @@ export const ChatPage: React.FC = () => {
      }
    };
 
+    const handleBlockStatusChange = ({ blockedBy, isBlocked: newIsBlocked }: { blockedBy: string, isBlocked: boolean }) => {
+      if (blockedBy === userId) {
+        setIsBlocked(newIsBlocked);
+        toast.info(newIsBlocked ? 'The partner has blocked you' : 'The partner has unblocked you');
+      }
+    };
+
    socket.on('receive-message', handleReceiveMessage);
    socket.on('messages-read', handleMessagesRead);
    socket.on('typing', handleTyping);
@@ -249,6 +256,7 @@ export const ChatPage: React.FC = () => {
    socket.on('ice-candidate', handleIceCandidate);
    socket.on('call-ended', handleCallEnded);
    socket.on('message-deleted', handleMessageDeleted);
+   socket.on('block-status-change', handleBlockStatusChange);
 
    return () => {
      socket.off('receive-message', handleReceiveMessage);
@@ -260,7 +268,8 @@ export const ChatPage: React.FC = () => {
      socket.off('call-answered', handleCallAnswered);
      socket.off('ice-candidate', handleIceCandidate);
      socket.off('call-ended', handleCallEnded);
-   socket.off('message-deleted', handleMessageDeleted);
+     socket.off('message-deleted', handleMessageDeleted);
+     socket.off('block-status-change', handleBlockStatusChange);
    };
  }, [currentUser, userId, socket, getRoomId, chatPartner, fetchConversations]);
 

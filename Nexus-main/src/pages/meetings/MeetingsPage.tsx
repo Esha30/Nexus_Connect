@@ -80,13 +80,27 @@ export const MeetingsPage: React.FC = () => {
 
     fetchPotentialPartners();
 
+    // Global refresh listener
+    const handleRefresh = (e: any) => {
+      if (e.detail?.type === 'meeting' || e.detail?.type === 'all') {
+        fetchMeetings();
+      }
+    };
+    window.addEventListener('nexus-refresh', handleRefresh);
+
     // Socket updates for live status changes
     if (socket) {
       socket.on('meeting-updated', fetchMeetings);
-      return () => {
-        socket.off('meeting-updated', fetchMeetings);
-      };
     }
+
+    // Polling fallback
+    const interval = setInterval(fetchMeetings, 30000);
+
+    return () => {
+      window.removeEventListener('nexus-refresh', handleRefresh);
+      if (socket) socket.off('meeting-updated', fetchMeetings);
+      clearInterval(interval);
+    };
   }, [location, socket, fetchMeetings, fetchPotentialPartners]);
 
   const handleScheduleMeeting = async (e: React.FormEvent) => {

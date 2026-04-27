@@ -289,6 +289,23 @@ io.on('connection', (socket) => {
     io.to(payload.senderId).emit('messages-read', { readerId: payload.readerId });
   });
 
+  socket.on('toggle-block', (payload) => {
+    // payload: { targetId, senderId, isBlocked }
+    io.to(payload.targetId).emit('block-status-change', { 
+      blockedBy: payload.senderId, 
+      isBlocked: payload.isBlocked 
+    });
+  });
+
+  socket.on('global-update', (payload) => {
+    // payload: { targetId, type }
+    if (payload.targetId) {
+      io.to(payload.targetId).emit('refresh-data', { type: payload.type });
+    } else {
+      socket.broadcast.emit('refresh-data', { type: payload.type });
+    }
+  });
+
   // Handle disconnect - set user offline
   socket.on('disconnect', async () => {
     const userId = socketUserMap[socket.id];

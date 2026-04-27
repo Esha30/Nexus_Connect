@@ -544,6 +544,16 @@ export const toggleBlockUser = async (req, res) => {
     }
 
     await user.save();
+    
+    // Emit socket event for real-time UI update
+    const io = req.app.get('socketio');
+    if (io) {
+      io.to(partnerId).emit('block-status-change', { 
+        blockedBy: userId, 
+        isBlocked: !isBlocked 
+      });
+    }
+
     res.json({ message: isBlocked ? 'User unblocked' : 'User blocked', isBlocked: !isBlocked });
   } catch (err) {
     console.error('Error toggling block:', err);

@@ -96,9 +96,25 @@ export const DocumentsPage: React.FC = () => {
     .slice(0, 3);
  }, [documents]);
 
- useEffect(() => {
-  fetchDocuments();
- }, []);
+  useEffect(() => {
+    fetchDocuments();
+
+    // Global refresh listener
+    const handleRefresh = (e: any) => {
+      if (e.detail?.type === 'document' || e.detail?.type === 'all') {
+        fetchDocuments();
+      }
+    };
+    window.addEventListener('nexus-refresh', handleRefresh);
+
+    // Polling fallback
+    const interval = setInterval(fetchDocuments, 60000);
+
+    return () => {
+      window.removeEventListener('nexus-refresh', handleRefresh);
+      clearInterval(interval);
+    };
+  }, []);
 
  const fetchDocuments = async () => {
   try {

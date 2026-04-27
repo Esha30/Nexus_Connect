@@ -108,6 +108,22 @@ export const InvestorDashboard: React.FC = () => {
     if (user) {
       fetchDiscoveryData();
       setPriorityStatus(user.profile?.priorityAccess || 'none');
+
+      // Global refresh listener
+      const handleRefresh = (e: any) => {
+        if (e.detail?.type === 'dashboard' || e.detail?.type === 'all') {
+          fetchDiscoveryData();
+        }
+      };
+      window.addEventListener('nexus-refresh', handleRefresh);
+
+      // Polling fallback (3 mins for dashboard)
+      const interval = setInterval(fetchDiscoveryData, 180000);
+
+      return () => {
+        window.removeEventListener('nexus-refresh', handleRefresh);
+        clearInterval(interval);
+      };
     }
   }, [user, fetchDiscoveryData]);
 
