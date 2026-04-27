@@ -46,7 +46,7 @@ export const AdminDashboard: React.FC = () => {
   const fetchAllData = async () => {
     setIsLoading(true);
     try {
-      const [statsRes, usersRes, postsRes, ticketsRes, priorityRes, settingsRes, logsRes] = await Promise.all([
+      const [statsRes, usersRes, postsRes, ticketsRes, priorityRes, settingsRes, logsRes, reportsRes] = await Promise.all([
         api.get('/admin/stats'),
         api.get('/admin/users'),
         api.get('/admin/posts'),
