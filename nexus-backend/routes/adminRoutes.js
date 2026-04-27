@@ -14,7 +14,6 @@ import {
   updateUserStatus,
   getSystemSettings,
   updateSystemSettings,
-  updateSystemSettings,
   getAuditLogs,
   getReports,
   deleteReport

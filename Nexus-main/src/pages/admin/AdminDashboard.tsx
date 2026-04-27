@@ -282,7 +282,7 @@ export const AdminDashboard: React.FC = () => {
                         <Badge className="bg-white/5 text-gray-500 border-white/10">30D</Badge>
                       </div>
                     </div>
-                    <div className="h-72 w-full">
+                    <div className="h-[300px] min-h-[300px] w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={stats?.analytics}>
                           <defs>

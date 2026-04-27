@@ -83,7 +83,8 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
       timeout: 20000,
-      forceNew: true
+      forceNew: true,
+      transports: ['websocket', 'polling']
     });
 
     socketRef.current = socket;

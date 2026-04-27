@@ -260,8 +260,9 @@ export const InvestorDashboard: React.FC = () => {
           </CardHeader>
           <CardBody>
             {(stats?.industryDistribution?.length ?? 0) > 0 ? (
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={stats.industryDistribution} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+              <div className="h-[250px] min-h-[250px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={stats.industryDistribution} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis dataKey="name" tick={{ fontSize: 12 }} stroke="#9ca3af" />
                   <YAxis tick={{ fontSize: 12 }} stroke="#9ca3af" />
