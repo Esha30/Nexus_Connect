@@ -661,7 +661,7 @@ export const ChatPage: React.FC = () => {
  };
 
  return (
-  <div className="h-full bg-white flex overflow-hidden pb-16 md:pb-0">
+  <div className="h-full bg-white flex overflow-hidden pb-20 md:pb-0">
  {/* Sidebar */}
  <div className={`${userId ? 'hidden md:flex' : 'flex w-full'} md:flex-shrink-0 border-r border-gray-100`}>
  <div className="flex flex-col w-full md:w-80 lg:w-96 bg-white">
