@@ -5,8 +5,8 @@ import validateObjectId from '../middleware/validateObjectId.js';
 
 const router = express.Router();
 
-router.put('/action/block-user/:partnerId', protect, validateObjectId('partnerId'), toggleBlockUser);
-router.post('/action/report-user', protect, reportUser);
+router.put('/blockuser/:partnerId', protect, toggleBlockUser);
+router.post('/reportuser', protect, reportUser);
 router.get('/conversations', protect, getConversations);
 router.delete('/clear/:partnerId', protect, validateObjectId('partnerId'), clearChat);
 router.put('/mute/:partnerId', protect, validateObjectId('partnerId'), toggleMuteChat);
