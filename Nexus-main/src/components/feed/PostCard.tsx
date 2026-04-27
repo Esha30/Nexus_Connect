@@ -11,6 +11,7 @@ import { SynergyModal } from './SynergyModal';
 interface PostCardProps {
   post: any;
   onUpdate: () => void;
+  onRetrySynergy?: () => void;
 }
 
 export const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
@@ -68,14 +69,16 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
 
   const handleViewConnection = async () => {
     setShowSynergy(true);
-    if (synergyData) return;
+    if (synergyData && !isLoadingSynergy) return;
 
     setIsLoadingSynergy(true);
     try {
       const res = await api.post('/ai/synergy', { targetUserId: post.author?._id });
       setSynergyData(res.data);
     } catch (err) {
-      toast.error('Failed to generate synergy report');
+      console.error('Synergy Error:', err);
+      setSynergyData(null);
+      toast.error('Nexus Intelligence is busy. Please try again.');
     } finally {
       setIsLoadingSynergy(false);
     }
@@ -252,6 +255,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
           onClose={() => setShowSynergy(false)} 
           data={synergyData} 
           isLoading={isLoadingSynergy} 
+          onRetry={handleViewConnection}
         />
       )}
     </div>

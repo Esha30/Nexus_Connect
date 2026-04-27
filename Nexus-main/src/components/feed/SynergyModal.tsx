@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Sparkles, TrendingUp, AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react';
+import { X, Sparkles, TrendingUp, AlertTriangle, CheckCircle2, Loader2, RefreshCw } from 'lucide-react';
 
 interface SynergyModalProps {
   onClose: () => void;
@@ -10,9 +10,10 @@ interface SynergyModalProps {
     risks: string[];
   } | null;
   isLoading: boolean;
+  onRetry: () => void;
 }
 
-export const SynergyModal: React.FC<SynergyModalProps> = ({ onClose, data, isLoading }) => {
+export const SynergyModal: React.FC<SynergyModalProps> = ({ onClose, data, isLoading, onRetry }) => {
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-xl p-4 animate-in fade-in duration-300">
       <div className="bg-white/95 backdrop-blur-md w-full max-w-2xl rounded-[3rem] shadow-[0_32px_128px_rgba(0,0,0,0.4)] scale-in overflow-hidden border border-white/50">
@@ -127,8 +128,19 @@ export const SynergyModal: React.FC<SynergyModalProps> = ({ onClose, data, isLoa
               </div>
             </div>
           ) : (
-            <div className="text-center py-10">
-              <p className="text-gray-500">Failed to generate synergy report.</p>
+            <div className="text-center py-12 px-6">
+              <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle className="text-red-500" size={32} />
+              </div>
+              <h4 className="text-lg font-bold text-gray-900 mb-2">Analysis Interrupted</h4>
+              <p className="text-sm text-gray-500 mb-6">Nexus Intelligence encountered a timeout while analyzing the ecosystem DNA.</p>
+              <button 
+                onClick={onRetry}
+                className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary-600 text-white rounded-xl text-xs font-bold hover:bg-primary-700 transition-all active:scale-95 shadow-lg shadow-primary-600/20"
+              >
+                <RefreshCw size={14} className={isLoading ? 'animate-spin' : ''} />
+                Attempt Re-sync
+              </button>
             </div>
           )}
         </div>
