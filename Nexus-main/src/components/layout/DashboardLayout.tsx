@@ -5,6 +5,7 @@ import { Navbar } from './Navbar';
 import { Sidebar } from './Sidebar';
 import { BottomNavbar } from './BottomNavbar';
 import { CopilotWidget } from '../ai/CopilotWidget';
+import { MeetingReminder } from '../meetings/MeetingReminder';
 
 export const DashboardLayout: React.FC = () => {
  const { isAuthenticated, isLoading } = useAuth();
@@ -46,6 +47,7 @@ export const DashboardLayout: React.FC = () => {
   
   <BottomNavbar />
   <CopilotWidget />
+  <MeetingReminder />
   </div>
   );
 };

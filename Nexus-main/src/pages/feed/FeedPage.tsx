@@ -12,6 +12,7 @@ export const FeedPage: React.FC = () => {
   const { user } = useAuth();
   const { socket } = useSocket();
   const [posts, setPosts] = useState<any[]>([]);
+  const [newPostsBuffer, setNewPostsBuffer] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -34,9 +35,9 @@ export const FeedPage: React.FC = () => {
     if (!socket) return;
 
     socket.on('new-post', (newPost: any) => {
-      setPosts(prev => {
-        // Prevent duplicate posts if the sender also receives the broadcast
-        if (prev.some(p => p._id === newPost._id)) return prev;
+      // Prevent duplicate posts if the sender also receives the broadcast
+      setNewPostsBuffer(prev => {
+        if (posts.some(p => p._id === newPost._id) || prev.some(p => p._id === newPost._id)) return prev;
         return [newPost, ...prev];
       });
       toast.success('New update from the community!', { icon: '🚀' });
@@ -50,6 +51,12 @@ export const FeedPage: React.FC = () => {
   const handlePostCreated = (newPost: any) => {
     setPosts([newPost, ...posts]);
     setShowCreateModal(false);
+  };
+
+  const handleApplyNewPosts = () => {
+    setPosts(prev => [...newPostsBuffer, ...prev]);
+    setNewPostsBuffer([]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -112,7 +119,19 @@ export const FeedPage: React.FC = () => {
         </div>
 
         {/* Right Column: Feed List (3/4) */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-3 relative">
+          {newPostsBuffer.length > 0 && (
+            <div className="sticky top-24 z-30 flex justify-center mb-6 animate-in slide-in-from-top-4 duration-300">
+              <button 
+                onClick={handleApplyNewPosts}
+                className="bg-primary-600 text-white px-6 py-2.5 rounded-full shadow-xl shadow-primary-500/30 flex items-center gap-2 text-xs font-bold hover:bg-primary-700 transition-all hover:scale-105 active:scale-95"
+              >
+                <Plus size={16} />
+                {newPostsBuffer.length} New Update{newPostsBuffer.length > 1 ? 's' : ''} Available
+              </button>
+            </div>
+          )}
+
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-4 bg-white rounded-2xl border border-gray-100 shadow-sm">
               <div className="w-10 h-10 border-4 border-primary-50 border-t-primary-600 rounded-full animate-spin"></div>

@@ -27,6 +27,7 @@ export const MeetingsPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
+  const [activeFilter, setActiveFilter] = useState<'all' | 'pending' | 'scheduled' | 'attended'>('all');
   
   // Form State
   const [title, setTitle] = useState('');
@@ -135,6 +136,17 @@ export const MeetingsPage: React.FC = () => {
     );
   };
 
+  const filteredMeetings = useMemo(() => {
+    const now = new Date();
+    return meetings.filter(m => {
+      if (activeFilter === 'all') return true;
+      if (activeFilter === 'pending') return m.status === 'pending';
+      if (activeFilter === 'scheduled') return m.status === 'accepted' && new Date(m.startTime) > now;
+      if (activeFilter === 'attended') return m.status === 'completed' || (m.status === 'accepted' && new Date(m.endTime) < now);
+      return true;
+    });
+  }, [meetings, activeFilter]);
+
   const events = useMemo(() => {
     return meetings.map(m => ({
       id: m._id,
@@ -203,6 +215,30 @@ export const MeetingsPage: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Filter Tabs (Visible in List View) */}
+        {viewMode === 'list' && (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-16 mt-8 flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+            {[
+              { id: 'all', label: 'All Sessions' },
+              { id: 'pending', label: 'Pending' },
+              { id: 'scheduled', label: 'Scheduled' },
+              { id: 'attended', label: 'Attended' }
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveFilter(tab.id as any)}
+                className={`px-6 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap ${
+                  activeFilter === tab.id 
+                    ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/20' 
+                    : 'bg-white text-gray-400 border border-gray-100 hover:bg-gray-50'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="max-w-7xl mx-auto px-6 sm:px-5 lg:px-16 -mt-8 relative z-20">
@@ -226,18 +262,27 @@ export const MeetingsPage: React.FC = () => {
                   onSelectEvent={(e) => toast(`"${e.title}"`, { icon: '📅', duration: 2000 })}
                 />
               </div>
-            ) : meetings.length === 0 ? (
+            ) : filteredMeetings.length === 0 ? (
               <div className="p-20 sm:p-40 text-center flex flex-col items-center">
                 <Clock size={48} className="text-gray-300 mb-6" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">{t('meetings.empty.title')}</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No {activeFilter === 'all' ? '' : activeFilter} meetings found</h3>
                 <p className="text-gray-500">{t('meetings.empty.subtitle')}</p>
               </div>
             ) : (
               <div className="divide-y divide-gray-50">
-                {meetings.map((m: Meeting) => {
+                {filteredMeetings.map((m: Meeting) => {
                   const isHost = m.host?._id === user?.id;
-                  const statusColor = m.status === 'accepted' ? 'success' : m.status === 'rejected' ? 'error' : 'warning';
+                  const statusColor = m.status === 'accepted' ? 'success' : m.status === 'rejected' ? 'error' : m.status === 'pending' ? 'warning' : 'primary';
                   
+                  let displayStatus = m.status;
+                  const now = new Date();
+                  if (m.status === 'accepted') {
+                    displayStatus = new Date(m.startTime) > now ? 'Scheduled' : 'Attended';
+                  } else if (m.status === 'completed') {
+                    displayStatus = 'Attended';
+                  } else if (m.status === 'pending') {
+                    displayStatus = 'Pending';
+                  }
                   return (
                     <div key={m._id} className="group relative flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 sm:p-8 hover:bg-gray-50 transition-all gap-4">
                       <div className="flex items-center gap-6">
@@ -266,7 +311,7 @@ export const MeetingsPage: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center w-full sm:w-auto gap-3">
-                        <Badge variant={statusColor} className="px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full">{m.status}</Badge>
+                        <Badge variant={statusColor as any} className="px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full">{displayStatus}</Badge>
                         {m.status === 'pending' && !isHost && (
                           <div className="flex gap-2">
                             <Button size="sm" onClick={() => handleUpdateStatus(m._id, 'accepted')} className="bg-success-600 text-white rounded-lg text-[10px] font-bold">{t('meetings.list.accept')}</Button>
