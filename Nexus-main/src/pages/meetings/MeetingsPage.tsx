@@ -174,31 +174,31 @@ export const MeetingsPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50 pb-20">
       
       {/* Hero Header */}
-      <div className="relative pt-10 pb-20 px-6 sm:px-5 lg:px-16 overflow-hidden bg-white">
+      <div className="relative pt-6 sm:pt-10 pb-12 sm:pb-20 px-4 sm:px-6 lg:px-16 overflow-hidden bg-white">
         <div className="absolute -top-40 -left-60 w-96 h-96 bg-blue-400/20 rounded-full pointer-events-none" />
-        <div className="max-w-7xl mx-auto relative z-10 flex flex-col md:flex-row justify-between items-end gap-10">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-50 text-primary-600 text-xs font-medium mb-6">
+        <div className="max-w-7xl mx-auto relative z-10 flex flex-col lg:flex-row justify-between items-center lg:items-end gap-6 sm:gap-10">
+          <div className="max-w-2xl text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-50 text-primary-600 text-[10px] font-bold uppercase tracking-wider mb-6">
               <CalendarIcon size={14} /> {t('meetings.hero.badge')}
             </div>
-            <h1 className="text-2xl md:text-2xl font-medium text-gray-900 tracking-tight leading-tight mb-4">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight leading-tight mb-4">
               {t('meetings.hero.title')} <span className="text-primary-600">{t('meetings.hero.sync')}</span>
             </h1>
-            <p className="text-lg md:text-xl text-gray-500 font-medium leading-relaxed">
+            <p className="text-sm sm:text-lg text-gray-500 font-medium leading-relaxed">
               {t('meetings.hero.subtitle')}
             </p>
           </div>
           
-          <div className="w-full md:w-[450px] flex flex-col gap-4">
-            <Button onClick={() => setIsModalOpen(true)} leftIcon={<Plus size={18} />} fullWidth className="bg-primary-600 hover:bg-blue-700 shadow-sm py-4 text-lg font-medium rounded-lg">
+          <div className="w-full lg:w-[450px] flex flex-col gap-3">
+            <Button onClick={() => setIsModalOpen(true)} leftIcon={<Plus size={18} />} fullWidth className="bg-primary-600 hover:bg-blue-700 shadow-sm py-3.5 text-base font-bold rounded-xl">
               {t('meetings.schedule')}
             </Button>
-            <div className="flex bg-white p-1.5 rounded-lg shadow-sm border border-gray-100">
-              <button onClick={() => setViewMode('calendar')} className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg transition-all duration-300 font-medium text-xs ${viewMode === 'calendar' ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50'}`}>
-                <LayoutGrid size={18} /> {t('meetings.calendar')}
+            <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
+              <button onClick={() => setViewMode('calendar')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg transition-all duration-300 font-bold text-[10px] uppercase tracking-wider ${viewMode === 'calendar' ? 'bg-white text-primary-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>
+                <LayoutGrid size={16} /> {t('meetings.calendar')}
               </button>
-              <button onClick={() => setViewMode('list')} className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg transition-all duration-300 font-medium text-xs ${viewMode === 'list' ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50'}`}>
-                <List size={18} /> {t('meetings.timeline')}
+              <button onClick={() => setViewMode('list')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg transition-all duration-300 font-bold text-[10px] uppercase tracking-wider ${viewMode === 'list' ? 'bg-white text-primary-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}>
+                <List size={16} /> {t('meetings.timeline')}
               </button>
             </div>
           </div>
@@ -209,11 +209,11 @@ export const MeetingsPage: React.FC = () => {
         <Card className="bg-white border border-gray-100 shadow-sm rounded-[2rem] overflow-hidden">
           <CardBody className="p-0">
             {isLoading ? (
-              <div className="p-40 text-center flex flex-col items-center gap-4">
+              <div className="p-20 sm:p-40 text-center flex flex-col items-center gap-4">
                 <div className="w-12 h-12 border-4 border-secondary-100 border-t-secondary-600 rounded-full animate-spin"></div>
               </div>
             ) : viewMode === 'calendar' ? (
-              <div className="h-[750px] p-8 bg-white">
+              <div className="h-[450px] sm:h-[750px] p-4 sm:p-8 bg-white overflow-hidden">
                 <Calendar
                   localizer={localizer}
                   events={events}
@@ -227,7 +227,7 @@ export const MeetingsPage: React.FC = () => {
                 />
               </div>
             ) : meetings.length === 0 ? (
-              <div className="p-40 text-center flex flex-col items-center">
+              <div className="p-20 sm:p-40 text-center flex flex-col items-center">
                 <Clock size={48} className="text-gray-300 mb-6" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">{t('meetings.empty.title')}</h3>
                 <p className="text-gray-500">{t('meetings.empty.subtitle')}</p>
@@ -239,7 +239,7 @@ export const MeetingsPage: React.FC = () => {
                   const statusColor = m.status === 'accepted' ? 'success' : m.status === 'rejected' ? 'error' : 'warning';
                   
                   return (
-                    <div key={m._id} className="group relative flex justify-between items-center p-8 hover:bg-gray-50 transition-all">
+                    <div key={m._id} className="group relative flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 sm:p-8 hover:bg-gray-50 transition-all gap-4">
                       <div className="flex items-center gap-6">
                         <div className="flex -space-x-3 overflow-hidden">
                           {[m.host, ...m.participants].slice(0, 4).map((member, i) => (
@@ -265,20 +265,20 @@ export const MeetingsPage: React.FC = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="flex flex-col items-end gap-3">
-                        <Badge variant={statusColor} className="px-4 py-1.5 text-xs font-medium rounded-full">{m.status}</Badge>
+                      <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center w-full sm:w-auto gap-3">
+                        <Badge variant={statusColor} className="px-4 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full">{m.status}</Badge>
                         {m.status === 'pending' && !isHost && (
                           <div className="flex gap-2">
-                            <Button size="sm" onClick={() => handleUpdateStatus(m._id, 'accepted')} className="bg-success-600 text-white rounded-lg">{t('meetings.list.accept')}</Button>
-                            <Button size="sm" variant="outline" onClick={() => handleUpdateStatus(m._id, 'rejected')} className="text-red-500 border-red-500">{t('meetings.list.decline')}</Button>
+                            <Button size="sm" onClick={() => handleUpdateStatus(m._id, 'accepted')} className="bg-success-600 text-white rounded-lg text-[10px] font-bold">{t('meetings.list.accept')}</Button>
+                            <Button size="sm" variant="outline" onClick={() => handleUpdateStatus(m._id, 'rejected')} className="text-red-500 border-red-500 text-[10px] font-bold">{t('meetings.list.decline')}</Button>
                           </div>
                         )}
                         {m.status === 'accepted' && (
                           <Button 
                             onClick={() => navigate(`/meeting/${m.roomID}`)}
-                            className="bg-primary-600 text-white text-sm font-medium rounded-lg flex items-center gap-2"
+                            className="bg-primary-600 text-white text-[10px] font-bold rounded-lg flex items-center gap-2 px-4 py-2"
                           >
-                            <Video size={16} /> {t('meetings.list.join')}
+                            <Video size={14} /> {t('meetings.list.join')}
                           </Button>
                         )}
                       </div>

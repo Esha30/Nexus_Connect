@@ -831,12 +831,12 @@ export const ChatPage: React.FC = () => {
  )}
 
       {/* Input Area */}
-      <div className="px-4 py-3 bg-[#F0F2F5] flex flex-col shrink-0">
+      <div className="px-2 sm:px-4 py-2 sm:py-3 bg-[#F0F2F5] flex flex-col shrink-0">
         {replyingToMessage && (
-        <div className="mb-3 p-3 bg-gray-50 rounded-xl flex items-center justify-between border-l-4 border-primary-500 animate-in slide-in-from-bottom-2 duration-200">
-        <div className="text-xs">
-        <p className="font-bold text-primary-600">Replying to {replyingToMessage.senderId === currentUser?.id ? 'Yourself' : chatPartner?.name}</p>
-        <p className="text-gray-500 truncate">{replyingToMessage.content}</p>
+        <div className="mb-2 p-2 sm:p-3 bg-gray-50 rounded-xl flex items-center justify-between border-l-4 border-primary-500 animate-in slide-in-from-bottom-2 duration-200">
+        <div className="text-[10px] sm:text-xs">
+        <p className="font-bold text-primary-600 uppercase tracking-wider">Replying to {replyingToMessage.senderId === currentUser?.id ? 'Yourself' : chatPartner?.name}</p>
+        <p className="text-gray-500 truncate max-w-[200px] sm:max-w-none">{replyingToMessage.content}</p>
         </div>
         <button onClick={() => setReplyingToMessage(null)} className="p-1 text-gray-400 hover:text-gray-600">
         <X size={16} />
@@ -845,12 +845,12 @@ export const ChatPage: React.FC = () => {
         )}
          
         {attachment && (
-        <div className="mb-3 p-3 bg-primary-50 rounded-xl flex items-center justify-between border border-primary-100 animate-in slide-in-from-bottom-2 duration-200">
-        <div className="flex items-center gap-3">
+        <div className="mb-2 p-2 sm:p-3 bg-primary-50 rounded-xl flex items-center justify-between border border-primary-100 animate-in slide-in-from-bottom-2 duration-200">
+        <div className="flex items-center gap-2 sm:gap-3">
         <Paperclip size={16} className="text-primary-600" />
-        <div className="text-xs">
-        <p className="font-bold text-gray-900 truncate">{attachment.name}</p>
-        <p className="text-primary-600 font-medium">Ready to send</p>
+        <div className="text-[10px] sm:text-xs">
+        <p className="font-bold text-gray-900 truncate max-w-[150px] sm:max-w-none">{attachment.name}</p>
+        <p className="text-primary-600 font-bold uppercase tracking-widest text-[8px] sm:text-[10px]">Ready to sync</p>
         </div>
         </div>
         <button onClick={() => setAttachment(null)} className="p-1 text-gray-400 hover:text-gray-600">
@@ -859,18 +859,18 @@ export const ChatPage: React.FC = () => {
         </div>
         )}
 
-        <form onSubmit={handleSendMessage} className="flex items-center gap-2 md:gap-4 w-full">
-          <div className="relative flex items-center">
-            <button type="button" onClick={() => setShowEmojiPicker(!showEmojiPicker)} className="p-2 text-gray-500 hover:text-gray-700 transition">
-              <Smile size={24} />
+        <form onSubmit={handleSendMessage} className="flex items-center gap-1.5 sm:gap-3 w-full">
+          <div className="flex items-center">
+            <button type="button" onClick={() => setShowEmojiPicker(!showEmojiPicker)} className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-700 transition">
+              <Smile size={22} className="sm:w-6 sm:h-6" />
             </button>
             {showEmojiPicker && (
-            <div className="absolute bottom-16 left-0 z-50 shadow-2xl border-none rounded-2xl overflow-hidden">
+            <div className="absolute bottom-16 left-0 z-50 shadow-2xl border-none rounded-2xl overflow-hidden scale-90 sm:scale-100 origin-bottom-left">
             <EmojiPicker onEmojiClick={onEmojiClick} />
             </div>
             )}
-            <button type="button" onClick={() => fileInputRef.current?.click()} className="p-2 text-gray-500 hover:text-gray-700 transition">
-              <Paperclip size={24} />
+            <button type="button" onClick={() => fileInputRef.current?.click()} className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-700 transition">
+              <Paperclip size={22} className="sm:w-6 sm:h-6" />
             </button>
           </div>
           <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileSelect} />
@@ -879,22 +879,22 @@ export const ChatPage: React.FC = () => {
             type="button" 
             onClick={handleAiDraft} 
             disabled={isDrafting || !userId}
-            className={`p-2 transition-all duration-300 ${isDrafting ? 'text-primary-600' : 'text-gray-500 hover:text-primary-600'}`}
+            className={`p-1.5 sm:p-2 transition-all duration-300 ${isDrafting ? 'text-primary-600' : 'text-gray-400 hover:text-primary-600'}`}
             title="AI Assist"
           >
-            {isDrafting ? <Loader2 size={24} className="animate-spin" /> : <Sparkles size={24} />}
+            {isDrafting ? <Loader2 size={22} className="animate-spin" /> : <Sparkles size={22} className="sm:w-6 sm:h-6" />}
           </button>
 
           <input
             type="text"
             value={newMessage}
             onChange={(e) => { setNewMessage(e.target.value); handleTyping(); }}
-            placeholder={editingMessage ? "Edit message..." : "Type a message"}
-            className="flex-1 bg-white border border-gray-200 py-2.5 px-4 rounded-xl text-[15px] text-gray-900 placeholder-gray-500 focus:ring-1 focus:ring-primary-500 outline-none shadow-sm"
+            placeholder={editingMessage ? "Edit..." : "Message"}
+            className="flex-1 bg-white border border-gray-200 py-2 sm:py-2.5 px-3 sm:px-4 rounded-xl text-sm sm:text-[15px] text-gray-900 placeholder-gray-400 focus:ring-1 focus:ring-primary-500 outline-none shadow-sm"
           />
 
-          <button type="submit" className="p-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-sm active:scale-95 transition-all flex items-center justify-center h-10 w-10 ml-1" disabled={isUploading || (!newMessage.trim() && !attachment)}>
-            <Send size={18} className="ml-1" />
+          <button type="submit" className="p-2 sm:p-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-md active:scale-90 transition-all flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 shrink-0" disabled={isUploading || (!newMessage.trim() && !attachment)}>
+            <Send size={16} className="sm:w-5 sm:h-5 ml-0.5" />
           </button>
         </form>
       </div>

@@ -162,41 +162,40 @@ export const NotificationsPage: React.FC = () => {
  <div className="relative pt-10 pb-20 px-6 sm:px-5 lg:px-16 overflow-hidden bg-white">
  <div className="absolute -top-40 -left-60 w-96 h-96 bg-primary-400/20 rounded-full pointer-events-none" />
  <div className="absolute top-20 -right-20 w-72 h-72 bg-emerald-400/20 rounded-full pointer-events-none" />
- 
- <div className="max-w-7xl mx-auto relative z-10 flex flex-col md:flex-row justify-between items-end gap-10">
- <div className="max-w-2xl">
- <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-50 text-primary-600 text-xs font-medium mb-6 ">
- <Sparkles size={14} /> Unified Updates
- </div>
- <h1 className="text-2xl md:text-2xl font-medium text-gray-900 tracking-tight leading-tight mb-4">
- Your Network <span className="text-primary-600">Pulse.</span>
- </h1>
- <p className="text-lg md:text-xl text-gray-500 font-medium leading-relaxed">
- Stay connected with real-time alerts on connection requests, messages, and investment milestones.
- </p>
- </div>
- 
- <div className="w-full md:w-[450px] flex gap-3">
- <Button 
- onClick={markAllAsRead} 
- variant="outline"
- fullWidth
- disabled={!notifications.some(n => !n.isRead)}
- className="bg-white border-gray-200 py-4 text-xs font-semibold rounded-lg shadow-sm hover:shadow-sm transition-all flex items-center justify-center gap-2"
- >
- <CheckCircle2 size={16} /> Mark Read
- </Button>
- <Button 
- onClick={() => setIsClearModalOpen(true)} 
- variant="outline"
- fullWidth
- disabled={notifications.length === 0}
- className="bg-white border-red-100 text-red-600 py-4 text-xs font-semibold rounded-lg shadow-sm hover:bg-red-50 transition-all flex items-center justify-center gap-2"
- >
- <Trash2 size={16} /> Clear All
- </Button>
- </div>
- </div>
+  <div className="max-w-7xl mx-auto relative z-10 flex flex-col lg:flex-row justify-between items-center lg:items-end gap-8 md:gap-10">
+  <div className="max-w-2xl text-center lg:text-left">
+  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-50 text-primary-600 text-[10px] font-bold uppercase tracking-wider mb-6 ">
+  <Sparkles size={14} /> Unified Updates
+  </div>
+  <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight leading-tight mb-4">
+  Your Network <span className="text-primary-600">Pulse.</span>
+  </h1>
+  <p className="text-sm sm:text-lg text-gray-500 font-medium leading-relaxed">
+  Real-time alerts on connection requests, messages, and investment milestones.
+  </p>
+  </div>
+  
+  <div className="w-full lg:w-[450px] flex gap-2 sm:gap-3">
+  <Button 
+  onClick={markAllAsRead} 
+  variant="outline"
+  fullWidth
+  disabled={!notifications.some(n => !n.isRead)}
+  className="bg-white border-gray-200 py-3 sm:py-4 text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded-xl shadow-sm hover:shadow-sm transition-all flex items-center justify-center gap-2"
+  >
+  <CheckCircle2 size={16} /> Mark Read
+  </Button>
+  <Button 
+  onClick={() => setIsClearModalOpen(true)} 
+  variant="outline"
+  fullWidth
+  disabled={notifications.length === 0}
+  className="bg-white border-red-100 text-red-600 py-3 sm:py-4 text-[10px] sm:text-xs font-bold uppercase tracking-widest rounded-xl shadow-sm hover:bg-red-50 transition-all flex items-center justify-center gap-2"
+  >
+  <Trash2 size={16} /> Clear All
+  </Button>
+  </div>
+  </div>
  </div>
 
  <div className="max-w-4xl mx-auto px-6 -mt-8 relative z-20">
@@ -234,58 +233,58 @@ export const NotificationsPage: React.FC = () => {
  ) : (
  filteredNotifications.map(notification => (
  <div
- key={notification._id}
- onClick={() => handleNotificationClick(notification)}
- className={`group relative flex items-start p-6 rounded-[2rem] transition-all duration-500 cursor-pointer overflow-hidden border ${
- !notification.isRead 
- ? 'bg-white shadow-[0_10px_30px_rgb(37,99,235,0.06)] border-blue-50 hover:bg-white' 
- : 'bg-white border-gray-100 hover:bg-gray-50 grayscale-[0.2] hover:grayscale-0'
- }`}
- >
- {!notification.isRead && (
- <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-primary-600 shadow-[2px_0_10px_rgb(37,99,235,0.4)]" />
- )}
- 
- <div className="relative mr-5">
- <Avatar
- src={notification.sender?.profile?.avatarUrl || notification.sender?.avatarUrl}
- alt={notification.sender?.name || 'Venture Partner'}
- size="lg"
- className=" shadow-sm group-hover:scale-105 transition-transform"
- />
- <div className="absolute -bottom-1 -right-1 p-1.5 bg-white rounded-lg shadow-sm border border-gray-100 text-gray-700">
- {getNotificationIcon(notification.type)}
- </div>
- </div>
- 
- <div className="flex-1 min-w-0">
- <div className="flex justify-between items-start">
- <div className="flex items-center gap-3">
- <span className="text-lg font-medium text-gray-900 group-hover:text-primary-600 transition-colors">
- {notification.sender?.name || 'Nexus System'}
- </span>
- {!notification.isRead && (
- <span className="bg-primary-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded shadow-sm">New</span>
- )}
- </div>
- <div className="flex items-center gap-3">
- <span className="text-xs font-medium text-gray-400 whitespace-nowrap">
- {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
- </span>
- <button 
- onClick={(e) => deleteNotification(e, notification._id)}
- className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all opacity-0 group-hover:opacity-100"
- >
- <X size={14} />
- </button>
- </div>
- </div>
- 
- <p className="text-[15px] leading-relaxed text-gray-600 mt-1 font-medium group-hover:text-gray-900 transition-colors">
- {notification.content}
- </p>
- </div>
- </div>
+  key={notification._id}
+  onClick={() => handleNotificationClick(notification)}
+  className={`group relative flex items-start p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] transition-all duration-500 cursor-pointer overflow-hidden border ${
+  !notification.isRead 
+  ? 'bg-white shadow-[0_10px_30px_rgb(37,99,235,0.06)] border-blue-50 hover:bg-white' 
+  : 'bg-white border-gray-100 hover:bg-gray-50 grayscale-[0.2] hover:grayscale-0'
+  }`}
+  >
+  {!notification.isRead && (
+  <div className="absolute top-0 left-0 bottom-0 w-1 sm:w-1.5 bg-primary-600 shadow-[2px_0_10px_rgb(37,99,235,0.4)]" />
+  )}
+  
+  <div className="relative mr-3 sm:mr-5 shrink-0">
+  <Avatar
+  src={notification.sender?.profile?.avatarUrl || notification.sender?.avatarUrl}
+  alt={notification.sender?.name || 'Partner'}
+  size="md"
+  className="shadow-sm group-hover:scale-105 transition-transform"
+  />
+  <div className="absolute -bottom-1 -right-1 p-1 bg-white rounded-lg shadow-sm border border-gray-100 text-gray-700">
+  {getNotificationIcon(notification.type)}
+  </div>
+  </div>
+  
+  <div className="flex-1 min-w-0">
+  <div className="flex flex-col sm:flex-row justify-between items-start gap-1">
+  <div className="flex items-center gap-2">
+  <span className="text-sm sm:text-lg font-bold text-gray-900 group-hover:text-primary-600 transition-colors truncate max-w-[150px] sm:max-w-none">
+  {notification.sender?.name || 'Nexus System'}
+  </span>
+  {!notification.isRead && (
+  <span className="bg-primary-600 text-white text-[8px] sm:text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded shadow-sm">New</span>
+  )}
+  </div>
+  <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end">
+  <span className="text-[10px] sm:text-xs font-bold text-gray-400 whitespace-nowrap uppercase tracking-wider">
+  {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+  </span>
+  <button 
+  onClick={(e) => deleteNotification(e, notification._id)}
+  className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all sm:opacity-0 group-hover:opacity-100"
+  >
+  <X size={14} />
+  </button>
+  </div>
+  </div>
+  
+  <p className="text-xs sm:text-[15px] leading-relaxed text-gray-600 mt-1 font-medium group-hover:text-gray-900 transition-colors line-clamp-2 sm:line-clamp-none">
+  {notification.content}
+  </p>
+  </div>
+  </div>
  ))
  )}
  </div>
