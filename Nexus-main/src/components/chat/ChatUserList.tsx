@@ -9,11 +9,12 @@ import { Trash2, VolumeX, Archive, MessageCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 interface ChatUserListProps {
- conversations: ChatConversation[];
- onClearChat?: (partnerId: string) => Promise<void>;
+  conversations: ChatConversation[];
+  activePartner?: any;
+  onClearChat?: (partnerId: string) => Promise<void>;
 }
 
-export const ChatUserList: React.FC<ChatUserListProps> = ({ conversations, onClearChat }) => {
+export const ChatUserList: React.FC<ChatUserListProps> = ({ conversations, activePartner, onClearChat }) => {
  const navigate = useNavigate();
  const { userId: activeUserId } = useParams<{ userId: string }>();
  const { user: currentUser } = useAuth();
@@ -24,11 +25,24 @@ export const ChatUserList: React.FC<ChatUserListProps> = ({ conversations, onCle
  navigate(`/messages/${userId}`);
  };
 
- return (
- <div className="bg-white border-r border-gray-200 w-full md:w-80 lg:w-96 overflow-y-auto">
- <div className="py-2">
- {conversations.length > 0 ? (
- conversations.map(conversation => {
+  const displayConversations = [...conversations];
+  if (activePartner && !displayConversations.some(c => (c.partner?.id || (c.partner as any)?._id) === (activePartner.id || activePartner._id))) {
+    displayConversations.unshift({
+      id: 'new-' + (activePartner.id || activePartner._id),
+      partner: activePartner,
+      lastMessage: null,
+      unreadCount: 0,
+      isMuted: false,
+      isArchived: false,
+      updatedAt: new Date().toISOString()
+    } as any);
+  }
+
+  return (
+  <div className="bg-white border-r border-gray-200 w-full md:w-80 lg:w-96 overflow-y-auto">
+  <div className="py-2">
+  {displayConversations.length > 0 ? (
+  displayConversations.map(conversation => {
  const otherUser = conversation.partner;
  if (!otherUser) return null;
  
