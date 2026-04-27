@@ -9,14 +9,12 @@ import { ChatMessage } from '../../components/chat/ChatMessage';
 import { ChatUserList } from '../../components/chat/ChatUserList';
 import { useAuth } from '../../context/AuthContext';
 import { Message, ChatConversation, User } from '../../types';
-import { io, Socket } from 'socket.io-client';
+import { useSocket } from '../../context/SocketContext';
 import toast from 'react-hot-toast';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 import { EmptyState } from '../../components/ui/EmptyState';
 
 
-// Connect to the base URL without /api
-const SOCKET_URL = (import.meta.env.VITE_API_URL || 'https://nexus-backend-iini.onrender.com/api').replace('/api', '');
 
 const STUN_SERVERS: RTCConfiguration = {
  iceServers: [
@@ -47,7 +45,7 @@ export const ChatPage: React.FC = () => {
  // All Refs
  const messagesEndRef = useRef<null | HTMLDivElement>(null);
  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
- const socketRef = useRef<Socket | null>(null);
+ const { socket } = useSocket();
  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
  const localStreamRef = useRef<MediaStream | null>(null);
  const localVideoRef = useRef<HTMLVideoElement | null>(null);
@@ -117,7 +115,7 @@ export const ChatPage: React.FC = () => {
  if (!currentUser || !userId || userId === 'undefined') return;
  fetchMessages();
   // Notify sender that we've read these messages now that history is loaded
-  socketRef.current?.emit('read-receipt', {
+  socket?.emit('read-receipt', {
     senderId: userId,
     readerId: currentUser?.id
   });
@@ -143,113 +141,112 @@ export const ChatPage: React.FC = () => {
  }, [messages]);
 
  useEffect(() => {
- if (!currentUser || !userId) return;
+   if (!currentUser || !userId || !socket) return;
 
-  // Connect Socket.IO
-  socketRef.current = io(SOCKET_URL, {
-    withCredentials: true,
-    reconnectionAttempts: 5,
-    reconnectionDelay: 2000,
-    timeout: 10000,
-  });
-  const roomId = getRoomId();
+   const roomId = getRoomId();
 
- socketRef.current.emit('join-room', roomId, currentUser.id);
- socketRef.current.emit('join-chat', currentUser.id);
+   socket.emit('join-room', roomId, currentUser.id);
+   socket.emit('join-chat', currentUser.id);
 
- // Messaging Events
-   socketRef.current.on('receive-message', (payload: Message) => {
-  if (payload.senderId === userId) {
-    setMessages(prev => [...prev, payload]);
-    // Mark as read live and notify sender
-    api.get(`/messages/${userId}`).catch(console.error);
-    socketRef.current?.emit('read-receipt', {
-      senderId: userId,
-      readerId: currentUser?.id
-    });
-  }
-  fetchConversations();
-  });
+   // Messaging Events
+   const handleReceiveMessage = (payload: Message) => {
+     if (payload.senderId === userId) {
+       setMessages(prev => [...prev, payload]);
+       // Mark as read live and notify sender
+       api.get(`/messages/${userId}`).catch(console.error);
+       socket.emit('read-receipt', {
+         senderId: userId,
+         readerId: currentUser?.id
+       });
+     }
+     fetchConversations();
+   };
 
-  socketRef.current.on('messages-read', ({ readerId }: { readerId: string }) => {
-    if (readerId === userId) {
-      setMessages(prev => prev.map(m => 
-        m.senderId === currentUser?.id ? { ...m, isRead: true } : m
-      ));
-    }
-  });
+   const handleMessagesRead = ({ readerId }: { readerId: string }) => {
+     if (readerId === userId) {
+       setMessages(prev => prev.map(m => 
+         m.senderId === currentUser?.id ? { ...m, isRead: true } : m
+       ));
+     }
+   };
 
- socketRef.current.on('messages-read', ({ readerId }: { readerId: string }) => {
- if (readerId === userId) {
- setMessages(prev => prev.map(m => 
-   m.senderId === currentUser.id ? { ...m, isRead: true } : m
- ));
- }
- });
+   const handleTyping = (senderId: string) => {
+     if (senderId === userId) setPartnerTyping(true);
+   };
 
- socketRef.current.on('typing', (senderId: string) => {
- if (senderId === userId) setPartnerTyping(true);
- });
+   const handleStopTyping = (senderId: string) => {
+     if (senderId === userId) setPartnerTyping(false);
+   };
 
- socketRef.current.on('stop-typing', (senderId: string) => {
- if (senderId === userId) setPartnerTyping(false);
- });
+   const handleStatusChange = ({ userId: statusUserId, isOnline }: { userId: string, isOnline: boolean }) => {
+     if (statusUserId === userId && chatPartner) {
+       setChatPartner({ ...chatPartner, isOnline });
+     }
+   };
 
- socketRef.current.on('user-status-change', ({ userId: statusUserId, isOnline }: { userId: string, isOnline: boolean }) => {
- if (statusUserId === userId && chatPartner) {
- setChatPartner({ ...chatPartner, isOnline });
- }
- });
+   // WebRTC Signaling Events
+   const handleCallMade = (data: SignalingPayload) => {
+     console.log("Call received from:", data.caller);
+     setCallerSignal(data);
+     setIsReceivingCall(true);
+     setActiveCallType(data.callType || 'video');
+   };
 
- // WebRTC Signaling Events
- socketRef.current.on('call-made', (data: SignalingPayload) => {
- console.log("Call received from:", data.caller);
- setCallerSignal(data);
- setIsReceivingCall(true);
- setActiveCallType(data.callType || 'video');
- });
+   const handleCallAnswered = async (data: SignalingPayload) => {
+     console.log("Incoming answer signal");
+     if (peerConnectionRef.current) {
+       await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data.signal));
+       // Flush ICE queue now that remote description is set
+       iceCandidateQueueRef.current.forEach(candidate => {
+         peerConnectionRef.current?.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => console.error("ICE err", e));
+       });
+       iceCandidateQueueRef.current = [];
+     }
+   };
 
- socketRef.current.on('call-answered', async (data: SignalingPayload) => {
- console.log("Incoming answer signal");
- if (peerConnectionRef.current) {
- await peerConnectionRef.current.setRemoteDescription(new RTCSessionDescription(data.signal));
- // Flush ICE queue now that remote description is set
- iceCandidateQueueRef.current.forEach(candidate => {
-  peerConnectionRef.current?.addIceCandidate(new RTCIceCandidate(candidate)).catch(e => console.error("ICE err", e));
- });
- iceCandidateQueueRef.current = [];
- }
- });
+   const handleIceCandidate = (data: IcePayload) => {
+     if (peerConnectionRef.current) {
+       if (peerConnectionRef.current.remoteDescription) {
+         peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error("ICE error", e));
+       } else {
+         iceCandidateQueueRef.current.push(data.candidate);
+       }
+     }
+   };
 
- socketRef.current.on('ice-candidate', (data: IcePayload) => {
- if (peerConnectionRef.current) {
-  if (peerConnectionRef.current.remoteDescription) {
-  peerConnectionRef.current.addIceCandidate(new RTCIceCandidate(data.candidate)).catch(e => console.error("ICE error", e));
-  } else {
-  iceCandidateQueueRef.current.push(data.candidate);
-  }
- }
- });
+   const handleCallEnded = () => {
+     toast.error("Call ended by partner");
+     window.dispatchEvent(new CustomEvent('internal-end-call'));
+   };
 
- socketRef.current.on('call-ended', () => {
- toast.error("Call ended by partner");
- // Local function call (need to handle carefully if defined below)
- window.dispatchEvent(new CustomEvent('internal-end-call'));
- });
+   socket.on('receive-message', handleReceiveMessage);
+   socket.on('messages-read', handleMessagesRead);
+   socket.on('typing', handleTyping);
+   socket.on('stop-typing', handleStopTyping);
+   socket.on('user-status-change', handleStatusChange);
+   socket.on('call-made', handleCallMade);
+   socket.on('call-answered', handleCallAnswered);
+   socket.on('ice-candidate', handleIceCandidate);
+   socket.on('call-ended', handleCallEnded);
 
- return () => {
- if (socketRef.current) {
- socketRef.current.disconnect();
- socketRef.current = null;
- }
- };
- }, [currentUser, userId, getRoomId, chatPartner, fetchConversations]);
+   return () => {
+     socket.off('receive-message', handleReceiveMessage);
+     socket.off('messages-read', handleMessagesRead);
+     socket.off('typing', handleTyping);
+     socket.off('stop-typing', handleStopTyping);
+     socket.off('user-status-change', handleStatusChange);
+     socket.off('call-made', handleCallMade);
+     socket.off('call-answered', handleCallAnswered);
+     socket.off('ice-candidate', handleIceCandidate);
+     socket.off('call-ended', handleCallEnded);
+   };
+ }, [currentUser, userId, socket, getRoomId, chatPartner, fetchConversations]);
 
  // --- WebRTC Logic ---
 
  const endCall = useCallback((emit: boolean = true) => {
-  if (emit && socketRef.current && userId) {
-  socketRef.current.emit('end-call', { target: userId });
+  if (emit && socket && userId) {
+  socket.emit('end-call', { target: userId });
   }
   
   // Close PC
@@ -316,7 +313,7 @@ export const ChatPage: React.FC = () => {
 
  pc.onicecandidate = (event) => {
  if (event.candidate) {
- socketRef.current?.emit('ice-candidate', {
+ socket?.emit('ice-candidate', {
  target: targetUserId,
  candidate: event.candidate,
  senderId: currentUser?.id
@@ -334,7 +331,7 @@ export const ChatPage: React.FC = () => {
  try {
  const offer = await pc.createOffer();
  await pc.setLocalDescription(offer);
- socketRef.current?.emit('make-call', {
+ socket?.emit('make-call', {
  target: targetUserId,
  caller: currentUser?.id,
  signal: offer,
@@ -378,7 +375,7 @@ export const ChatPage: React.FC = () => {
 
  pc.onicecandidate = (event) => {
  if (event.candidate) {
- socketRef.current?.emit('ice-candidate', {
+ socket?.emit('ice-candidate', {
  target: callerSignal!.caller,
  candidate: event.candidate,
  senderId: currentUser?.id
@@ -403,7 +400,7 @@ export const ChatPage: React.FC = () => {
  const answer = await pc.createAnswer();
  await pc.setLocalDescription(answer);
 
- socketRef.current?.emit('answer-call', {
+ socket?.emit('answer-call', {
  target: callerSignal!.caller,
  signal: answer
  });
@@ -432,18 +429,18 @@ export const ChatPage: React.FC = () => {
  };
   
  const handleTyping = () => {
- if (!socketRef.current || !userId || !currentUser) return;
+ if (!socket || !userId || !currentUser) return;
   
  if (!isTyping) {
  setIsTyping(true);
- socketRef.current.emit('typing', { senderId: currentUser.id, receiverId: userId });
+ socket.emit('typing', { senderId: currentUser.id, receiverId: userId });
  }
 
  if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
   
  typingTimeoutRef.current = setTimeout(() => {
  setIsTyping(false);
- socketRef.current?.emit('stop-typing', { senderId: currentUser.id, receiverId: userId });
+ socket?.emit('stop-typing', { senderId: currentUser.id, receiverId: userId });
  }, 3000);
  };
 
@@ -491,7 +488,7 @@ export const ChatPage: React.FC = () => {
  // Stop typing indicator immediately
  if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
  setIsTyping(false);
- socketRef.current?.emit('stop-typing', { senderId: currentUser.id, receiverId: userId });
+ socket?.emit('stop-typing', { senderId: currentUser.id, receiverId: userId });
 
  try {
  if (editingMessage) {
@@ -502,7 +499,7 @@ export const ChatPage: React.FC = () => {
  setMessages(prev => prev.map(m => m.id === updatedMsg.id ? updatedMsg : m));
  setEditingMessage(null);
   
- socketRef.current?.emit('edit-message', {
+ socket?.emit('edit-message', {
  receiverId: userId,
  message: updatedMsg
  });
@@ -543,7 +540,7 @@ export const ChatPage: React.FC = () => {
  setReplyingToMessage(null);
 
  // Emit via socket
- socketRef.current?.emit('send-message', {
+ socket?.emit('send-message', {
  ...message,
  receiverId: userId
  });
@@ -568,7 +565,7 @@ export const ChatPage: React.FC = () => {
  try {
  await api.delete(`/messages/${msgId}`);
  setMessages(prev => prev.filter(m => m.id !== msgId));
- socketRef.current?.emit('delete-message', {
+ socket?.emit('delete-message', {
  receiverId: userId,
  messageId: msgId
  });

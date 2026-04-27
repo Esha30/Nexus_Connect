@@ -13,7 +13,7 @@ import { Notification } from '../../types';
 export const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logout } = useAuth();
-  const { unreadNotificationsCount: unreadNotifications } = useSocket();
+  const { unreadNotificationsCount: unreadNotifications, totalUnreadCount: unreadMessages } = useSocket();
   const { t } = useTranslation();
   const navigate = useNavigate();
   
@@ -34,7 +34,20 @@ export const Navbar: React.FC = () => {
   
   const desktopNavLinks = [
     { icon: <span className="mr-1.5">🏠</span>, text: t('nav.dashboard'), path: dashboardRoute },
-    { icon: <MessageCircle size={16} className="mr-1.5" />, text: t('nav.messages'), path: user ? '/messages' : '/login' },
+    { 
+      icon: (
+        <span className="relative mr-1.5">
+          <MessageCircle size={16} />
+          {unreadMessages > 0 && (
+            <span className="absolute -top-1.5 -right-1.5 h-4 w-4 flex items-center justify-center rounded-full bg-primary-600 text-[10px] text-white font-bold">
+              {unreadMessages > 9 ? '9+' : unreadMessages}
+            </span>
+          )}
+        </span>
+      ), 
+      text: t('nav.messages'), 
+      path: user ? '/messages' : '/login' 
+    },
     {
       icon: (
         <span className="relative mr-1.5">
