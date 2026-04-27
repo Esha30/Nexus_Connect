@@ -111,16 +111,47 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     socket.on('new-notification', (data: any) => {
       setUnreadNotificationsCount(prev => prev + 1);
       
-      // Keep existing toast logic for meetings/collabs
-      if (data.type === 'meeting') {
-        toast.success(`📅 New Meeting Request: "${data.title}" from ${data.senderName}`, {
-          duration: 6000,
-          icon: '🗓️'
-        });
-      } else if (data.type === 'collab') {
-        toast.success(`🤝 New Collaboration Request from ${data.investorName}`, {
-          duration: 6000,
-          style: { background: '#4F46E5', color: '#fff' }
+      const isMeeting = data.type === 'meeting';
+      const isCollab = data.type === 'collab';
+
+      if (isMeeting || isCollab) {
+        toast((t) => (
+          <div className="flex flex-col gap-2 p-1 min-w-[250px]">
+            <div className="flex items-center gap-2 font-bold text-gray-900">
+              {isMeeting ? '📅' : '🤝'} 
+              <span className="truncate max-w-[200px]">
+                {isMeeting ? `Meeting: ${data.title}` : `Collab Request from ${data.investorName || data.senderName}`}
+              </span>
+            </div>
+            <p className="text-xs text-gray-500">
+              {isMeeting ? `From ${data.senderName}` : `Wants to collaborate on your venture`}
+            </p>
+            <div className="flex gap-2 mt-1">
+              <button 
+                onClick={() => {
+                  toast.dismiss(t.id);
+                  window.location.href = isMeeting ? '/meetings' : '/notifications';
+                }}
+                className="flex-1 bg-primary-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center justify-center hover:bg-primary-700 transition-colors"
+              >
+                View
+              </button>
+              <button 
+                onClick={() => toast.dismiss(t.id)}
+                className="flex-1 px-3 py-1.5 rounded-lg text-[10px] font-bold text-gray-500 border border-gray-100 hover:bg-gray-50 transition-colors"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        ), { 
+          duration: 8000,
+          position: 'top-right',
+          style: {
+            borderRadius: '16px',
+            border: '1px solid #f3f4f6',
+            boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)'
+          }
         });
       }
     });

@@ -12,8 +12,11 @@ import { Notification } from '../../types';
 
 export const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isNotificationsLoading, setIsNotificationsLoading] = useState(false);
   const { user, logout } = useAuth();
-  const { unreadNotificationsCount: unreadNotifications, totalUnreadCount: unreadMessages } = useSocket();
+  const { unreadNotificationsCount: unreadNotifications, totalUnreadCount: unreadMessages, refreshNotificationCount } = useSocket();
   const { t } = useTranslation();
   const navigate = useNavigate();
   
@@ -23,6 +26,35 @@ export const Navbar: React.FC = () => {
     logout();
     navigate('/login');
   };
+
+  const fetchRecentNotifications = async () => {
+    if (!user || isNotificationsLoading) return;
+    setIsNotificationsLoading(true);
+    try {
+      const res = await api.get('/notifications/');
+      setNotifications(res.data.slice(0, 5)); // Show last 5
+    } catch (err) {
+      console.error('Failed to fetch notifications:', err);
+    } finally {
+      setIsNotificationsLoading(false);
+    }
+  };
+
+  const markAllAsRead = async () => {
+    try {
+      await api.put('/notifications/mark-all-read');
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      refreshNotificationCount();
+    } catch (err) {
+      toast.error('Failed to mark notifications as read');
+    }
+  };
+
+  useEffect(() => {
+    if (isNotificationsOpen) {
+      fetchRecentNotifications();
+    }
+  }, [isNotificationsOpen]);
   
   const dashboardRoute = user?.role === 'entrepreneur' 
     ? '/dashboard/entrepreneur' 
@@ -110,6 +142,69 @@ export const Navbar: React.FC = () => {
               <>
                 {desktopNavLinks.map((link, index) => {
                   const isActive = window.location.pathname.startsWith(link.path.split('/').slice(0, 3).join('/'));
+                  
+                  if (link.text === t('nav.notifications')) {
+                    return (
+                      <div key={index} className="relative">
+                        <button
+                          onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                          className={`inline-flex items-center px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-300 ${
+                            isNotificationsOpen || isActive 
+                              ? 'text-primary-900 bg-primary-100/50 shadow-inner' 
+                              : 'text-primary-500 hover:text-primary-900 hover:bg-white/50'
+                          }`}
+                        >
+                          {link.icon}
+                          {link.text}
+                        </button>
+
+                        {isNotificationsOpen && (
+                          <div className="absolute right-0 mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
+                            <div className="p-4 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+                              <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest">Recent Activity</h3>
+                              {unreadNotifications > 0 && (
+                                <button onClick={markAllAsRead} className="text-[10px] font-bold text-primary-600 hover:text-primary-700">Mark all read</button>
+                              )}
+                            </div>
+                            <div className="max-h-96 overflow-y-auto hide-scrollbar">
+                              {isNotificationsLoading ? (
+                                <div className="p-8 text-center"><div className="w-5 h-5 border-2 border-primary-100 border-t-primary-600 rounded-full animate-spin mx-auto"></div></div>
+                              ) : notifications.length === 0 ? (
+                                <div className="p-8 text-center text-gray-400 text-xs font-medium">No recent notifications</div>
+                              ) : (
+                                notifications.map(n => (
+                                  <div 
+                                    key={n._id} 
+                                    className={`p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer ${!n.isRead ? 'bg-primary-50/30' : ''}`}
+                                    onClick={() => {
+                                      setIsNotificationsOpen(false);
+                                      navigate('/notifications');
+                                    }}
+                                  >
+                                    <div className="flex gap-3">
+                                      <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${!n.isRead ? 'bg-primary-600' : 'bg-transparent'}`} />
+                                      <div>
+                                        <p className="text-xs text-gray-700 leading-relaxed line-clamp-2">{n.content}</p>
+                                        <p className="text-[10px] text-gray-400 mt-1">{new Date(n.createdAt).toLocaleDateString()} {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                            <Link 
+                              to="/notifications" 
+                              onClick={() => setIsNotificationsOpen(false)}
+                              className="block p-3 text-center text-[10px] font-bold text-gray-500 hover:text-primary-600 bg-gray-50/50 hover:bg-gray-100 transition-all border-t border-gray-100"
+                            >
+                              View All Notifications
+                            </Link>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+
                   return (
                     <Link
                       key={index}
