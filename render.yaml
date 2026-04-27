@@ -18,7 +18,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: FRONTEND_URL
-        value: https://nexus-frontend-co3l.onrender.com
+        value: https://nexusconnect-brown.vercel.app
       - key: GEMINI_API_KEY
         sync: false
       - key: EMAIL_USER
@@ -45,6 +45,6 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        value: https://nexus-backend-jurl.onrender.com/api
+        value: https://nexus-backend-iini.onrender.com/api
       - key: VITE_GOOGLE_CLIENT_ID
         value: 584779340324-vl3pqpo7kr6dv98jg5fsnimk4a48t5ie.apps.googleusercontent.com

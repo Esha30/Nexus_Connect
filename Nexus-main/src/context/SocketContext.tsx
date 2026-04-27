@@ -4,7 +4,7 @@ import { useAuth } from './AuthContext';
 import api from '../api/api';
 import toast from 'react-hot-toast';
 
-const SOCKET_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5001';
+const SOCKET_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://nexus-backend-iini.onrender.com';
 
 interface SocketContextType {
   socket: Socket | null;

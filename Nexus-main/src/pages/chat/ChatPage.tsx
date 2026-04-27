@@ -16,7 +16,7 @@ import { EmptyState } from '../../components/ui/EmptyState';
 
 
 // Connect to the base URL without /api
-const SOCKET_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5001/api').replace('/api', '');
+const SOCKET_URL = (import.meta.env.VITE_API_URL || 'https://nexus-backend-iini.onrender.com/api').replace('/api', '');
 
 const STUN_SERVERS: RTCConfiguration = {
  iceServers: [

@@ -139,7 +139,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
             <div className="rounded-[1.5rem] overflow-hidden border border-gray-100 shadow-inner">
               <img 
                 src={post.image.startsWith('/uploads') 
-                  ? (import.meta.env.VITE_API_URL || 'http://localhost:5001/api').replace('/api', '') + post.image 
+                  ? (import.meta.env.VITE_API_URL || 'https://nexus-backend-iini.onrender.com/api').replace('/api', '') + post.image 
                   : post.image} 
                 alt="Post Attachment" 
                 className="w-full h-auto object-cover max-h-[400px]" 

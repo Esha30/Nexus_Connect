@@ -741,7 +741,7 @@ export const EntrepreneurProfile: React.FC = () => {
  </div>
  <div className="flex gap-1 shrink-0">
  <a 
- href={`${(import.meta.env.VITE_API_URL || 'http://localhost:5001/api').replace('/api', '')}${doc.filePath}`} 
+ href={`${(import.meta.env.VITE_API_URL || 'https://nexus-backend-iini.onrender.com/api').replace('/api', '')}${doc.filePath}`} 
  target="_blank" 
  rel="noopener noreferrer"
  >

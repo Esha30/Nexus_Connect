@@ -117,7 +117,7 @@ export const DocumentsPage: React.FC = () => {
     if (!downloadId || isLoading || documents.length === 0) return;
     const doc = documents.find((d) => d._id === downloadId);
     if (doc) {
-      const backendHost = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5001';
+      const backendHost = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://nexus-backend-iini.onrender.com';
       const anchor = document.createElement('a');
       anchor.href = `${backendHost}${doc.filePath}`;
       anchor.download = doc.fileName || doc.title || `document`;
@@ -184,7 +184,7 @@ export const DocumentsPage: React.FC = () => {
  };
 
  const getAbsoluteUrl = (filePath: string) => {
-  const backendHost = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5001';
+  const backendHost = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://nexus-backend-iini.onrender.com';
   return `${backendHost}${filePath}`;
  };
 

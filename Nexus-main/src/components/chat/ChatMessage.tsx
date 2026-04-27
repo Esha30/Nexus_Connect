@@ -4,7 +4,7 @@ import { Message } from '../../types';
 import { Avatar } from '../ui/Avatar';
 import { Check, CheckCheck, Ban, Download, ChevronDown, Edit2, CornerUpLeft, Trash2 } from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5001';
+const API_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://nexus-backend-iini.onrender.com';
 
 interface ChatMessageProps {
  message: Message;

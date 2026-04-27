@@ -108,7 +108,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onClose, onSuccess }) =>
               <div className="relative rounded-[1.5rem] overflow-hidden border border-gray-100 shadow-inner group/img">
                 <img 
                   src={image.startsWith('/uploads') 
-                    ? (import.meta.env.VITE_API_URL || 'http://localhost:5001/api').replace('/api', '') + image 
+                    ? (import.meta.env.VITE_API_URL || 'https://nexus-backend-iini.onrender.com/api').replace('/api', '') + image 
                     : image} 
                   alt="Preview" 
                   className="w-full h-48 object-cover" 

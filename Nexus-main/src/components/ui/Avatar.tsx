@@ -79,7 +79,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   const showPlaceholder = !src || imageError;
 
   // Resolve source URL (prepend backend origin if it's a relative upload path)
-  const backendOrigin = (import.meta.env.VITE_API_URL || 'http://localhost:5001/api').replace('/api', '');
+  const backendOrigin = (import.meta.env.VITE_API_URL || 'https://nexus-backend-iini.onrender.com/api').replace('/api', '');
   const resolvedSrc = (src && src.startsWith('/uploads'))
     ? `${backendOrigin}${src}`
     : src;
