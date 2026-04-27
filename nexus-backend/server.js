@@ -273,7 +273,10 @@ io.on('connection', (socket) => {
   });
 
   socket.on('delete-message', (payload) => {
-    io.to(payload.receiverId).emit('message-deleted', payload.messageId);
+    io.to(payload.receiverId).emit('message-deleted', { 
+      messageId: payload.messageId, 
+      deleteType: payload.deleteType 
+    });
   });
 
   socket.on('edit-message', (payload) => {

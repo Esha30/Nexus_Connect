@@ -219,6 +219,14 @@ export const ChatPage: React.FC = () => {
      window.dispatchEvent(new CustomEvent('internal-end-call'));
    };
 
+   const handleMessageDeleted = ({ messageId, deleteType }: { messageId: string, deleteType: 'me' | 'everyone' }) => {
+     if (deleteType === 'everyone') {
+       setMessages(prev => prev.map(m => 
+         m.id === messageId ? { ...m, isDeleted: true, content: 'This message was deleted', fileUrl: undefined } : m
+       ));
+     }
+   };
+
    socket.on('receive-message', handleReceiveMessage);
    socket.on('messages-read', handleMessagesRead);
    socket.on('typing', handleTyping);
@@ -228,6 +236,7 @@ export const ChatPage: React.FC = () => {
    socket.on('call-answered', handleCallAnswered);
    socket.on('ice-candidate', handleIceCandidate);
    socket.on('call-ended', handleCallEnded);
+   socket.on('message-deleted', handleMessageDeleted);
 
    return () => {
      socket.off('receive-message', handleReceiveMessage);
@@ -239,6 +248,7 @@ export const ChatPage: React.FC = () => {
      socket.off('call-answered', handleCallAnswered);
      socket.off('ice-candidate', handleIceCandidate);
      socket.off('call-ended', handleCallEnded);
+   socket.off('message-deleted', handleMessageDeleted);
    };
  }, [currentUser, userId, socket, getRoomId, chatPartner, fetchConversations]);
 
@@ -560,21 +570,29 @@ export const ChatPage: React.FC = () => {
  setReplyingToMessage(null);
  };
 
- const handleDeleteMessage = async (msgId: string) => {
- if (!userId) return;
- try {
- await api.delete(`/messages/${msgId}`);
- setMessages(prev => prev.filter(m => m.id !== msgId));
- socket?.emit('delete-message', {
- receiverId: userId,
- messageId: msgId
- });
- // Refresh sidebar
- fetchConversations();
- } catch (err) {
- console.error('Error deleting message:', err);
- toast.error('Failed to delete message');
- }
+ const handleDeleteMessage = async (msgId: string, deleteType: 'me' | 'everyone' = 'me') => {
+  if (!userId) return;
+  try {
+  await api.delete(`/messages/${msgId}`, { data: { deleteType } });
+  
+  if (deleteType === 'everyone') {
+   setMessages(prev => prev.map(m => 
+    m.id === msgId ? { ...m, isDeleted: true, content: 'This message was deleted', fileUrl: undefined } : m
+   ));
+  } else {
+   setMessages(prev => prev.filter(m => m.id !== msgId));
+  }
+
+  socket?.emit('delete-message', {
+  receiverId: userId,
+  messageId: msgId,
+  deleteType
+  });
+  fetchConversations();
+  } catch (err) {
+  console.error('Error deleting message:', err);
+  toast.error('Failed to delete message');
+  }
  };
 
  const handleClearChatPrompt = (targetId?: string) => {
@@ -779,7 +797,7 @@ export const ChatPage: React.FC = () => {
         }
         partnerName={chatPartner?.name}
         onEdit={() => handleEditInit(msg)}
-        onDelete={() => handleDeleteMessage(msg.id)}
+        onDelete={(id, deleteType) => handleDeleteMessage(id, deleteType)}
         onReply={() => setReplyingToMessage(msg)}
       />
     ))

@@ -45,7 +45,8 @@ export const getConversations = async (req, res) => {
           isDeleted: conv.lastMessage.isDeleted,
           fileUrl: conv.lastMessage.fileUrl,
           fileName: conv.lastMessage.fileName,
-          fileType: conv.lastMessage.fileType
+          fileType: conv.lastMessage.fileType,
+          deletedFor: conv.lastMessage.deletedFor || []
         } : null,
         unreadCount: conv.unreadCounts ? conv.unreadCounts[req.user._id.toString()] || 0 : 0,
         isMuted: conv.mutedBy?.some(id => id.toString() === req.user._id.toString()) || false,
@@ -152,7 +153,10 @@ export const getMessages = async (req, res) => {
       io.to(req.user._id.toString()).emit('notification-count-update');
     }
 
-    const messages = await Message.find({ conversationId: conversation._id })
+    const messages = await Message.find({ 
+      conversationId: conversation._id,
+      deletedFor: { $ne: req.user._id }
+    })
       .populate('replyTo', 'senderId content')
       .sort({ createdAt: 1 })
       .lean();
@@ -297,25 +301,33 @@ export const sendMessage = async (req, res) => {
 export const deleteMessage = async (req, res) => {
   try {
     const { id } = req.params;
+    const { deleteType } = req.body; // 'me' or 'everyone'
     const message = await Message.findById(id);
 
     if (!message) {
       return res.status(404).json({ message: 'Message not found' });
     }
 
-    if (message.senderId.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Not authorized to delete' });
+    if (deleteType === 'everyone') {
+      if (message.senderId.toString() !== req.user._id.toString()) {
+        return res.status(403).json({ message: 'Not authorized to delete for everyone' });
+      }
+      // Soft delete for everyone
+      message.isDeleted = true;
+      message.content = 'This message was deleted';
+      message.fileUrl = undefined;
+      message.fileName = undefined;
+      message.fileType = undefined;
+    } else {
+      // Delete for me
+      if (!message.deletedFor.includes(req.user._id)) {
+        message.deletedFor.push(req.user._id);
+      }
     }
-
-    // Soft delete
-    message.isDeleted = true;
-    message.content = 'This message was deleted';
-    message.fileUrl = undefined;
-    message.fileName = undefined;
-    message.fileType = undefined;
+    
     await message.save();
 
-    res.json({ message: 'Message deleted', id });
+    res.json({ message: 'Message deleted', id, deleteType });
   } catch (err) {
     console.error('Error deleting message:', err);
     res.status(500).json({ message: 'Server error deleting message' });
