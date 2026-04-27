@@ -1,4 +1,4 @@
-// Nexus Chat System - Production Ready
+// Nexus Chat System - Production Ready - v1.0.1
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Send, Phone, Video as VideoIcon, Info, Smile, Mic, MicOff, VideoOff, MessageCircle, Paperclip, X, ChevronLeft, MoreVertical, Trash2, Sparkles, Loader2 } from 'lucide-react';
