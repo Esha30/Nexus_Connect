@@ -136,12 +136,12 @@ export const CopilotWidget: React.FC<CopilotWidgetProps> = ({ isDocked = false, 
           onMouseDown={handleMouseDown}
           onClick={handleFabClick}
           style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
-          className={`fixed top-20 left-4 md:top-auto md:bottom-6 md:right-6 p-4 bg-gray-900 text-white rounded-full shadow-2xl hover:bg-gray-800 hover:scale-110 z-50 group flex items-center justify-center animate-fade-in ${
+          className={`fixed top-20 left-4 md:top-auto md:bottom-6 md:right-6 w-12 h-12 bg-gray-900 text-white rounded-full shadow-xl hover:bg-gray-800 hover:scale-110 z-50 group flex items-center justify-center animate-fade-in ${
             isDragging ? 'cursor-grabbing transition-none' : 'cursor-grab transition-all'
           }`}
         >
-          <div className="absolute inset-0 bg-primary-500 rounded-full blur-md opacity-40 group-hover:opacity-60 transition-opacity animate-pulse" />
-          <Sparkles size={24} className="relative z-10 text-primary-400 group-hover:text-primary-300" />
+          <div className="absolute inset-0 bg-primary-500 rounded-full blur-sm opacity-30 group-hover:opacity-50 transition-opacity animate-pulse" />
+          <Sparkles size={22} className="relative z-10 text-primary-400 group-hover:text-primary-300" />
         </button>
       )}
 
