@@ -4,7 +4,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { ChatConversation } from '../../types';
 import { Avatar } from '../ui/Avatar';
 import { Badge } from '../ui/Badge';
-import { Trash2, VolumeX, Archive, MessageCircle, MoreVertical, CheckSquare } from 'lucide-react';
+import { Trash2, VolumeX, Archive, MessageCircle, MoreVertical, CheckSquare, ChevronLeft } from 'lucide-react';
 
 import { useAuth } from '../../context/AuthContext';
 
@@ -30,6 +30,7 @@ export const ChatUserList: React.FC<ChatUserListProps> = ({
  const { user: currentUser } = useAuth();
  
  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+ const [showArchived, setShowArchived] = useState(false);
  const menuRef = useRef<HTMLDivElement | null>(null);
 
  useEffect(() => {
@@ -61,18 +62,45 @@ export const ChatUserList: React.FC<ChatUserListProps> = ({
     } as any);
   }
 
-  // Hide archived conversations unless they are currently active
-  const visibleConversations = displayConversations.filter(c => {
+  const archivedConversations = displayConversations.filter(c => c.isArchived);
+  const unarchivedConversations = displayConversations.filter(c => {
     const otherUserId = c.partner?.id || (c.partner as any)?._id;
     if (activeUserId === otherUserId) return true;
     return !c.isArchived;
   });
 
+  const activeConversations = showArchived ? archivedConversations : unarchivedConversations;
+
   return (
   <div className="bg-white border-r border-gray-200 w-full md:w-80 lg:w-96 overflow-y-auto relative flex-1 h-full min-h-0">
   <div className="pt-2 pb-48">
-  {visibleConversations.length > 0 ? (
-  visibleConversations.map(conversation => {
+  
+  {/* Archived Folder Header */}
+  {showArchived && (
+    <div 
+      className="px-4 py-3 flex items-center cursor-pointer hover:bg-gray-50 border-b border-gray-100 mb-2 transition-colors"
+      onClick={() => setShowArchived(false)}
+    >
+      <ChevronLeft className="text-gray-500 mr-2" size={20} />
+      <span className="text-sm font-bold text-gray-900">Archived Chats</span>
+    </div>
+  )}
+
+  {!showArchived && archivedConversations.length > 0 && (
+    <div 
+      className="px-4 py-3 flex items-center cursor-pointer hover:bg-gray-50 border-b border-gray-100 mb-2 transition-colors"
+      onClick={() => setShowArchived(true)}
+    >
+      <Archive className="text-gray-400 mr-3" size={18} />
+      <span className="text-sm font-medium text-gray-700">Archived</span>
+      <div className="ml-auto flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-gray-100 text-xs font-bold text-gray-600">
+        {archivedConversations.length}
+      </div>
+    </div>
+  )}
+
+  {activeConversations.length > 0 ? (
+  activeConversations.map(conversation => {
  const otherUser = conversation.partner;
  if (!otherUser) return null;
  
@@ -170,7 +198,13 @@ export const ChatUserList: React.FC<ChatUserListProps> = ({
      )}
      {onArchiveChat && (
        <button 
-         onClick={() => { onArchiveChat(otherUserId); setOpenMenuId(null); }}
+         onClick={() => { 
+           onArchiveChat(otherUserId); 
+           setOpenMenuId(null);
+           if (showArchived && archivedConversations.length === 1) {
+             setShowArchived(false); // Go back if we unarchived the last one
+           }
+         }}
          className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2"
        >
          <Archive size={15} className="text-gray-400" />
@@ -194,19 +228,23 @@ export const ChatUserList: React.FC<ChatUserListProps> = ({
   ) : (
     <div className="px-6 py-12 text-center">
       <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-        <MessageCircle size={24} className="text-gray-300" />
+        {showArchived ? <Archive size={24} className="text-gray-300" /> : <MessageCircle size={24} className="text-gray-300" />}
       </div>
-      <p className="text-sm font-semibold text-gray-900 mb-1">No chats yet</p>
-      <p className="text-xs text-gray-500 mb-6 px-4">Start connecting with founders and investors to see your messages here.</p>
-      <button 
-        onClick={() => {
-          const role = currentUser?.role?.toLowerCase();
-          navigate(role === 'investor' ? '/entrepreneurs' : '/investors');
-        }}
-        className="text-xs font-bold text-primary-600 hover:text-primary-700 bg-primary-50 px-4 py-2 rounded-lg transition-colors"
-      >
-        Discover Partners
-      </button>
+      <p className="text-sm font-semibold text-gray-900 mb-1">{showArchived ? 'No archived chats' : 'No chats yet'}</p>
+      {!showArchived && (
+        <>
+          <p className="text-xs text-gray-500 mb-6 px-4">Start connecting with founders and investors to see your messages here.</p>
+          <button 
+            onClick={() => {
+              const role = currentUser?.role?.toLowerCase();
+              navigate(role === 'investor' ? '/entrepreneurs' : '/investors');
+            }}
+            className="text-xs font-bold text-primary-600 hover:text-primary-700 bg-primary-50 px-4 py-2 rounded-lg transition-colors"
+          >
+            Discover Partners
+          </button>
+        </>
+      )}
     </div>
   )}
  </div>
