@@ -274,6 +274,7 @@ export const InvestorDashboard: React.FC = () => {
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
+            </div>
             ) : (
               <div className="text-center py-12">
                 <BarChart3 size={32} className="text-gray-300 mx-auto mb-3" />
