@@ -183,7 +183,7 @@ export const ChatPage: React.FC = () => {
   
   // Check if blocked
   try {
-    const profileRes = await api.get('/auth/profile/me');
+    const profileRes = await api.get('/auth/profile');
     const blockedList = profileRes.data.blockedUsers || [];
     setIsBlocked(blockedList.some((id: any) => id.toString() === userId?.toString()));
   } catch (_) {
@@ -625,10 +625,14 @@ export const ChatPage: React.FC = () => {
 
  // Refresh sidebar
  fetchConversations();
- } catch (err) {
- console.error('Error handling message:', err);
- toast.error(editingMessage ? 'Failed to edit message' : 'Failed to send message');
- }
+  } catch (err: any) {
+    console.error('Error handling message:', err);
+    if (err.response?.status === 403) {
+      toast.error(err.response.data?.message || 'Forbidden action');
+    } else {
+      toast.error(editingMessage ? 'Failed to edit message' : 'Failed to send message');
+    }
+  }
  };
 
  const handleEditInit = (msg: Message) => {
