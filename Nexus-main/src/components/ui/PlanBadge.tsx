@@ -7,7 +7,7 @@ interface PlanBadgeProps {
 }
 
 export const PlanBadge: React.FC<PlanBadgeProps> = ({ plan = 'starter', className = '' }) => {
-  const normalizedPlan = plan.toLowerCase();
+  const normalizedPlan = (plan || 'starter').toLowerCase();
 
   const config: Record<string, { label: string; icon: React.ReactNode; styles: string }> = {
     starter: {

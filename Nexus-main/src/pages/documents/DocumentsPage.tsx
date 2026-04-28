@@ -73,7 +73,7 @@ export const DocumentsPage: React.FC = () => {
    let docs = [...documents];
    
    if (searchQuery) {
-     docs = docs.filter(doc => doc.title.toLowerCase().includes(searchQuery.toLowerCase()));
+     docs = docs.filter(doc => (doc.title || '').toLowerCase().includes((searchQuery || '').toLowerCase()));
    }
 
    switch (activeFilter) {
