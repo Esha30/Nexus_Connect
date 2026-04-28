@@ -13,6 +13,7 @@ import { useSocket } from '../../context/SocketContext';
 import toast from 'react-hot-toast';
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 import { EmptyState } from '../../components/ui/EmptyState';
+import { ConfirmationModal } from '../../components/ui/ConfirmationModal';
 
 
 
@@ -79,8 +80,21 @@ export const ChatPage: React.FC = () => {
 
  // Block & Report State
  const [isBlocked, setIsBlocked] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [confirmConfig, setConfirmConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    confirmLabel?: string;
+    variant?: 'danger' | 'primary';
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
- const [reportReason, setReportReason] = useState('');
 
  const getRoomId = useCallback(() => {
  if (!currentUser || !userId) return '';
@@ -616,12 +630,23 @@ export const ChatPage: React.FC = () => {
   }
  };
 
- const handleClearChatPrompt = (targetId?: string) => {
- const idToClear = targetId || userId;
- if (!idToClear || !conversations.length) return;
- setChatToClear(idToClear);
- setIsClearModalOpen(true);
- };
+  const handleClearChatPrompt = (targetId?: string) => {
+  const idToClear = targetId || userId;
+  if (!idToClear || !conversations.length) return;
+  
+  setConfirmConfig({
+    isOpen: true,
+    title: 'Wipe Conversation?',
+    message: 'Are you sure you want to completely clear this conversation? This will permanently delete all messages for both you and your partner. This action is irreversible.',
+    confirmLabel: 'Delete All',
+    variant: 'danger',
+    onConfirm: () => {
+      setChatToClear(idToClear);
+      handleClearChatConfirm();
+      setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+    }
+  });
+  };
 
  const handleClearChatConfirm = async () => {
  if (!chatToClear) return;
@@ -695,16 +720,38 @@ export const ChatPage: React.FC = () => {
     }
   };
 
-  const handleToggleBlock = async () => {
+   const handleToggleBlock = async () => {
     if (!userId) return;
-    try {
-      const res = await api.put(`/messages/action/block-user/${userId}`);
-      setIsBlocked(res.data.isBlocked);
-      toast.success(res.data.message);
-    } catch (err) {
-      toast.error('Failed to update block status');
+    
+    if (!isBlocked) {
+      setConfirmConfig({
+        isOpen: true,
+        title: 'Block User?',
+        message: 'Are you sure you want to block this user? They will no longer be able to message you or view your profile updates.',
+        confirmLabel: 'Block User',
+        variant: 'danger',
+        onConfirm: async () => {
+          try {
+            const res = await api.put(`/messages/action/block-user/${userId}`);
+            setIsBlocked(res.data.isBlocked);
+            toast.success(res.data.message);
+          } catch (err) {
+            toast.error('Failed to update block status');
+          }
+          setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+        }
+      });
+    } else {
+      // Unblocking doesn't really need a scary confirmation
+      try {
+        const res = await api.put(`/messages/action/block-user/${userId}`);
+        setIsBlocked(res.data.isBlocked);
+        toast.success(res.data.message);
+      } catch (err) {
+        toast.error('Failed to update block status');
+      }
     }
-  };
+   };
 
   const handleReportUser = async () => {
     if (!userId || !reportReason.trim()) return;
@@ -1073,24 +1120,15 @@ export const ChatPage: React.FC = () => {
   )}
  </div>
  
- {/* Custom Confirm Modal for Clearing Chat */}
- {isClearModalOpen && (
-  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-300">
-    <div className="bg-white w-full max-w-sm rounded-3xl p-8 flex flex-col items-center text-center space-y-6 shadow-2xl scale-in">
-      <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-red-500 mb-2">
-        <Trash2 size={28} />
-      </div>
-      <div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">Clear Conversation?</h3>
-        <p className="text-sm font-medium text-gray-500">Are you sure you want to completely clear this conversation? This will permanently delete all messages for both you and your partner.</p>
-      </div>
-      <div className="flex gap-3 w-full pt-2">
-        <button onClick={() => { setIsClearModalOpen(false); setChatToClear(null); }} className="flex-1 py-3 text-sm font-semibold text-gray-700 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors">Cancel</button>
-        <button onClick={handleClearChatConfirm} className="flex-1 py-3 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-xl shadow-md transition-colors">Delete All</button>
-      </div>
-    </div>
-  </div>
- )}
+ <ConfirmationModal 
+        isOpen={confirmConfig.isOpen}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+        confirmLabel={confirmConfig.confirmLabel}
+        onConfirm={confirmConfig.onConfirm}
+        onClose={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+        variant={confirmConfig.variant as any}
+      />
  
   {/* Report User Modal */}
   {isReportModalOpen && (

@@ -9,6 +9,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Investor } from '../../types';
 import api from '../../api/api';
 import toast from 'react-hot-toast';
+import Swal from 'sweetalert2';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -93,23 +94,41 @@ export const InvestorProfile: React.FC = () => {
   }
  };
 
- const handleAddInterest = () => {
-  const interest = prompt('Enter investment interest:');
-  if (interest) {
-  setValue('profile.investmentInterests', [...interests, interest]);
-  }
- };
+  const handleAddInterest = async () => {
+    const { value: interest } = await Swal.fire({
+      title: 'Enter investment interest',
+      input: 'text',
+      inputPlaceholder: 'e.g., Fintech, AI, HealthTech',
+      showCancelButton: true,
+      confirmButtonColor: '#2563eb',
+      cancelButtonColor: '#64748b',
+      background: '#ffffff',
+      color: '#1e293b'
+    });
+    if (interest) {
+      setValue('profile.investmentInterests', [...interests, interest]);
+    }
+  };
 
  const handleRemoveInterest = (idx: number) => {
   setValue('profile.investmentInterests', interests.filter((_, i) => i !== idx));
  };
 
- const handleAddStage = () => {
-  const stage = prompt('Enter investment stage (e.g., Seed, Series A):');
-  if (stage) {
-  setValue('profile.investmentStage', [...stages, stage]);
-  }
- };
+  const handleAddStage = async () => {
+    const { value: stage } = await Swal.fire({
+      title: 'Enter investment stage',
+      input: 'text',
+      inputPlaceholder: 'e.g., Seed, Series A',
+      showCancelButton: true,
+      confirmButtonColor: '#2563eb',
+      cancelButtonColor: '#64748b',
+      background: '#ffffff',
+      color: '#1e293b'
+    });
+    if (stage) {
+      setValue('profile.investmentStage', [...stages, stage]);
+    }
+  };
 
  const handleRemoveStage = (idx: number) => {
   setValue('profile.investmentStage', stages.filter((_, i) => i !== idx));
