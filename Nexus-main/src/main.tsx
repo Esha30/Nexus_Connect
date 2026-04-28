@@ -1,3 +1,4 @@
+// v1.1.0 — SweetAlert2 popup migration
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { GoogleOAuthProvider } from '@react-oauth/google';
