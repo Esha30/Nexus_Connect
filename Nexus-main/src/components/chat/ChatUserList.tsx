@@ -62,8 +62,8 @@ export const ChatUserList: React.FC<ChatUserListProps> = ({
     } as any);
   }
 
-  const archivedConversations = displayConversations.filter(c => c.isArchived);
-  const unarchivedConversations = displayConversations.filter(c => !c.isArchived);
+  const archivedConversations = displayConversations.filter(c => c.isArchived && c.partner);
+  const unarchivedConversations = displayConversations.filter(c => !c.isArchived && c.partner);
 
   const activeConversations = showArchived ? archivedConversations : unarchivedConversations;
 
@@ -226,9 +226,20 @@ export const ChatUserList: React.FC<ChatUserListProps> = ({
       ) : (
         <div className="px-6 py-12 text-center">
           <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Archive size={24} className="text-gray-300" />
+            {showArchived ? (
+              <Archive size={24} className="text-gray-300" />
+            ) : (
+              <MessageCircle size={24} className="text-gray-300" />
+            )}
           </div>
-          <p className="text-sm font-semibold text-gray-900 mb-1">No archived chats</p>
+          <p className="text-sm font-semibold text-gray-900 mb-1">
+            {showArchived ? 'No archived chats' : 'No active chats'}
+          </p>
+          {!showArchived && (
+            <p className="text-xs text-gray-500 px-4">
+              Your active conversations will appear here.
+            </p>
+          )}
         </div>
       )}
     </>

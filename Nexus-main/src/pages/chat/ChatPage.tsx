@@ -677,33 +677,27 @@ export const ChatPage: React.FC = () => {
     confirmLabel: 'Delete All',
     variant: 'danger',
     onConfirm: () => {
-      setChatToClear(idToClear);
-      handleClearChatConfirm();
+      handleClearChatConfirm(idToClear);
       setConfirmConfig(prev => ({ ...prev, isOpen: false }));
     }
   });
   };
 
- const handleClearChatConfirm = async () => {
- if (!chatToClear) return;
- try {
- await api.delete(`/messages/clear/${chatToClear}`);
- 
- // If wiping the currently active chat, clear messages array
- if (chatToClear === userId) {
-   setMessages([]);
-   setShowChatOptions(false);
- }
- 
- fetchConversations();
- setIsClearModalOpen(false);
- setChatToClear(null);
- toast.success('Conversation wiped clean');
- } catch (err) {
- console.error('Error clearing chat:', err);
- toast.error('Failed to clear chat');
- }
- };
+ const handleClearChatConfirm = async (targetId: string) => {
+    try {
+      await api.delete(`/messages/clear/${targetId}`);
+      if (targetId === userId) {
+        setMessages([]);
+        setShowChatOptions(false);
+      }
+      fetchConversations();
+      setIsClearModalOpen(false);
+      toast.success('Conversation wiped clean');
+    } catch (err) {
+      console.error('Error clearing chat:', err);
+      toast.error('Failed to clear chat');
+    }
+  };
 
   const handleToggleMute = async () => {
     if (!userId) return;
