@@ -129,6 +129,20 @@ export const ChatPage: React.FC = () => {
  }
  }, [currentUser, fetchConversations]);
 
+ // Global listener for any new message to update the chat list
+ useEffect(() => {
+   if (!currentUser || !socket) return;
+   
+   const handleGlobalMessage = () => {
+     fetchConversations();
+   };
+   
+   socket.on('receive-message', handleGlobalMessage);
+   return () => {
+     socket.off('receive-message', handleGlobalMessage);
+   };
+ }, [currentUser, socket, fetchConversations]);
+
  // Fetch messages AND chat partner when userId changes
  useEffect(() => {
  if (!currentUser || !userId || userId === 'undefined') return;

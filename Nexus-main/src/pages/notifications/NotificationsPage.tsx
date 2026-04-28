@@ -71,15 +71,12 @@ export const NotificationsPage: React.FC = () => {
  };
 
  const handleNotificationClick = async (notification: Notification) => {
- // Mark as read if needed
- if (!notification.isRead) {
  try {
- await api.put(`/notifications/${notification._id}/read`);
- setNotifications(prev => prev.map(n => n._id === notification._id ? { ...n, isRead: true } : n));
+ await api.delete(`/notifications/${notification._id}`);
+ setNotifications(prev => prev.filter(n => n._id !== notification._id));
  window.dispatchEvent(new CustomEvent('notifications-updated'));
  } catch (err) {
- console.error('Failed to mark as read:', err);
- }
+ console.error('Failed to delete notification:', err);
  }
 
  // Navigate based on type

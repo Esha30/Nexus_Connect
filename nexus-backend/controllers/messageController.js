@@ -91,10 +91,9 @@ export const markAllRead = async (req, res) => {
       await conversation.save();
     }
 
-    // Mark any unread message-type notifications from this sender as read
-    await Notification.updateMany(
-      { recipient: userId, sender: partnerId, type: 'message', isRead: false },
-      { $set: { isRead: true } }
+    // Delete any message-type notifications from this sender
+    await Notification.deleteMany(
+      { recipient: userId, sender: partnerId, type: 'message' }
     );
 
     const io = req.app.get('socketio');
@@ -143,11 +142,10 @@ export const getMessages = async (req, res) => {
       io.to(req.user._id.toString()).emit('message-count-update');
     }
 
-    // Mark any unread message-type notifications from this sender as read
+    // Delete any message-type notifications from this sender
     // This clears the notification badge on the bell icon
-    await Notification.updateMany(
-      { recipient: req.user._id, sender: userId, type: 'message', isRead: false },
-      { $set: { isRead: true } }
+    await Notification.deleteMany(
+      { recipient: req.user._id, sender: userId, type: 'message' }
     );
     // Emit notification count update so the bell badge clears in real-time
     if (io) {
