@@ -248,7 +248,7 @@ export const SettingsPage: React.FC = () => {
                 <div className="p-8 space-y-10">
                   <div className="flex flex-col sm:flex-row items-center gap-8 bg-gray-50/50 p-6 rounded-2xl border border-gray-100/50">
                     <div className="relative group">
-                      <Avatar src={user.profile?.avatarUrl} size="2xl" />
+                      <Avatar src={user.profile?.avatarUrl} alt={user.name || ''} size="2xl" />
                       <button 
                         onClick={() => fileInputRef.current?.click()}
                         className="absolute bottom-1 right-1 p-2.5 bg-primary-600 text-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all active:scale-95 translate-y-2 group-hover:translate-y-0"
