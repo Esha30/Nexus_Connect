@@ -19,6 +19,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import toast from 'react-hot-toast';
+import Swal from 'sweetalert2';
 import { 
  Radar, 
  RadarChart, 
@@ -209,24 +210,29 @@ export const EntrepreneurProfile: React.FC = () => {
  };
 
  const handleDeleteDocument = async (docId: string) => {
- toast((t) => (
- <div className="flex flex-col gap-3">
- <span className="font-semibold text-gray-900">Delete this document exactly?</span>
- <div className="flex justify-end gap-2 mt-2">
- <button className="px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-md transition" onClick={() => toast.dismiss(t.id)}>Cancel</button>
- <button className="px-3 py-1.5 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-md shadow-sm transition" onClick={async () => {
- toast.dismiss(t.id);
- try {
- await api.delete(`/documents/${docId}`);
- setDocuments((prev) => prev.filter((d) => d._id !== docId));
- toast.success('Document deleted');
- } catch (err) {
- toast.error('Failed to delete document');
- }
- }}>Confirm Delete</button>
- </div>
- </div>
- ), { duration: Infinity, style: { minWidth: '300px' } });
+  const result = await Swal.fire({
+    title: 'Delete Document?',
+    text: 'This will permanently remove the document from the vault. This action cannot be undone.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Delete',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#dc2626',
+    cancelButtonColor: '#64748b',
+    background: '#ffffff',
+    color: '#1e293b',
+    reverseButtons: true,
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    await api.delete(`/documents/${docId}`);
+    setDocuments((prev) => prev.filter((d) => d._id !== docId));
+    toast.success('Document deleted');
+  } catch (err) {
+    toast.error('Failed to delete document');
+  }
  };
 
  const handleSendRequest = async () => {
