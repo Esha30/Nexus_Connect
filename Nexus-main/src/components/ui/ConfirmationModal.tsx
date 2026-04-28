@@ -73,7 +73,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               {cancelLabel}
             </Button>
             <Button 
-              variant={variant === 'danger' ? 'danger' : 'primary'}
+              variant={variant === 'danger' ? 'error' : 'primary'}
               fullWidth 
               onClick={() => {
                 onConfirm();
