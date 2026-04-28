@@ -186,7 +186,9 @@ export const ChatPage: React.FC = () => {
     const profileRes = await api.get('/auth/profile/me');
     const blockedList = profileRes.data.blockedUsers || [];
     setIsBlocked(blockedList.some((id: any) => id.toString() === userId?.toString()));
-  } catch (_) {}
+  } catch (_) {
+    /* ignore error */
+  }
   };
  loadChatPartner();
  // eslint-disable-next-line react-hooks/exhaustive-deps

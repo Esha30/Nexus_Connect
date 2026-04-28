@@ -292,7 +292,7 @@ export const updateUserProfile = async (req, res) => {
       }
       
       if (req.body.profile) {
-        user.profile = { ...user.profile, ...req.body.profile };
+        Object.assign(user.profile, req.body.profile);
       }
 
       const updatedUser = await user.save();

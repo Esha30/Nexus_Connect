@@ -69,7 +69,9 @@ export const NotificationsPage: React.FC = () => {
          const hasChanges = prev.some((n, i) => n._id !== res.data[i]?._id || n.isRead !== res.data[i]?.isRead);
          return hasChanges ? res.data : prev;
        });
-     } catch (e) {}
+     } catch (e) {
+       /* ignore error */
+     }
    }, 2000);
    return () => clearInterval(intervalId);
  }, [user]);
