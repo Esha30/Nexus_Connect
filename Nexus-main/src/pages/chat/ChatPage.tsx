@@ -124,7 +124,7 @@ export const ChatPage: React.FC = () => {
  console.error("Error fetching messages:", err);
  }
  // NOTE: chatPartner is intentionally excluded from deps to prevent infinite re-fetch
- // eslint-disable-next-line react-hooks/exhaustive-deps
+  
  }, [userId]);
 
  useEffect(() => {
