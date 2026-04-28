@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Shield, Ticket, UserCheck, CheckCircle2, Users, LayoutGrid, 
+import {
+  Shield, Ticket, UserCheck, CheckCircle2, Users, LayoutGrid,
   BarChart3, Trash2, Mail, ExternalLink, AlertCircle, TrendingUp,
   Briefcase, Activity, Clock, Search, Settings, History, Ban,
   ToggleLeft, Save, Globe, Cpu, Database
 } from 'lucide-react';
-import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
 import { Card, CardBody } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -48,7 +48,7 @@ export const AdminDashboard: React.FC = () => {
     isOpen: false,
     title: '',
     message: '',
-    onConfirm: () => {}
+    onConfirm: () => { }
   });
 
   useEffect(() => {
@@ -181,8 +181,8 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
-  const filteredUsers = users.filter(u => 
-    u.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredUsers = users.filter(u =>
+    u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     u.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -229,11 +229,10 @@ export const AdminDashboard: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as AdminTab)}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all text-sm whitespace-nowrap ${
-                    activeTab === tab.id 
-                      ? 'bg-primary-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]' 
+                  className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all text-sm whitespace-nowrap ${activeTab === tab.id
+                      ? 'bg-primary-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]'
                       : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
+                    }`}
                 >
                   {tab.icon} {tab.label}
                 </button>
@@ -321,24 +320,24 @@ export const AdminDashboard: React.FC = () => {
                         <AreaChart data={stats?.analytics}>
                           <defs>
                             <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                              <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                              <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                              <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" vertical={false} />
                           <XAxis dataKey="date" stroke="#475569" fontSize={10} axisLine={false} tickLine={false} dy={10} />
                           <YAxis stroke="#475569" fontSize={10} axisLine={false} tickLine={false} />
-                          <Tooltip 
+                          <Tooltip
                             contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #ffffff10', borderRadius: '16px', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.5)' }}
                             itemStyle={{ color: '#fff', fontSize: '12px', fontWeight: 'bold' }}
                           />
-                          <Area 
-                            type="monotone" 
-                            dataKey="users" 
-                            stroke="#3b82f6" 
+                          <Area
+                            type="monotone"
+                            dataKey="users"
+                            stroke="#3b82f6"
                             strokeWidth={4}
-                            fillOpacity={1} 
-                            fill="url(#colorUsers)" 
+                            fillOpacity={1}
+                            fill="url(#colorUsers)"
                           />
                         </AreaChart>
                       </ResponsiveContainer>
@@ -390,9 +389,9 @@ export const AdminDashboard: React.FC = () => {
                 <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-[#161B2C] p-6 rounded-3xl border border-white/5">
                   <div className="relative w-full md:w-96">
                     <Search className="absolute left-4 top-3.5 text-gray-500" size={18} />
-                    <input 
-                      type="text" 
-                      placeholder="Search users by name or email..." 
+                    <input
+                      type="text"
+                      placeholder="Search users by name or email..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-white text-sm focus:ring-2 focus:ring-primary-500/50 outline-none transition-all"
@@ -449,9 +448,9 @@ export const AdminDashboard: React.FC = () => {
                             </td>
                             <td className="px-8 py-6 text-right">
                               <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Button 
-                                  size="sm" 
-                                  variant="ghost" 
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
                                   className="text-primary-400 hover:text-primary-300 p-2"
                                   onClick={() => {
                                     setSelectedUserId(u._id);
@@ -460,17 +459,17 @@ export const AdminDashboard: React.FC = () => {
                                 >
                                   <ExternalLink size={18} />
                                 </Button>
-                                <Button 
-                                  size="sm" 
-                                  variant="ghost" 
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
                                   className={`${u.status === 'suspended' ? 'text-emerald-400' : 'text-orange-400'} p-2`}
                                   onClick={() => updateUserStatus(u._id, { status: u.status === 'suspended' ? 'active' : 'suspended' })}
                                 >
                                   {u.status === 'suspended' ? <CheckCircle2 size={18} /> : <Ban size={18} />}
                                 </Button>
-                                <Button 
-                                  size="sm" 
-                                  variant="ghost" 
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
                                   className="text-red-400 hover:text-red-300 hover:bg-red-500/10 p-2"
                                   onClick={() => deleteUser(u._id)}
                                 >
@@ -557,7 +556,7 @@ export const AdminDashboard: React.FC = () => {
                         </div>
                         <div className="flex flex-col justify-end min-w-[200px]">
                           {ticket.status !== 'resolved' && (
-                            <Button 
+                            <Button
                               onClick={() => resolveTicket(ticket._id)}
                               className="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 rounded-2xl shadow-[0_0_30px_rgba(16,185,129,0.3)]"
                               fullWidth
@@ -583,7 +582,7 @@ export const AdminDashboard: React.FC = () => {
                     {reports.map((report) => (
                       <Card key={report._id} className="bg-[#161B2C] border-white/5 p-8 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-1.5 h-full bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.4)]" />
-                        
+
                         <div className="flex flex-col gap-6">
                           <div className="flex justify-between items-start">
                             <div className="flex items-center gap-3">
@@ -595,9 +594,9 @@ export const AdminDashboard: React.FC = () => {
                                 <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest">ID: {report._id.slice(-8)}</p>
                               </div>
                             </div>
-                            <Button 
-                              size="sm" 
-                              variant="ghost" 
+                            <Button
+                              size="sm"
+                              variant="ghost"
                               className="text-gray-500 hover:text-white"
                               onClick={() => deleteReport(report._id)}
                             >
@@ -638,16 +637,16 @@ export const AdminDashboard: React.FC = () => {
                               FILED: {new Date(report.createdAt).toLocaleString()}
                             </span>
                             <div className="flex gap-2">
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
+                              <Button
+                                size="sm"
+                                variant="outline"
                                 className="border-red-500/30 text-red-500 hover:bg-red-500/10 text-[10px] font-black uppercase"
                                 onClick={() => updateUserStatus(report.reportedId?._id, { status: 'suspended' })}
                               >
                                 Suspend Entity
                               </Button>
-                              <Button 
-                                size="sm" 
+                              <Button
+                                size="sm"
                                 className="bg-primary-600 text-[10px] font-black uppercase"
                                 onClick={() => {
                                   setSelectedUserId(report.reportedId?._id);
@@ -673,10 +672,10 @@ export const AdminDashboard: React.FC = () => {
                 ) : (
                   pendingInvestors.map((investor) => (
                     <Card key={investor._id} className="bg-[#161B2C] border-white/5 p-8 text-center border-t-4 border-t-primary-500">
-                      <Avatar 
-                        src={investor.profile?.avatarUrl} 
-                        alt={investor.name} 
-                        size="xl" 
+                      <Avatar
+                        src={investor.profile?.avatarUrl}
+                        alt={investor.name}
+                        size="xl"
                         className="mx-auto mb-6 border-4 border-white/5 p-1 ring-2 ring-primary-500/20"
                       />
                       <h3 className="text-xl font-bold text-white mb-1">{investor.name}</h3>
@@ -686,8 +685,8 @@ export const AdminDashboard: React.FC = () => {
                           {investor.profile?.company || 'Independent Investor'}
                         </p>
                       </div>
-                      
-                      <Button 
+
+                      <Button
                         onClick={() => approvePriority(investor._id)}
                         fullWidth
                         className="font-black bg-primary-600 hover:bg-primary-700 py-4 rounded-2xl shadow-[0_0_20px_rgba(37,99,235,0.3)]"
@@ -727,8 +726,8 @@ export const AdminDashboard: React.FC = () => {
                       <h3 className="text-xl font-bold text-white">Core Configuration</h3>
                       <p className="text-sm text-gray-500">Adjust high-level system parameters and feature availability.</p>
                     </div>
-                    <Button 
-                      onClick={() => saveSettings(systemSettings)} 
+                    <Button
+                      onClick={() => saveSettings(systemSettings)}
                       isLoading={isSaving}
                       leftIcon={<Save size={18} />}
                       className="bg-primary-600 hover:bg-primary-700 shadow-[0_0_20px_rgba(37,99,235,0.3)]"
@@ -751,7 +750,7 @@ export const AdminDashboard: React.FC = () => {
                               <p className="text-white font-bold">{item.label}</p>
                               <p className="text-xs text-gray-500">{item.desc}</p>
                             </div>
-                            <button 
+                            <button
                               onClick={() => setSystemSettings((prev: any) => ({ ...prev, [item.key]: !prev[item.key] }))}
                               className={`w-14 h-8 rounded-full transition-all relative ${systemSettings?.[item.key] ? (item.danger ? 'bg-red-600' : 'bg-primary-600') : 'bg-white/10'}`}
                             >
@@ -774,10 +773,10 @@ export const AdminDashboard: React.FC = () => {
                         ].map((feature) => (
                           <div key={feature.key} className="flex items-center justify-between p-5 bg-white/[0.02] rounded-2xl border border-white/5">
                             <span className="text-gray-300 font-medium">{feature.label}</span>
-                            <button 
-                              onClick={() => setSystemSettings((prev: any) => ({ 
-                                ...prev, 
-                                featureToggles: { ...prev.featureToggles, [feature.key]: !prev.featureToggles[feature.key] } 
+                            <button
+                              onClick={() => setSystemSettings((prev: any) => ({
+                                ...prev,
+                                featureToggles: { ...prev.featureToggles, [feature.key]: !prev.featureToggles[feature.key] }
                               }))}
                               className={`w-10 h-5 rounded-full transition-all relative ${systemSettings?.featureToggles?.[feature.key] ? 'bg-emerald-600' : 'bg-white/10'}`}
                             >
@@ -866,14 +865,14 @@ export const AdminDashboard: React.FC = () => {
       </div>
 
       {showUserModal && selectedUserId && (
-        <UserDetailsModal 
-          userId={selectedUserId} 
-          onClose={() => setShowUserModal(false)} 
+        <UserDetailsModal
+          userId={selectedUserId}
+          onClose={() => setShowUserModal(false)}
           onDelete={deleteUser}
         />
       )}
 
-      <ConfirmationModal 
+      <ConfirmationModal
         isOpen={confirmConfig.isOpen}
         title={confirmConfig.title}
         message={confirmConfig.message}
