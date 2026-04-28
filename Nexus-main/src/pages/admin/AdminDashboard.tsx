@@ -133,7 +133,7 @@ export const AdminDashboard: React.FC = () => {
       variant: 'danger',
       onConfirm: async () => {
         try {
-          await api.delete(`/posts/${id}`);
+          await api.delete(`/admin/posts/${id}`);
           setPosts(prev => prev.filter(p => p._id !== id));
           toast.success('Broadcast removed');
         } catch (err) {
