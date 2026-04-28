@@ -248,6 +248,45 @@ export const DocumentationPage: React.FC = () => {
           </div>
         </div>
       )
+    },
+    {
+      id: 'feed',
+      title: 'Global Feed & Broadcasts',
+      icon: <Users size={18} />,
+      content: (
+        <div className="space-y-6">
+          <p className="text-gray-600 leading-relaxed font-medium">
+            Stay updated with the latest ecosystem intelligence using the Global Feed.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <h4 className="font-bold text-gray-900 mb-2">Create Broadcasts</h4>
+              <p className="text-sm text-gray-500 italic">Share your startup's milestones, funding needs, or investment thesis to the entire network to attract inbound requests.</p>
+            </div>
+            <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <h4 className="font-bold text-gray-900 mb-2">Engage & Network</h4>
+              <p className="text-sm text-gray-500 italic">Like and comment on other users' broadcasts to build operational rapport before sending a formal collaboration request.</p>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'notifications',
+      title: 'Real-time Alerts',
+      icon: <Zap size={18} />,
+      content: (
+        <div className="space-y-6">
+          <p className="text-gray-600 leading-relaxed font-medium">
+            Nexus uses real-time, low-latency syncing for all ecosystem alerts and notifications.
+          </p>
+          <ul className="list-disc list-inside space-y-2 text-sm text-gray-600 font-medium pl-2">
+            <li>Get instant alerts for incoming collaboration requests, messages, and meetings.</li>
+            <li>In-app badges auto-refresh every 2 seconds to ensure no data loss during network shifts.</li>
+            <li>Clicking a notification immediately routes you to the relevant operational console.</li>
+          </ul>
+        </div>
+      )
     }
   ];
 
