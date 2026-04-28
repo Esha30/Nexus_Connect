@@ -115,7 +115,11 @@ export const ChatPage: React.FC = () => {
  if (!userId || userId === 'undefined') return;
  try {
  const res = await api.get(`/messages/${userId}`);
- setMessages(res.data);
+ setMessages(prev => {
+   if (prev.length !== res.data.length) return res.data;
+   const hasChanges = prev.some((msg, i) => msg.id !== res.data[i]?.id || msg.isRead !== res.data[i]?.isRead || msg.content !== res.data[i]?.content);
+   return hasChanges ? res.data : prev;
+ });
  } catch (err) {
  console.error("Error fetching messages:", err);
  }
@@ -127,7 +131,19 @@ export const ChatPage: React.FC = () => {
  if (currentUser) {
  fetchConversations();
  }
- }, [currentUser, fetchConversations]);
+ 
+ // Polling fallback for Vercel
+ const intervalId = setInterval(() => {
+   if (currentUser) {
+     fetchConversations();
+     if (userId && userId !== 'undefined') {
+       fetchMessages();
+     }
+   }
+ }, 2000);
+ 
+ return () => clearInterval(intervalId);
+ }, [currentUser, userId, fetchConversations, fetchMessages]);
 
  // Global listener for any new message to update the chat list
  useEffect(() => {

@@ -227,7 +227,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const interval = setInterval(() => {
       fetchMessageCount();
       fetchNotificationCount();
-    }, 60000);
+    }, 2000);
 
     return () => {
       clearInterval(interval);

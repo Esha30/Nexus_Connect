@@ -45,18 +45,34 @@ export const NotificationsPage: React.FC = () => {
   init();
   }, [user]);
 
- // Real-time notification updates
+ // Real-time notification updates and fallback polling
  useEffect(() => {
- if (socket) {
- const handleNewNotification = (notification: Notification) => {
- setNotifications(prev => [notification, ...prev]);
- };
- socket.on('new-notification', handleNewNotification);
- return () => {
- socket.off('new-notification', handleNewNotification);
- };
- }
+   if (socket) {
+     const handleNewNotification = (notification: Notification) => {
+       setNotifications(prev => [notification, ...prev]);
+     };
+     socket.on('new-notification', handleNewNotification);
+     return () => {
+       socket.off('new-notification', handleNewNotification);
+     };
+   }
  }, [socket]);
+
+ useEffect(() => {
+   if (!user) return;
+   const intervalId = setInterval(async () => {
+     try {
+       const res = await api.get('/notifications/');
+       refreshNotificationCount();
+       setNotifications(prev => {
+         if (prev.length !== res.data.length) return res.data;
+         const hasChanges = prev.some((n, i) => n._id !== res.data[i]?._id || n.isRead !== res.data[i]?.isRead);
+         return hasChanges ? res.data : prev;
+       });
+     } catch (e) {}
+   }, 2000);
+   return () => clearInterval(intervalId);
+ }, [user]);
 
  const markAllAsRead = async () => {
  if (!notifications.some(n => !n.isRead)) return;
