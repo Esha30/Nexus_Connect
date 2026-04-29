@@ -136,6 +136,59 @@ export const FeedPage: React.FC = () => {
 
         {/* Right Column: Feed List (3/4) */}
         <div className="lg:col-span-3 relative">
+          {/* AI Market Pulse Banner */}
+          <div className="mb-8 relative overflow-hidden bg-gradient-to-br from-gray-900 to-indigo-950 rounded-[2.5rem] p-8 border border-white/5 shadow-2xl">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary-600/10 rounded-full blur-3xl -mr-32 -mt-32" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-600/5 rounded-full blur-3xl -ml-24 -mb-24" />
+            
+            <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
+              <div className="flex flex-col items-center justify-center p-6 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-xl min-w-[140px]">
+                <div className="relative w-20 h-20 mb-3">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 96 96">
+                    <circle cx="48" cy="48" r="42" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-white/5" />
+                    <circle cx="48" cy="48" r="42" stroke="currentColor" strokeWidth="8" fill="transparent"
+                      strokeDasharray={263.8}
+                      strokeDashoffset={263.8 * (1 - 0.92)}
+                      className="text-emerald-400"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-2xl font-black text-white">92</span>
+                    <span className="text-[8px] font-black text-emerald-400 uppercase tracking-tighter">Pulse</span>
+                  </div>
+                </div>
+                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Ecosystem</p>
+              </div>
+
+              <div className="flex-1 text-center md:text-left">
+                <div className="flex items-center justify-center md:justify-start gap-2 mb-3">
+                  <Sparkles className="text-primary-400" size={16} />
+                  <span className="text-[10px] font-black text-primary-400 uppercase tracking-[0.2em]">Nexus Neural Pulse</span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-white mb-4 tracking-tight">
+                  Ecosystem sentiment is <span className="text-emerald-400">Extraordinarily Positive.</span>
+                </h2>
+                <p className="text-gray-400 text-sm font-medium leading-relaxed italic border-l-2 border-primary-500/30 pl-4">
+                  "Nexus AI detects a 15% surge in Web3 mandate frequency. Strategic alignment between seed-stage fintech and enterprise investors is at a 12-month high."
+                </p>
+              </div>
+
+              <div className="hidden xl:flex flex-col gap-3">
+                {[
+                  { label: 'Momentum', value: '+4.2%', color: 'text-emerald-400' },
+                  { label: 'Volatility', value: 'Low', color: 'text-blue-400' },
+                  { label: 'Synergy', value: 'Optimum', color: 'text-primary-400' }
+                ].map((m, i) => (
+                  <div key={i} className="px-4 py-2 bg-white/5 rounded-xl border border-white/5">
+                    <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-0.5">{m.label}</p>
+                    <p className={`text-xs font-black ${m.color}`}>{m.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
           {newPostsBuffer.length > 0 && (
             <div className="sticky top-24 z-30 flex justify-center mb-6 animate-in slide-in-from-top-4 duration-300">
               <button 
