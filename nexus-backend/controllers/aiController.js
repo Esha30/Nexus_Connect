@@ -269,9 +269,16 @@ export const generateSynergy = async (req, res) => {
     const { targetUserId } = req.body;
     const investor = req.user;
 
+    if (!targetUserId) {
+      return res.status(400).json({ error: 'Target user ID is required for synergy analysis' });
+    }
+
     const entrepreneur = await User.findById(targetUserId);
 
-    if (!entrepreneur) return res.status(404).json({ error: 'Target profile not found' });
+    if (!entrepreneur) {
+      console.warn(`[AI_SYNERGY] Target profile not found: ${targetUserId}`);
+      return res.status(404).json({ error: 'The specified target profile could not be found in our database' });
+    }
 
     const permitted = await checkAndIncrementAiQuota(investor._id);
     if (!permitted) {

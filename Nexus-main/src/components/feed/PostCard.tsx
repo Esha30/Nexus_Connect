@@ -71,14 +71,22 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
     setShowSynergy(true);
     if (synergyData && !isLoadingSynergy) return;
 
+    const targetId = post.author?._id || post.author?.id || (typeof post.author === 'string' ? post.author : null);
+    
+    if (!targetId) {
+      toast.error('Unable to identify profile for synergy analysis');
+      return;
+    }
+
     setIsLoadingSynergy(true);
     try {
-      const res = await api.post('/ai/synergy', { targetUserId: post.author?._id });
+      const res = await api.post('/ai/synergy', { targetUserId: targetId });
       setSynergyData(res.data);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Synergy Error:', err);
+      const errorMsg = err.response?.data?.error || 'Nexus Intelligence is busy. Please try again.';
+      toast.error(errorMsg);
       setSynergyData(null);
-      toast.error('Nexus Intelligence is busy. Please try again.');
     } finally {
       setIsLoadingSynergy(false);
     }
