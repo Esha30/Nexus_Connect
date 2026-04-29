@@ -266,23 +266,25 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
       </div>
       
       {/* AI Synergy Snippet */}
-      <div className="px-8 py-4 bg-primary-50/30 border-t border-primary-50/50 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="p-1 bg-primary-100/50 rounded-lg text-primary-600">
-            <Sparkles size={14} />
+      {post.author && (
+        <div className="px-8 py-4 bg-primary-50/30 border-t border-primary-50/50 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="p-1 bg-primary-100/50 rounded-lg text-primary-600">
+              <Sparkles size={14} />
+            </div>
+            <div>
+              <p className="text-[10px] font-extrabold text-primary-800 uppercase tracking-widest">AI Synergy Insight</p>
+              <p className="text-[9px] font-bold text-primary-600/70 uppercase">Strategic Alignment: High</p>
+            </div>
           </div>
-          <div>
-            <p className="text-[10px] font-extrabold text-primary-800 uppercase tracking-widest">AI Synergy Insight</p>
-            <p className="text-[9px] font-bold text-primary-600/70 uppercase">Strategic Alignment: High</p>
-          </div>
+          <button 
+            onClick={handleViewConnection}
+            className="text-[10px] font-extrabold text-primary-600 hover:underline flex items-center gap-1 group"
+          >
+            View Connection <ChevronRight size={10} className="transition-transform group-hover:translate-x-0.5" />
+          </button>
         </div>
-        <button 
-          onClick={handleViewConnection}
-          className="text-[10px] font-extrabold text-primary-600 hover:underline flex items-center gap-1 group"
-        >
-          View Connection <ChevronRight size={10} className="transition-transform group-hover:translate-x-0.5" />
-        </button>
-      </div>
+      )}
 
       {showSynergy && (
         <SynergyModal 

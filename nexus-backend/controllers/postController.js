@@ -10,7 +10,11 @@ export const getPosts = async (req, res) => {
       .populate('author', 'name profile.avatarUrl role')
       .populate('comments.user', 'name profile.avatarUrl')
       .sort({ createdAt: -1 });
-    res.status(200).json(posts);
+    
+    // Filter out posts where the author might have been deleted
+    const filteredPosts = posts.filter(post => post.author !== null);
+    
+    res.status(200).json(filteredPosts);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching posts', error: error.message });
   }
