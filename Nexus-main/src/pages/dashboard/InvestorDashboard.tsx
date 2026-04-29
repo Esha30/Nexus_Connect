@@ -55,6 +55,8 @@ export const InvestorDashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isApplying, setIsApplying] = useState(false);
   const [priorityStatus, setPriorityStatus] = useState<string>(user?.profile?.priorityAccess || 'none');
+  const [sentiment, setSentiment] = useState<{sentiment: string, insight: string, score: number} | null>(null);
+  const [isFetchingSentiment, setIsFetchingSentiment] = useState(false);
   
   const debouncedSearch = useDebounce(searchQuery, 400);
 
@@ -104,9 +106,22 @@ export const InvestorDashboard: React.FC = () => {
     }
   }, [debouncedSearch, activeIndustry]);
 
+  const fetchSentiment = useCallback(async () => {
+    setIsFetchingSentiment(true);
+    try {
+      const res = await api.get('/ai/sentiment');
+      setSentiment(res.data);
+    } catch (err) {
+      console.error('Failed to fetch sentiment:', err);
+    } finally {
+      setIsFetchingSentiment(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (user) {
       fetchDiscoveryData();
+      fetchSentiment();
       setPriorityStatus(user.profile?.priorityAccess || 'none');
 
       // Global refresh listener
@@ -248,6 +263,55 @@ export const InvestorDashboard: React.FC = () => {
               <p className="text-sm text-gray-500">No startups found matching your criteria</p>
             </div>
           )}
+        </CardBody>
+      </Card>
+
+      {/* AI Signal Intelligence */}
+      <Card className="bg-gradient-to-br from-indigo-600 to-purple-700 text-white border-none overflow-hidden relative group">
+        <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+          <TrendingUp size={120} />
+        </div>
+        <CardBody className="p-8 relative z-10">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-white/20 rounded-lg backdrop-blur-md">
+              <BarChart3 size={20} />
+            </div>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-100">AI Signal Intelligence</span>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+            <div className="lg:col-span-2">
+              <h3 className="text-2xl font-black mb-3">Market Pulse Protocol</h3>
+              {isFetchingSentiment ? (
+                <div className="flex items-center gap-3 text-indigo-200">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white" />
+                  <span className="text-sm font-medium">Synthesizing platform updates...</span>
+                </div>
+              ) : sentiment ? (
+                <div className="space-y-4">
+                  <p className="text-indigo-50 font-medium leading-relaxed italic text-lg">
+                    "{sentiment.insight}"
+                  </p>
+                  <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-black uppercase text-indigo-200">Sentiment:</span>
+                      <span className="text-sm font-bold text-white">{sentiment.sentiment}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-black uppercase text-indigo-200">Momentum:</span>
+                      <span className="text-sm font-bold text-white">{sentiment.score}%</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-indigo-200 text-sm">Waiting for new strategic signals from the global hub.</p>
+              )}
+            </div>
+            <div className="flex justify-end">
+              <Button className="bg-white text-indigo-700 hover:bg-indigo-50 font-black rounded-xl px-8 py-4 shadow-xl shadow-indigo-900/40">
+                View Reports
+              </Button>
+            </div>
+          </div>
         </CardBody>
       </Card>
 
