@@ -21,6 +21,7 @@ import {
 } from 'recharts';
 import { ActivityFeed } from '../../components/dashboard/ActivityFeed';
 import { PlanBadge } from '../../components/ui/PlanBadge';
+import { AiAdvisor } from '../../components/dashboard/AiAdvisor';
 
 const COLORS = ['#4F46E5', '#8B5CF6', '#EC4899', '#10B981', '#F59E0B'];
 
@@ -373,6 +374,7 @@ export const InvestorDashboard: React.FC = () => {
           </CardBody>
         </Card>
       )}
+      <AiAdvisor />
     </div>
   );
 };

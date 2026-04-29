@@ -11,6 +11,7 @@ import { CollaborationRequest, Investor } from '../../types';
 import api from '../../api/api';
 import { ActivityFeed } from '../../components/dashboard/ActivityFeed';
 import { PlanBadge } from '../../components/ui/PlanBadge';
+import { AiAdvisor } from '../../components/dashboard/AiAdvisor';
 
 export const EntrepreneurDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -246,6 +247,7 @@ export const EntrepreneurDashboard: React.FC = () => {
           </Card>
         </div>
       </div>
+      <AiAdvisor />
     </div>
   );
 };
