@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
+import path from 'path';
+
 export const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGODB_URI, {
@@ -13,7 +15,8 @@ export const connectDB = async () => {
     console.error(`MongoDB Connection Error: ${error.message}`);
     console.log("Falling back to local in-memory MongoDB for testing purposes...");
     try {
-      const dbPath = 'd:/Nexus/nexus-backend/.mongo-data';
+      const __dirname = path.resolve();
+      const dbPath = path.join(__dirname, '.mongo-data');
       // Create data directory if it doesn't exist
       const fs = await import('fs');
       if (!fs.existsSync(dbPath)) fs.mkdirSync(dbPath, { recursive: true });
@@ -21,7 +24,7 @@ export const connectDB = async () => {
       const mongoServer = await MongoMemoryServer.create({
         binary: {
           version: '4.4.29',
-          downloadDir: 'd:/Nexus/nexus-backend/.mongo-bin'
+          downloadDir: path.join(__dirname, '.mongo-bin')
         },
         instance: {
           dbPath: dbPath,

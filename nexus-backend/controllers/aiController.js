@@ -132,7 +132,7 @@ Be highly concise, professional, insightful and action-oriented. Do not write gi
     });
 
     // Strategic Intelligence Engine - Tiered Response Architecture
-    let responseText = "";
+    let responseText;
     
     if (isRegionalError) {
       const { startupName, industry, problemStatement, solution } = req.user.profile || {};
